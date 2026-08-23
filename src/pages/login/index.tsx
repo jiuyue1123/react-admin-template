@@ -6,7 +6,7 @@ import {
   SunOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTheme } from "@/theme";
 import { fetchLogin } from "@/service/api/auth";
 import { useAuthStore } from "@/store/auth";
@@ -22,6 +22,8 @@ interface LoginParams {
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get("redirect");
   const { message } = App.useApp();
   const { theme, toggleTheme } = useTheme();
   const login = useAuthStore((state) => state.login);
@@ -40,8 +42,8 @@ export default function LoginPage() {
       // 用户信息拉取失败已由请求层提示，不阻塞进入系统
     });
     message.success("登录成功");
-    navigate("/", { replace: true });
-  }, [data, login, getUserInfo, message, navigate]);
+    navigate(redirect || "/", { replace: true });
+  }, [data, login, getUserInfo, message, navigate, redirect]);
 
   // 登录失败：统一错误提示
   useEffect(() => {

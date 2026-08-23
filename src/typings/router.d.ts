@@ -38,6 +38,8 @@ export interface RouteConfig {
   order?: number
   /** 是否在菜单中隐藏，默认 false */
   hideInMenu?: boolean
+  /** 常量路由：无需登录即可访问（如登录页、404），默认 false */
+  constant?: boolean
 }
 
 /** 路由配置数组 */

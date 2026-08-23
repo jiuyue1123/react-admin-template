@@ -112,7 +112,7 @@ interface ThemeTokens {
 | 背景 | bgLayout | `#f5f5f5` | `#000` | `--tp-bg-layout` | `bg-layout` |
 | 背景 | bgContainer | `#fff` | `#141414` | `--tp-bg-container` | `bg-container` |
 | 背景 | bgElevated | `#fff` | `#1f1f1f` | `--tp-bg-elevated` | `bg-elevated` |
-| 背景 | bgSpotlight | `#000` | `#fff` | `--tp-bg-spotlight` | `bg-spotlight` |
+| 背景 | bgSpotlight | `#000` | `#424242` | `--tp-bg-spotlight` | `bg-spotlight` |
 | 边框 | border | `#d9d9d9` | `#424242` | `--tp-border` | `border-border` |
 | 边框 | borderSecondary | `#f0f0f0` | `#303030` | `--tp-border-secondary` | `border-border-secondary` |
 | 边框 | split | `rgba(5,5,5,.06)` | `rgba(253,253,253,.12)` | `--tp-split` | `border-split` |

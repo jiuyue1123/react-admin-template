@@ -69,8 +69,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           token: toAntdTokens(tokens),
           components: {
             Layout: {
-              colorBgHeader: tokens.headerBg,
-              colorBgBody: tokens.bgLayout,
+              headerBg: tokens.headerBg,
+              bodyBg: tokens.bgLayout,
               siderBg: tokens.siderBg,
             },
             Menu: {

@@ -22,6 +22,7 @@ const routes: RouteConfigs = [
     title: '登录',
     i18nKey: 'menu.login',
     hideInMenu: true,
+    constant: true,
   },
   {
     path: '/dashboard',
@@ -67,11 +68,12 @@ const routes: RouteConfigs = [
     hideInMenu: true,
   },
   {
-    path: '/404',
+    path: '/*',
     layout: '@/layouts/blank',
     component: 'exception/404',
     title: '404',
     hideInMenu: true,
+    constant: true,
   },
 ]
 

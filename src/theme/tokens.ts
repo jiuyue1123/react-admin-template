@@ -101,7 +101,8 @@ export const darkTokens: ThemeTokens = {
   bgLayout: '#000000',
   bgContainer: '#141414',
   bgElevated: '#1f1f1f',
-  bgSpotlight: '#ffffff',
+  // 气泡/提示背景：两种主题下都保持深底白字（对齐 antd 暗色算法 getSolidColor('#000', 26)）
+  bgSpotlight: '#424242',
   border: '#424242',
   borderSecondary: '#303030',
   split: 'rgba(253, 253, 253, 0.12)',

@@ -1,33 +1,29 @@
-import { createElement } from 'react'
-import type { ComponentType } from 'react'
+import { createElement, lazy } from 'react'
+import type { ComponentType, LazyExoticComponent } from 'react'
 import { Navigate } from 'react-router-dom'
 import type { RouteObject } from 'react-router-dom'
 import type { RouteConfig } from '@/typings/router'
 
-// 构建时预加载所有页面与布局组件（Vite import.meta.glob 静态分析）
-const pageModules = import.meta.glob<{ default: ComponentType }>('../pages/**/index.tsx', {
-  eager: true,
-})
-const layoutModules = import.meta.glob<{ default: ComponentType }>('../layouts/**/index.tsx', {
-  eager: true,
-})
+// 页面与布局组件：按路由懒加载（每个页面一个独立 chunk）
+const pageModules = import.meta.glob<{ default: ComponentType }>('../pages/**/index.tsx')
+const layoutModules = import.meta.glob<{ default: ComponentType }>('../layouts/**/index.tsx')
 
 /**
- * 将路由配置中的组件路径字符串解析为真实组件
+ * 将路由配置中的组件路径字符串解析为懒加载组件
  *
  * - `@/` 开头：相对 src 根解析，如 `@/layouts/base` → src/layouts/base/index.tsx
  * - 其他字符串：相对页面目录解析，如 `system/user` → src/pages/system/user/index.tsx
  */
-export function loadComponent(component: string): ComponentType {
+export function loadComponent(component: string): LazyExoticComponent<ComponentType> {
   const key = component.startsWith('@/')
     ? `../${component.slice(2)}/index.tsx`
     : `../pages/${component}/index.tsx`
 
-  const mod = key.startsWith('../layouts/') ? layoutModules[key] : pageModules[key]
-  if (!mod) {
+  const loader = key.startsWith('../layouts/') ? layoutModules[key] : pageModules[key]
+  if (!loader) {
     throw new Error(`[router] 未找到组件：${component}（期望路径 ${key}）`)
   }
-  return mod.default
+  return lazy(loader)
 }
 
 /**

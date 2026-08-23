@@ -2,7 +2,6 @@ import { createAlova } from 'alova'
 import type { Alova, AlovaMethodCreateConfig, RequestBody } from 'alova'
 import adapterFetch from 'alova/fetch'
 import { Modal, message } from 'antd'
-import { router } from '@/router'
 import { useAuthStore } from '@/store/auth'
 import reactHook from 'alova/react'
 
@@ -30,10 +29,9 @@ function isSuccessCode(code: number | string): boolean {
     return String(code) === SUCCESS_CODE
 }
 
-/** 登出：清除登录态并跳转登录页 */
+/** 登出：清除登录态（token/userInfo 持久化一并清除）并跳转登录页 */
 function handleLogout() {
-    // TODO: 清除本地 token / 用户信息（认证系统接入后实现）
-    router.navigate('/login', { replace: true })
+    useAuthStore.getState().logout()
 }
 
 /** 弹窗登出 */
@@ -43,16 +41,33 @@ function handleModalLogout() {
         content: '请重新登录后继续操作',
         okText: '重新登录',
         cancelButtonProps: { style: { display: 'none' } },
-        onOk: () => router.navigate('/login', { replace: true }),
+        onOk: () => useAuthStore.getState().logout(),
     })
 }
 
+/** 已做过刷新重试的方法实例，避免令牌过期后无限重发 */
+const retriedMethods = new WeakSet<object>()
+
+/** 进行中的刷新请求（并发去重） */
+let refreshing: Promise<void> | null = null
+
 /**
- * 刷新令牌
- * TODO: 调用刷新令牌接口并更新本地 token 存储（认证系统接入后实现），随后 onSuccess 会重发请求
+ * 刷新访问令牌：用当前 refreshToken 换取新令牌并更新 store
+ * 多个请求同时过期时共享同一次刷新
  */
-async function refreshToken(): Promise<void> {
-    throw new Error('登录已过期，请重新登录')
+function refreshAccessToken(): Promise<void> {
+    if (!refreshing) {
+        refreshing = (async () => {
+            const { token, refreshToken } = useAuthStore.getState()
+            if (!token?.refreshToken) {
+                throw new Error('缺少刷新令牌，请重新登录')
+            }
+            await refreshToken(token)
+        })().finally(() => {
+            refreshing = null
+        })
+    }
+    return refreshing
 }
 
 const alovaInstance = createAlova({
@@ -87,7 +102,12 @@ const alovaInstance = createAlova({
                 } else if (MODAL_LOGOUT_CODES.includes(code)) {
                     handleModalLogout()
                 } else if (EXPIRED_TOKEN_CODES.includes(code)) {
-                    await refreshToken()
+                    // 令牌过期：刷新后重发（同一方法只重试一次，避免死循环）
+                    if (retriedMethods.has(method)) {
+                        throw new Error('登录已过期，请重新登录')
+                    }
+                    retriedMethods.add(method)
+                    await refreshAccessToken()
                     return method.send()
                 }
                 throw new Error(json.msg || `请求失败（code: ${json.code}）`)

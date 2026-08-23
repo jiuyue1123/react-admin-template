@@ -1,1 +1,36 @@
 @import "tailwindcss";
+
+/* 深色模式由 <html data-theme="dark"> 属性驱动 */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+/* 语义化设计令牌 → Tailwind 工具类
+   值为 var(--tp-*)，由 ThemeProvider 运行时注入，主题切换时自动翻转 */
+@theme inline {
+  --color-primary: var(--tp-primary);
+  --color-primary-hover: var(--tp-primary-hover);
+  --color-primary-active: var(--tp-primary-active);
+  --color-primary-bg: var(--tp-primary-bg);
+  --color-primary-bg-hover: var(--tp-primary-bg-hover);
+  --color-primary-border: var(--tp-primary-border);
+  --color-success: var(--tp-success);
+  --color-warning: var(--tp-warning);
+  --color-error: var(--tp-error);
+  --color-info: var(--tp-info);
+  --color-text: var(--tp-text);
+  --color-text-secondary: var(--tp-text-secondary);
+  --color-text-tertiary: var(--tp-text-tertiary);
+  --color-text-quaternary: var(--tp-text-quaternary);
+  --color-bg-layout: var(--tp-bg-layout);
+  --color-bg-container: var(--tp-bg-container);
+  --color-bg-elevated: var(--tp-bg-elevated);
+  --color-bg-spotlight: var(--tp-bg-spotlight);
+  --color-border: var(--tp-border);
+  --color-border-secondary: var(--tp-border-secondary);
+  --color-split: var(--tp-split);
+  --color-fill: var(--tp-fill);
+  --color-fill-secondary: var(--tp-fill-secondary);
+  --color-fill-tertiary: var(--tp-fill-tertiary);
+  --color-fill-quaternary: var(--tp-fill-quaternary);
+  --color-header: var(--tp-header-bg);
+  --color-sider: var(--tp-sider-bg);
+}

@@ -6,11 +6,14 @@ import {
   DashboardOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  MoonOutlined,
   SettingOutlined,
+  SunOutlined,
   TeamOutlined,
   UserSwitchOutlined,
 } from '@ant-design/icons'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { useTheme } from '@/theme'
 import routes from '@/router/routes'
 import type { RouteConfig } from '@/typings/router'
 
@@ -52,6 +55,7 @@ function getOpenKeys(pathname: string): string[] {
 export default function BaseLayout() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
+  const { theme, toggleTheme } = useTheme()
   const menuItems = useMemo(() => buildMenuItems(routes), [])
   const [collapsed, setCollapsed] = useState(false)
 
@@ -69,7 +73,7 @@ export default function BaseLayout() {
         collapsed={collapsed}
         onCollapse={setCollapsed}
       >
-        <div className="flex h-16 items-center justify-center overflow-hidden border-b border-gray-200 font-semibold text-gray-800">
+        <div className="flex h-16 items-center justify-center overflow-hidden border-b border-border-secondary font-semibold text-text">
           {collapsed ? 'RA' : 'React Admin'}
         </div>
         <Menu
@@ -84,17 +88,21 @@ export default function BaseLayout() {
       </Sider>
       <Layout>
         <Header
-          style={{ background: '#fff', paddingInline: 16 }}
-          className="flex items-center justify-between border-b border-gray-200"
+          style={{ paddingInline: 16 }}
+          className="flex items-center justify-between border-b border-border-secondary"
         >
-          <div className="flex items-center gap-3">
-            <Button
-              type="text"
-              aria-label={collapsed ? '展开侧边栏' : '折叠侧边栏'}
-              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              onClick={() => setCollapsed(prev => !prev)}
-            />
-          </div>
+          <Button
+            type="text"
+            aria-label={collapsed ? '展开侧边栏' : '折叠侧边栏'}
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setCollapsed(prev => !prev)}
+          />
+          <Button
+            type="text"
+            aria-label={theme === 'dark' ? '切换到浅色模式' : '切换到深色模式'}
+            icon={theme === 'dark' ? <SunOutlined /> : <MoonOutlined />}
+            onClick={toggleTheme}
+          />
         </Header>
         <Content className="m-4">
           <Outlet />

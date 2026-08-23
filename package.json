@@ -1,11 +1,13 @@
 {
   "name": "react-admin-template",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --mode test",
+    "dev:host": "vite --mode test --host",
     "build": "tsc -b && vite build",
+    "typecheck": "tsc -b --noEmit",
     "lint": "oxlint",
     "preview": "vite preview"
   },

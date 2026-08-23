@@ -1,0 +1,127 @@
+import { createAlova } from 'alova'
+import type { Alova, AlovaMethodCreateConfig, RequestBody } from 'alova'
+import adapterFetch from 'alova/fetch'
+import { Modal, message } from 'antd'
+import { router } from '@/router'
+
+// ---- 环境变量：业务 code ----
+
+/** 成功码 */
+const SUCCESS_CODE = import.meta.env.VITE_SERVICE_SUCCESS_CODE
+/** 登出码：登出并跳转登录页 */
+const LOGOUT_CODES = splitCodes(import.meta.env.VITE_SERVICE_LOGOUT_CODES)
+/** 弹窗登出码：弹窗提示后登出 */
+const MODAL_LOGOUT_CODES = splitCodes(import.meta.env.VITE_SERVICE_MODAL_LOGOUT_CODES)
+/** 令牌过期码：刷新令牌后重发请求 */
+const EXPIRED_TOKEN_CODES = splitCodes(import.meta.env.VITE_SERVICE_EXPIRED_TOKEN_CODES)
+
+/** 逗号分隔的 code 列表 → 字符串数组，如 '8888,8889' → ['8888', '8889'] */
+function splitCodes(codes?: string): string[] {
+    return (codes ?? '')
+        .split(',')
+        .map(item => item.trim())
+        .filter(Boolean)
+}
+
+/** 判断是否为成功码（兼容数字/字符串两种后端返回） */
+function isSuccessCode(code: number | string): boolean {
+    return String(code) === SUCCESS_CODE
+}
+
+/** 登出：清除登录态并跳转登录页 */
+function handleLogout() {
+    // TODO: 清除本地 token / 用户信息（认证系统接入后实现）
+    router.navigate('/login', { replace: true })
+}
+
+/** 弹窗登出 */
+function handleModalLogout() {
+    Modal.confirm({
+        title: '登录已过期',
+        content: '请重新登录后继续操作',
+        okText: '重新登录',
+        cancelButtonProps: { style: { display: 'none' } },
+        onOk: () => router.navigate('/login', { replace: true }),
+    })
+}
+
+/**
+ * 刷新令牌
+ * TODO: 调用刷新令牌接口并更新本地 token 存储（认证系统接入后实现），随后 onSuccess 会重发请求
+ */
+async function refreshToken(): Promise<void> {
+    throw new Error('登录已过期，请重新登录')
+}
+
+const alovaInstance = createAlova({
+    requestAdapter: adapterFetch(),
+    beforeRequest: _metmod => { },
+
+    // 统一响应拦截器
+    responded: {
+        /** 请求成功拦截器：处理 HTTP 状态、业务 code，成功后解包返回业务数据 */
+        onSuccess: async (response, method) => {
+            if (response.status >= 400) {
+                throw new Error(response.statusText)
+            }
+
+            const json = (await response.json()) as App.Service.Response
+            if (!isSuccessCode(json.code)) {
+                const code = String(json.code)
+                if (LOGOUT_CODES.includes(code)) {
+                    handleLogout()
+                } else if (MODAL_LOGOUT_CODES.includes(code)) {
+                    handleModalLogout()
+                } else if (EXPIRED_TOKEN_CODES.includes(code)) {
+                    await refreshToken()
+                    return method.send()
+                }
+                throw new Error(json.msg || `请求失败（code: ${json.code}）`)
+            }
+
+            // 成功：返回业务数据（解包）
+            return json.data
+        },
+
+        /** 请求失败拦截器：统一错误提示 */
+        onError: err => {
+            message.error(err instanceof Error ? err.message : '网络请求失败')
+        },
+    },
+})
+
+/** 从 alova 实例提取泛型参数（含请求/响应/请求头类型） */
+type AG = typeof alovaInstance extends Alova<infer G> ? G : never
+
+/** 请求配置，Responded 类型与业务数据类型保持一致 */
+type ServiceConfig<T> = AlovaMethodCreateConfig<AG, T, unknown>
+
+/**
+ * 统一请求封装
+ *
+ * 响应拦截器已统一处理：HTTP 状态、业务 code、登出/过期等系统码；
+ * 成功后返回解包后的业务数据，`request.Get<T>` 的类型解析为 `T`。
+ *
+ * @example
+ * const { data } = useRequest(request.Get<Todo>('/todos'))
+ * // data 类型为 Todo
+ */
+export const request = {
+    Get<T>(url: string, config?: ServiceConfig<T>) {
+        return alovaInstance.Get<T>(url, config)
+    },
+    Post<T>(url: string, data?: RequestBody, config?: ServiceConfig<T>) {
+        return alovaInstance.Post<T>(url, data, config)
+    },
+    Put<T>(url: string, data?: RequestBody, config?: ServiceConfig<T>) {
+        return alovaInstance.Put<T>(url, data, config)
+    },
+    Patch<T>(url: string, data?: RequestBody, config?: ServiceConfig<T>) {
+        return alovaInstance.Patch<T>(url, data, config)
+    },
+    Delete<T>(url: string, data?: RequestBody, config?: ServiceConfig<T>) {
+        return alovaInstance.Delete<T>(url, data, config)
+    },
+}
+
+export default request

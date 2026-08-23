@@ -4,5 +4,5 @@ export default function DashboardPage() {
       <h1>仪表盘</h1>
       <p>仪表盘页（mock）</p>
     </main>
-  )
+  );
 }

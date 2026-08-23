@@ -158,7 +158,7 @@ Menu: {
 
 @theme inline {
   --color-primary: var(--tp-primary);
-  --color-bg-container: var(--tp-bg-container);
+  --color-container: var(--tp-bg-container);
   /* ... */
 }
 ```
@@ -228,6 +228,8 @@ export const lightTokens: ThemeTokens = {
 4. 页面里使用 `bg-menu`
 
 > 若该 token 还需 antd 消费，在 `toAntdTokens()` 里补映射。
+
+> ⚠️ `@theme inline` 的变量名决定工具类前缀：`--color-container` 生成 `bg-container`；命名时**不要再带 `bg-` 前缀**，否则会变成 `bg-bg-container`（如 `--color-bg-layout` → `bg-bg-layout`，`bg-layout` 无法生效）。
 
 ## 常见问题
 

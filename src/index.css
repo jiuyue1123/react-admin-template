@@ -20,10 +20,10 @@
   --color-text-secondary: var(--tp-text-secondary);
   --color-text-tertiary: var(--tp-text-tertiary);
   --color-text-quaternary: var(--tp-text-quaternary);
-  --color-bg-layout: var(--tp-bg-layout);
-  --color-bg-container: var(--tp-bg-container);
-  --color-bg-elevated: var(--tp-bg-elevated);
-  --color-bg-spotlight: var(--tp-bg-spotlight);
+  --color-layout: var(--tp-bg-layout);
+  --color-container: var(--tp-bg-container);
+  --color-elevated: var(--tp-bg-elevated);
+  --color-spotlight: var(--tp-bg-spotlight);
   --color-border: var(--tp-border);
   --color-border-secondary: var(--tp-border-secondary);
   --color-split: var(--tp-split);

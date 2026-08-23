@@ -3,6 +3,8 @@ import type { Alova, AlovaMethodCreateConfig, RequestBody } from 'alova'
 import adapterFetch from 'alova/fetch'
 import { Modal, message } from 'antd'
 import { router } from '@/router'
+import { useAuthStore } from '@/store/auth'
+import reactHook from 'alova/react'
 
 // ---- 环境变量：业务 code ----
 
@@ -54,8 +56,20 @@ async function refreshToken(): Promise<void> {
 }
 
 const alovaInstance = createAlova({
+    // 开发环境走 vite 代理（/api → VITE_SERVICE_BASE_URL），生产由反向代理承载
+    baseURL: '/api',
+    statesHook: reactHook,
     requestAdapter: adapterFetch(),
-    beforeRequest: _metmod => { },
+    // 请求前：自动携带访问令牌
+    beforeRequest: method => {
+        const { token } = useAuthStore.getState()
+        if (token?.accessToken) {
+            method.config.headers = {
+                Authorization: `Bearer ${token.accessToken}`,
+                ...method.config.headers,
+            }
+        }
+    },
 
     // 统一响应拦截器
     responded: {

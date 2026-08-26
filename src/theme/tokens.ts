@@ -152,6 +152,9 @@ export function toAntdTokens(t: ThemeTokens): ThemeConfig['token'] {
     colorFillSecondary: t.fillSecondary,
     colorFillTertiary: t.fillTertiary,
     colorFillQuaternary: t.fillQuaternary,
+    // antd v6 将 colorFillAlter 派生为 colorFillQuaternary，而本项目的 fill 色阶命名与 antd 相反
+    // （fillQuaternary 是最深档），若沿用派生值，Table 表头/行悬浮/footer 等背景会过深，故显式指回最浅的 fill
+    colorFillAlter: t.fill,
     borderRadius: t.radius,
     borderRadiusLG: t.radiusLg,
     fontSize: t.fontSize,

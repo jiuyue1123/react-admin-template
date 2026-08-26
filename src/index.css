@@ -34,3 +34,138 @@
   --color-header: var(--tp-header-bg);
   --color-sider: var(--tp-sider-bg);
 }
+
+/* 全局细滚动条：随主题翻转（body / 表格 / 抽屉 / 弹窗 / 菜单等所有可滚动区域） */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--tp-border) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--tp-border);
+  border-radius: 4px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--tp-text-quaternary);
+}
+
+/* 认证页入场动画：登录/注册各元素错峰浮现 */
+@keyframes jff-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.jff-anim {
+  animation: jff-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .jff-anim {
+    animation: none;
+  }
+}
+
+/* Markdown 正文排版：协议/政策等文档（react-markdown） */
+.markdown-body {
+  color: var(--tp-text);
+  font-size: 14px;
+  line-height: 1.7;
+  word-break: break-word;
+}
+.markdown-body > :first-child {
+  margin-top: 0;
+}
+.markdown-body > :last-child {
+  margin-bottom: 0;
+}
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4 {
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 1.2em 0 0.5em;
+}
+.markdown-body h1 {
+  font-size: 1.6em;
+}
+.markdown-body h2 {
+  font-size: 1.4em;
+}
+.markdown-body h3 {
+  font-size: 1.2em;
+}
+.markdown-body h4 {
+  font-size: 1em;
+}
+.markdown-body p {
+  margin: 0.6em 0;
+}
+.markdown-body ul,
+.markdown-body ol {
+  margin: 0.6em 0;
+  padding-left: 1.6em;
+}
+.markdown-body li {
+  margin: 0.25em 0;
+}
+.markdown-body blockquote {
+  margin: 0.8em 0;
+  padding: 0.4em 1em;
+  border-left: 3px solid var(--tp-border);
+  color: var(--tp-text-secondary);
+  background: var(--tp-fill);
+}
+.markdown-body code {
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  background: var(--tp-fill-secondary);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+}
+.markdown-body pre {
+  margin: 0.8em 0;
+  padding: 1em;
+  border-radius: 6px;
+  background: var(--tp-fill);
+  overflow-x: auto;
+}
+.markdown-body pre code {
+  background: transparent;
+  padding: 0;
+}
+.markdown-body table {
+  width: 100%;
+  margin: 0.8em 0;
+  border-collapse: collapse;
+}
+.markdown-body th,
+.markdown-body td {
+  padding: 0.5em 0.8em;
+  border: 1px solid var(--tp-border-secondary);
+}
+.markdown-body th {
+  background: var(--tp-fill-secondary);
+  font-weight: 600;
+}
+.markdown-body a {
+  color: var(--tp-primary);
+}
+.markdown-body img {
+  max-width: 100%;
+}
+.markdown-body hr {
+  margin: 1.2em 0;
+  border: none;
+  border-top: 1px solid var(--tp-border);
+}

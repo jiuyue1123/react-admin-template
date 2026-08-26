@@ -25,6 +25,14 @@ const routes: RouteConfigs = [
     constant: true,
   },
   {
+    path: '/register',
+    layout: '@/layouts/blank',
+    component: 'register',
+    title: '注册',
+    hideInMenu: true,
+    constant: true,
+  },
+  {
     path: '/dashboard',
     layout: '@/layouts/base',
     component: 'dashboard',
@@ -32,6 +40,13 @@ const routes: RouteConfigs = [
     i18nKey: 'menu.dashboard',
     icon: 'DashboardOutlined',
     order: 1,
+  },
+  {
+    path: '/profile',
+    layout: '@/layouts/base',
+    component: 'profile',
+    title: '个人中心',
+    hideInMenu: true,
   },
   {
     path: '/system',

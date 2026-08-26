@@ -5,6 +5,8 @@ import type { RouteConfig } from '@/typings/router'
 
 /** 登录页路径 */
 const LOGIN_PATH = '/login'
+/** 游客专属页面：已登录访问时回首页 */
+const GUEST_PATHS = [LOGIN_PATH, '/register']
 
 /** 在路由配置中查找与当前路径匹配的路由（含子路由） */
 function findRoute(list: RouteConfig[], pathname: string): RouteConfig | undefined {
@@ -29,8 +31,8 @@ export default function AuthGuard() {
   const isLogin = useAuthStore(state => state.isLogin)
   const { pathname, search } = useLocation()
 
-  // 已登录访问登录页：直接回首页
-  if (isLogin && pathname === LOGIN_PATH) {
+  // 已登录访问游客页（登录/注册）：直接回首页
+  if (isLogin && GUEST_PATHS.includes(pathname)) {
     return <Navigate to="/" replace />
   }
 

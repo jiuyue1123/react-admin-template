@@ -74,6 +74,7 @@ const alovaInstance = createAlova({
     // 开发环境走 vite 代理（/api → VITE_SERVICE_BASE_URL），生产由反向代理承载
     baseURL: '/api',
     statesHook: reactHook,
+    cacheFor: null,
     requestAdapter: adapterFetch(),
     // 请求前：自动携带访问令牌
     beforeRequest: method => {

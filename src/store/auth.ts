@@ -1,50 +1,39 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { router } from '@/router'
-import { fetchGetUserInfo, fetchRefreshToken } from '@/service/api/auth'
-
-/** 超级角色标识（来自 .env 的 VITE_SUPER_ROLE） */
-const SUPER_ROLE = import.meta.env.VITE_SUPER_ROLE
-
-/** 判断是否为超级角色 */
-function isSuperRole(userInfo: Api.Auth.UserInfo): boolean {
-  return userInfo.roles.includes(SUPER_ROLE)
-}
+import { fetchLogout, fetchRefreshToken } from '@/service/api/auth'
 
 interface AuthStore {
   /** 访问令牌与刷新令牌 */
   token: Api.Auth.LoginToken | null
-  /** 用户信息 */
-  userInfo: Api.Auth.UserInfo | null
-  /** 是否为超级角色 */
-  isSuper: boolean
   /** 是否已登录 */
   isLogin: boolean
   /** 重置登录态（仅清除状态） */
   reset: () => void
-  /** 登出：清除登录态并跳转登录页 */
+  /** 登出：通知后端吊销令牌、清除登录态并跳转登录页 */
   logout: () => void
-  /** 登录：保存访问令牌并置为已登录（令牌由登录页 useRequest 获取后传入） */
+  /** 登录：保存访问令牌并置为已登录 */
   login: (loginToken: Api.Auth.LoginToken) => void
   /** 刷新令牌：用旧令牌换取新令牌并更新本地存储 */
   refreshToken: (loginToken: Api.Auth.LoginToken) => Promise<void>
-  /** 获取用户信息并更新 userInfo / isSuper */
-  getUserInfo: () => Promise<Api.Auth.UserInfo>
 }
 
 export const useAuthStore = create<AuthStore>()(
   persist(
     (set, get) => ({
       token: null,
-      userInfo: null,
-      isSuper: false,
       isLogin: false,
 
       reset: () => {
-        set({ token: null, userInfo: null, isSuper: false, isLogin: false })
+        set({ token: null, isLogin: false })
       },
 
       logout: () => {
+        // 通知后端吊销 refreshToken（失败不阻塞本地登出，保持静默）
+        const refreshToken = get().token?.refreshToken
+        if (refreshToken) {
+          void fetchLogout(refreshToken).catch(() => {})
+        }
         get().reset()
         router.navigate('/login', { replace: true })
       },
@@ -59,20 +48,12 @@ export const useAuthStore = create<AuthStore>()(
         )
         set({ token: { accessToken, refreshToken: newRefreshToken } })
       },
-
-      getUserInfo: async () => {
-        const userInfo = await fetchGetUserInfo()
-        set({ userInfo, isSuper: isSuperRole(userInfo) })
-        return userInfo
-      },
     }),
     {
-      name: 'admin-auth',
+      name: 'jff-tenant-auth',
       storage: createJSONStorage(() => localStorage),
       partialize: state => ({
         token: state.token,
-        userInfo: state.userInfo,
-        isSuper: state.isSuper,
         isLogin: state.isLogin,
       }),
     },

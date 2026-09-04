@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@ant-design/icons": "^6.3.2",
+    "@jff/builder-blocks": "workspace:*",
+    "@puckeditor/core": "^0.23.0",
     "@tailwindcss/vite": "^4.3.3",
     "alova": "^3.5.5",
     "antd": "^6.6.1",

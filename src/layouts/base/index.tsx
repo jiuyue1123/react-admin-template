@@ -1,22 +1,33 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { Avatar, Button, Dropdown, Layout, Menu } from "antd";
+import { Alert, Avatar, Badge, Button, Dropdown, Layout, Menu } from "antd";
 import type { MenuProps } from "antd";
 import {
+  AppstoreOutlined,
+  BellOutlined,
+  CreditCardOutlined,
   DashboardOutlined,
+  FileOutlined,
+  FileTextOutlined,
+  FolderOutlined,
+  GlobalOutlined,
+  IdcardOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
+  MenuOutlined,
   MenuUnfoldOutlined,
   MoonOutlined,
-  SettingOutlined,
+  PictureOutlined,
+  ProfileOutlined,
   SunOutlined,
-  TeamOutlined,
   UserOutlined,
-  UserSwitchOutlined,
 } from "@ant-design/icons";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "@/theme";
 import { useAuthStore } from "@/store/auth";
+import { useBillingStore } from "@/store/billing";
+import { useMessagesStore } from "@/store/messages";
+import { getBillingBanner } from "@/utils/billing";
 import routes from "@/router/routes";
 import type { RouteConfig } from "@/typings/router";
 
@@ -24,10 +35,17 @@ const { Header, Sider, Content } = Layout;
 
 /** 配置中的 icon 名称 → antd 图标组件（新增图标时在此扩展） */
 const iconMap: Record<string, ReactNode> = {
+  AppstoreOutlined: <AppstoreOutlined />,
+  CreditCardOutlined: <CreditCardOutlined />,
   DashboardOutlined: <DashboardOutlined />,
-  SettingOutlined: <SettingOutlined />,
-  TeamOutlined: <TeamOutlined />,
-  UserSwitchOutlined: <UserSwitchOutlined />,
+  FileOutlined: <FileOutlined />,
+  FileTextOutlined: <FileTextOutlined />,
+  FolderOutlined: <FolderOutlined />,
+  GlobalOutlined: <GlobalOutlined />,
+  IdcardOutlined: <IdcardOutlined />,
+  MenuOutlined: <MenuOutlined />,
+  PictureOutlined: <PictureOutlined />,
+  ProfileOutlined: <ProfileOutlined />,
 };
 
 /** 顶栏用户菜单 */
@@ -65,14 +83,52 @@ function getOpenKeys(pathname: string): string[] {
     .map((_, i) => `/${segments.slice(0, i + 1).join("/")}`);
 }
 
+/** 计费到期横幅：套餐临期 / 过期时在内容区顶部提醒，点击前往续费 */
+function BillingBanner() {
+  const navigate = useNavigate();
+  const subscription = useBillingStore((state) => state.subscription);
+  const banner = getBillingBanner(subscription);
+  if (!banner) return null;
+
+  return (
+    <div className="mb-4">
+      <Alert
+        type={banner.type}
+        message={banner.message}
+        showIcon
+        action={
+          <Button size="small" type="primary" onClick={() => navigate("/billing/plans")}>
+            去续费
+          </Button>
+        }
+      />
+    </div>
+  );
+}
+
 /** base 布局：antd Layout 外壳（可折叠侧边菜单 + 顶栏 + 内容区） */
 export default function BaseLayout() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { theme, toggleTheme } = useTheme();
   const logout = useAuthStore((state) => state.logout);
+  const unreadCount = useMessagesStore((state) => state.unreadCount);
   const menuItems = useMemo(() => buildMenuItems(routes), []);
   const [collapsed, setCollapsed] = useState(false);
+
+  // 预热当前订阅（供到期横幅展示；支付 / 退款成功后由相关页主动刷新）
+  useEffect(() => {
+    void useBillingStore.getState().refresh();
+  }, []);
+
+  // 站内信未读数角标：登录后每 60s 轮询一次
+  useEffect(() => {
+    void useMessagesStore.getState().refreshUnread();
+    const timer = window.setInterval(() => {
+      void useMessagesStore.getState().refreshUnread();
+    }, 60 * 1000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   const onMenuClick: MenuProps["onClick"] = ({ key }) => {
     navigate(key);
@@ -136,6 +192,14 @@ export default function BaseLayout() {
             onClick={() => setCollapsed((prev) => !prev)}
           />
           <div className="flex items-center gap-2">
+            <Badge count={unreadCount} size="small" offset={[-2, 4]}>
+              <Button
+                type="text"
+                aria-label="站内信"
+                icon={<BellOutlined />}
+                onClick={() => navigate("/messages")}
+              />
+            </Badge>
             <Button
               type="text"
               aria-label={
@@ -153,6 +217,7 @@ export default function BaseLayout() {
           </div>
         </Header>
         <Content className="m-4">
+          <BillingBanner />
           <Outlet />
         </Content>
       </Layout>

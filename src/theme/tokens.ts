@@ -21,15 +21,18 @@ export interface ThemeTokens {
   textSecondary: string
   textTertiary: string
   textQuaternary: string
+  textDisabled: string
   // 背景色
   bgLayout: string
   bgContainer: string
   bgElevated: string
   bgSpotlight: string
+  bgContainerDisabled: string
   // 边框色
   border: string
   borderSecondary: string
   split: string
+  borderDisabled: string
   // 填充色
   fill: string
   fillSecondary: string
@@ -62,13 +65,16 @@ export const lightTokens: ThemeTokens = {
   textSecondary: 'rgba(0, 0, 0, 0.65)',
   textTertiary: 'rgba(0, 0, 0, 0.45)',
   textQuaternary: 'rgba(0, 0, 0, 0.25)',
+  textDisabled: 'rgba(0, 0, 0, 0.25)',
   bgLayout: '#f5f5f5',
   bgContainer: '#ffffff',
   bgElevated: '#ffffff',
   bgSpotlight: '#000000',
+  bgContainerDisabled: 'rgba(0, 0, 0, 0.08)',
   border: '#d9d9d9',
   borderSecondary: '#f0f0f0',
   split: 'rgba(5, 5, 5, 0.06)',
+  borderDisabled: 'rgba(0, 0, 0, 0.06)',
   fill: 'rgba(0, 0, 0, 0.04)',
   fillSecondary: 'rgba(0, 0, 0, 0.06)',
   fillTertiary: 'rgba(0, 0, 0, 0.08)',
@@ -98,14 +104,17 @@ export const darkTokens: ThemeTokens = {
   textSecondary: 'rgba(255, 255, 255, 0.65)',
   textTertiary: 'rgba(255, 255, 255, 0.45)',
   textQuaternary: 'rgba(255, 255, 255, 0.25)',
+  textDisabled: 'rgba(0, 0, 0, 0.25)',
   bgLayout: '#000000',
   bgContainer: '#141414',
   bgElevated: '#1f1f1f',
   // 气泡/提示背景：两种主题下都保持深底白字（对齐 antd 暗色算法 getSolidColor('#000', 26)）
   bgSpotlight: '#424242',
+  bgContainerDisabled: 'rgba(255, 255, 255, 0.08)',
   border: '#424242',
   borderSecondary: '#303030',
   split: 'rgba(253, 253, 253, 0.12)',
+  borderDisabled: 'rgba(255, 255, 255, 0.12)',
   fill: 'rgba(255, 255, 255, 0.04)',
   fillSecondary: 'rgba(255, 255, 255, 0.08)',
   fillTertiary: 'rgba(255, 255, 255, 0.12)',
@@ -141,13 +150,16 @@ export function toAntdTokens(t: ThemeTokens): ThemeConfig['token'] {
     colorTextSecondary: t.textSecondary,
     colorTextTertiary: t.textTertiary,
     colorTextQuaternary: t.textQuaternary,
+    colorTextDisabled: t.textDisabled,
     colorBgLayout: t.bgLayout,
     colorBgContainer: t.bgContainer,
     colorBgElevated: t.bgElevated,
     colorBgSpotlight: t.bgSpotlight,
+    colorBgContainerDisabled: t.bgContainerDisabled,
     colorBorder: t.border,
     colorBorderSecondary: t.borderSecondary,
     colorSplit: t.split,
+    colorBorderDisabled: t.borderDisabled,
     colorFill: t.fill,
     colorFillSecondary: t.fillSecondary,
     colorFillTertiary: t.fillTertiary,

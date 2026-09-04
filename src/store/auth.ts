@@ -32,7 +32,7 @@ export const useAuthStore = create<AuthStore>()(
         // 通知后端吊销 refreshToken（失败不阻塞本地登出，保持静默）
         const refreshToken = get().token?.refreshToken
         if (refreshToken) {
-          void fetchLogout(refreshToken).catch(() => {})
+          void fetchLogout(refreshToken).catch(() => { })
         }
         get().reset()
         router.navigate('/login', { replace: true })

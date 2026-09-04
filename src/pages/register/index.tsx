@@ -93,7 +93,11 @@ export default function RegisterPage() {
             className="jff-anim rounded-2xl border border-border-secondary bg-container p-5 shadow-sm"
             style={{ animationDelay: '180ms' }}
           >
-            <RegisterForm loading={loading} onFinish={handleFinish} />
+            <RegisterForm
+              loading={loading}
+              onFinish={handleFinish}
+              onOpenAgreement={setAgreement}
+            />
           </div>
 
           {/* 登录入口 */}
@@ -128,10 +132,12 @@ export default function RegisterPage() {
 interface RegisterFormProps {
   loading: boolean
   onFinish: (values: RegisterFormValues) => void
+  /** 打开服务协议 / 隐私政策弹窗 */
+  onOpenAgreement: (type: 'service' | 'privacy') => void
 }
 
 /** 租户注册表单 */
-function RegisterForm({ loading, onFinish }: RegisterFormProps) {
+function RegisterForm({ loading, onFinish, onOpenAgreement }: RegisterFormProps) {
   const [form] = Form.useForm<RegisterFormValues>()
 
   return (
@@ -247,7 +253,7 @@ function RegisterForm({ loading, onFinish }: RegisterFormProps) {
             onClick={e => {
               e.preventDefault()
               e.stopPropagation()
-              setAgreement('service')
+              onOpenAgreement('service')
             }}
             className="mx-0.5 text-primary transition-colors hover:text-primary-hover"
           >
@@ -259,7 +265,7 @@ function RegisterForm({ loading, onFinish }: RegisterFormProps) {
             onClick={e => {
               e.preventDefault()
               e.stopPropagation()
-              setAgreement('privacy')
+              onOpenAgreement('privacy')
             }}
             className="mx-0.5 text-primary transition-colors hover:text-primary-hover"
           >

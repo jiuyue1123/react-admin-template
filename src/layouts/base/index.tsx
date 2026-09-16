@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Alert, Avatar, Badge, Button, Dropdown, Layout, Menu } from "antd";
 import type { MenuProps } from "antd";
 import {
+  AccountBookOutlined,
   AppstoreOutlined,
   BellOutlined,
   CreditCardOutlined,
@@ -35,6 +36,7 @@ const { Header, Sider, Content } = Layout;
 
 /** 配置中的 icon 名称 → antd 图标组件（新增图标时在此扩展） */
 const iconMap: Record<string, ReactNode> = {
+  AccountBookOutlined: <AccountBookOutlined />,
   AppstoreOutlined: <AppstoreOutlined />,
   CreditCardOutlined: <CreditCardOutlined />,
   DashboardOutlined: <DashboardOutlined />,

@@ -9,12 +9,15 @@ import {
   Input,
   Skeleton,
   Tag,
+  Upload,
 } from 'antd'
 import {
   CheckOutlined,
+  DeleteOutlined,
   GlobalOutlined,
   LoadingOutlined,
   RightOutlined,
+  UploadOutlined,
 } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useRequest } from 'alova/client'
@@ -24,6 +27,7 @@ import {
   fetchPublishSite,
   fetchUpdateSite,
 } from '@/service/api/site'
+import { fetchUploadMedia } from '@/service/api/media'
 import { fetchGetVerification } from '@/service/api/verification'
 import { useBillingStore } from '@/store/billing'
 import {
@@ -269,15 +273,15 @@ export default function SitePage() {
               style={{ resize: 'none' }}
             />
           </Form.Item>
-          <Form.Item name="logo" label="Logo URL" rules={[{ type: 'url', message: '请输入合法的 URL' }]}>
-            <Input placeholder="https://example.com/logo.png" maxLength={200} />
+          <Form.Item name="logo" label="站点 Logo">
+            <SiteAssetField label="上传 Logo" hint="建议透明背景 PNG，展示于站点头部" />
           </Form.Item>
-          <Form.Item
-            name="favicon"
-            label="Favicon URL"
-            rules={[{ type: 'url', message: '请输入合法的 URL' }]}
-          >
-            <Input placeholder="https://example.com/favicon.ico" maxLength={200} />
+          <Form.Item name="favicon" label="站点 Favicon">
+            <SiteAssetField
+              label="上传 Favicon"
+              accept=".png,.jpg,.jpeg,.webp,.svg,.ico"
+              hint="建议 64×64 的 .ico 或 .png，展示于浏览器标签页"
+            />
           </Form.Item>
 
           <Button type="primary" htmlType="submit" loading={saving}>
@@ -285,6 +289,81 @@ export default function SitePage() {
           </Button>
         </Form>
       </Card>
+    </div>
+  )
+}
+
+/** 单图上传控件：上传到媒体库后回填 URL，可预览 / 更换 / 移除 */
+function SiteAssetField({
+  value,
+  onChange,
+  label,
+  hint,
+  accept = 'image/*',
+}: {
+  value?: string
+  onChange?: (value: string | undefined) => void
+  label: string
+  hint?: string
+  /** 可选文件类型，如 .ico；默认图片 */
+  accept?: string
+}) {
+  const { message } = App.useApp()
+  const uploadRequest = useRequest(
+    ({ file }: { file: File }) => fetchUploadMedia(file),
+    { immediate: false },
+  )
+
+  useEffect(() => {
+    if (uploadRequest.error) message.error(uploadRequest.error.message || '上传失败')
+  }, [uploadRequest.error, message])
+
+  const handleFile = (file: File) => {
+    void uploadRequest
+      .send({ file })
+      .then(created => {
+        onChange?.(created.url)
+        message.success('上传成功')
+      })
+      .catch(() => {
+        // 错误已通过 error 状态 effect 提示
+      })
+    return false
+  }
+
+  return (
+    <div className="flex items-start gap-4">
+      {value ? (
+        <img
+          src={value}
+          alt="站点图标预览"
+          className="h-16 w-16 shrink-0 rounded-lg border border-border-secondary bg-fill object-contain p-1"
+        />
+      ) : (
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border border-dashed border-border-secondary text-text-tertiary">
+          <UploadOutlined className="text-lg" />
+        </div>
+      )}
+      <div>
+        <Upload accept={accept} showUploadList={false} beforeUpload={f => handleFile(f as File)}>
+          <Button icon={<UploadOutlined />} loading={uploadRequest.loading}>
+            {value ? '更换图片' : label}
+          </Button>
+        </Upload>
+        {value ? (
+          <Button
+            className="mt-1"
+            type="text"
+            size="small"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => onChange?.('')}
+          >
+            移除
+          </Button>
+        ) : null}
+        {hint ? <div className="mt-1 text-xs text-text-tertiary">{hint}</div> : null}
+      </div>
     </div>
   )
 }

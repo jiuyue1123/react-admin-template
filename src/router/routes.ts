@@ -69,6 +69,7 @@ const routes: RouteConfigs = [
         component: 'billing/plans',
         title: '套餐与价格',
         icon: 'AppstoreOutlined',
+        hideInMenu: true,
         order: 1,
       },
       {
@@ -84,6 +85,13 @@ const routes: RouteConfigs = [
         title: '订单记录',
         icon: 'FileTextOutlined',
         order: 3,
+      },
+      {
+        path: '/billing/invoices',
+        component: 'billing/invoices',
+        title: '发票',
+        icon: 'AccountBookOutlined',
+        order: 4,
       },
       {
         path: '/billing/orders/:orderNo',

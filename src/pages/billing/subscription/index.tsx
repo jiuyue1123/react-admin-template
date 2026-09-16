@@ -1,7 +1,10 @@
 import { useEffect } from 'react'
-import { App, Button, Card, Empty, Skeleton, Table, Tag } from 'antd'
-import type { TableProps } from 'antd'
-import { CheckCircleOutlined as CheckIcon } from '@ant-design/icons'
+import { App, Button, Card, Dropdown, Empty, Skeleton, Table, Tag } from 'antd'
+import type { MenuProps, TableProps } from 'antd'
+import {
+  CheckCircleOutlined as CheckIcon,
+  MoreOutlined,
+} from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useRequest } from 'alova/client'
 import {
@@ -19,6 +22,20 @@ import {
   parsePlanSnapshot,
 } from '@/utils/billing'
 import { formatDate, formatDateTime } from '@/utils/date'
+
+/**
+ * 套餐变更列文案：仅“迁移类”变更（续费/升配/降配）显示 from → to 箭头；
+ * 购买 / 退款等非迁移类变更忽略后端残留的 from 快照，避免误读
+ * （例如退款后再重新开通，后端 fromPlanCode 仍会沿用上一套餐编码）。
+ */
+function planChangeText(log: Api.Billing.SubscriptionChangeLog): string {
+  const from = log.fromPlanCode?.trim() || ''
+  const to = log.toPlanCode?.trim() || log.planName?.trim() || ''
+  const migration = log.changeType === 2 || log.changeType === 3 || log.changeType === 4
+  if (!migration) return to
+  if (from && to && from !== to) return `${from} → ${to}`
+  return to
+}
 
 /** 我的订阅：当前生效套餐、可退款额与订阅变更记录 */
 export default function SubscriptionPage() {
@@ -56,17 +73,13 @@ export default function SubscriptionPage() {
 
   const handleRefund = () => {
     modal.confirm({
-      title: '申请退款',
+      title: '确认退订',
       content: (
         <div className="text-sm text-text-secondary">
-          将按剩余时长折算退款，上限{' '}
-          <b className="text-text">
-            {formatMoney(typeof subscription?.maxRefundable === 'number' ? subscription.maxRefundable : undefined)}
-          </b>
-          （扣除已使用部分）。提交后当前订阅立即终止、站点下线 / 降级，涉及的支付订单进入退款中，由管理员审核通过后原路退回。
+          退订后将停止当前套餐服务（站点下线 / 降级），涉及的支付订单进入退款中待管理员审核；退款将按平台核算的剩余部分原路退回。请确认是否继续？
         </div>
       ),
-      okText: '确认申请',
+      okText: '确认退订',
       okButtonProps: { danger: true },
       cancelText: '取消',
       onOk: () =>
@@ -80,6 +93,18 @@ export default function SubscriptionPage() {
             // 错误已通过 error 状态 effect 提示
           }),
     })
+  }
+
+  // 卡片右上角「更多」：退订入口低调收敛，避免引导退款
+  const planMoreItems: MenuProps['items'] = [
+    ...(canRefund
+      ? [{ key: 'refund', label: '退订并申请退款', danger: true }]
+      : []),
+    { key: 'orders', label: '查看订单记录' },
+  ]
+  const handlePlanMore: MenuProps['onClick'] = ({ key }) => {
+    if (key === 'refund') handleRefund()
+    else if (key === 'orders') navigate('/billing/orders')
   }
 
   const daysText = subscription
@@ -102,17 +127,9 @@ export default function SubscriptionPage() {
       title: '套餐变更',
       key: 'plan',
       render: (_, record) => {
-        if (record.fromPlanCode && record.toPlanCode) {
-          return (
-            <span className="font-mono text-xs text-text">
-              {record.fromPlanCode}
-              <span className="mx-1 text-text-quaternary">→</span>
-              {record.toPlanCode}
-            </span>
-          )
-        }
-        const target = record.toPlanCode || record.planName
-        return <span className="font-medium text-text">{target || '-'}</span>
+        const text = planChangeText(record)
+        if (!text) return <span className="text-text-tertiary">-</span>
+        return <span className="font-mono text-xs text-text">{text}</span>
       },
     },
     {
@@ -193,9 +210,18 @@ export default function SubscriptionPage() {
                 <Tag color={changeMeta.color}>{changeMeta.label}</Tag>
               </div>
             </div>
-            <Button type="primary" onClick={() => navigate('/billing/plans')}>
-              {active.active ? '续费 / 变更套餐' : '立即开通'}
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button type="primary" onClick={() => navigate('/billing/plans')}>
+                {active.active ? '续费 / 变更套餐' : '立即开通'}
+              </Button>
+              <Dropdown
+                menu={{ items: planMoreItems, onClick: handlePlanMore }}
+                trigger={['click']}
+                placement="bottomRight"
+              >
+                <Button type="text" aria-label="更多操作" icon={<MoreOutlined />} />
+              </Dropdown>
+            </div>
           </div>
 
           {/* 权益 */}
@@ -220,22 +246,6 @@ export default function SubscriptionPage() {
               tone={subscription.daysLeft === null || subscription.daysLeft === undefined ? 'normal' : subscription.daysLeft <= 0 ? 'danger' : subscription.daysLeft <= 15 ? 'warning' : 'normal'}
             />
           </div>
-
-          {/* 退款（仅生效中且有可退上限） */}
-          {canRefund ? (
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border-secondary bg-container px-4 py-3">
-              <div className="text-sm text-text-secondary">
-                剩余可退金额{' '}
-                <span className="font-semibold text-primary">
-                  {formatMoney(subscription?.maxRefundable)}
-                </span>
-                <span className="ml-2 text-xs text-text-tertiary">按剩余未使用时长折算，审核通过后原路退回</span>
-              </div>
-              <Button danger loading={refundRequest.loading} onClick={handleRefund}>
-                申请退款
-              </Button>
-            </div>
-          ) : null}
         </Card>
       )}
 
@@ -264,7 +274,7 @@ export default function SubscriptionPage() {
             <li>到期前 15 天起每日站内提醒续费；到期后站点立即下线。</li>
             <li>到期后 180 天内续费可恢复站点，按新套餐重新计算有效期，原数据保留。</li>
             <li>升配立即生效（按剩余天数折算差价）；降配下期生效，不退还差价。</li>
-            <li>退款按当前订阅剩余未使用时长折算（上限见本页可退金额），提交后涉及的支付订单进入退款中，审核通过后原路退回（见订单记录）。</li>
+            <li>如需退订，可在订阅卡片右上角「更多」菜单操作；申请后涉及的支付订单进入退款中，审核通过后原路退回（见订单记录）。</li>
           </ul>
         </div>
       </Card>

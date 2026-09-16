@@ -104,7 +104,7 @@ export const darkTokens: ThemeTokens = {
   textSecondary: 'rgba(255, 255, 255, 0.65)',
   textTertiary: 'rgba(255, 255, 255, 0.45)',
   textQuaternary: 'rgba(255, 255, 255, 0.25)',
-  textDisabled: 'rgba(0, 0, 0, 0.25)',
+  textDisabled: 'rgba(255, 255, 255, 0.85)',
   bgLayout: '#000000',
   bgContainer: '#141414',
   bgElevated: '#1f1f1f',

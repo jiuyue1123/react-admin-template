@@ -126,30 +126,109 @@ export function getDurationLabel(days?: number): string {
   return days === 0 ? '永久有效' : `${days} 天有效期`
 }
 
-/** 从权益 JSON 字符串解析为可读行（JSON 数组 / 对象 / 纯文本行） */
-export function parsePlanFeatures(features?: string): string[] {
+// ---------------------------------------------------------------------------
+// 权益结构化（对齐后端真实返回：features = JSON { groups: [{ groupName, items: [{ label, value }] }] }）
+// ---------------------------------------------------------------------------
+
+/** 单项权益：label 名称，value 取值（布尔用字符串 "true"/"false"） */
+export interface PlanFeatureItem {
+  label: string
+  value: string
+}
+
+/** 一组权益（分组名 + 若干行） */
+export interface PlanFeatureGroup {
+  groupName: string
+  items: PlanFeatureItem[]
+}
+
+/** 归一化权益值为字符串（兼容 "true"/"false"/布尔/数字） */
+function normalizeFeatureValue(value: unknown): string {
+  if (value === null || value === undefined) return ''
+  if (typeof value === 'boolean') return value ? 'true' : 'false'
+  return String(value)
+}
+
+/** 解析权益 JSON 字符串为分组结构；缺结构 / 非法时返回 [] */
+export function parseFeatureGroups(features?: string): PlanFeatureGroup[] {
   if (!features) return []
   const text = features.trim()
   if (!text) return []
-
+  let parsed: unknown
   try {
-    const parsed: unknown = JSON.parse(text)
-    if (Array.isArray(parsed)) {
-      return parsed.map(item => featureItemLabel(item)).filter((item): item is string => Boolean(item))
-    }
-    if (parsed && typeof parsed === 'object') {
-      const obj = parsed as Record<string, unknown>
-      return Object.entries(obj)
-        .map(([key, value]) => {
-          const empty = value === undefined || value === null || value === '' || value === true
-          return empty ? key : `${key}：${String(value)}`
-        })
-        .filter(Boolean)
-    }
+    parsed = JSON.parse(text)
   } catch {
-    // 非 JSON，回退为纯文本拆分
+    return []
+  }
+  return extractGroups(parsed)
+}
+
+/** 从任意结构提取分组（兼容顶层 {groups:[...]} / 直接数组 / 单组 {groupName, items}） */
+function extractGroups(raw: unknown): PlanFeatureGroup[] {
+  let source: unknown = raw
+  if (source && typeof source === 'object' && !Array.isArray(source)) {
+    const obj = source as Record<string, unknown>
+    if (Array.isArray(obj.groups)) {
+      source = obj.groups
+    } else if (Array.isArray(obj.items)) {
+      const single = parseOneGroup(source)
+      return single ? [single] : []
+    } else {
+      return []
+    }
+  }
+  if (!Array.isArray(source)) return []
+
+  const groups: PlanFeatureGroup[] = []
+  for (const entry of source) {
+    const group = parseOneGroup(entry)
+    if (group) groups.push(group)
+  }
+  return groups
+}
+
+/** 解析单个分组对象 */
+function parseOneGroup(entry: unknown): PlanFeatureGroup | null {
+  if (!entry || typeof entry !== 'object') return null
+  const obj = entry as Record<string, unknown>
+  const groupName = typeof obj.groupName === 'string' && obj.groupName ? obj.groupName : '未分组'
+  const rawItems = Array.isArray(obj.items) ? obj.items : []
+  const items: PlanFeatureItem[] = []
+  for (const item of rawItems) {
+    if (!item || typeof item !== 'object') continue
+    const it = item as Record<string, unknown>
+    const label = typeof it.label === 'string' && it.label ? it.label : ''
+    if (label) items.push({ label, value: normalizeFeatureValue(it.value) })
+  }
+  if (!items.length) return null
+  return { groupName, items }
+}
+
+/** 从权益 JSON 解析为可读行：分组拍平（true→仅 label，false 不展示，其余 label：value） */
+export function parsePlanFeatures(features?: string): string[] {
+  const groups = parseFeatureGroups(features)
+  if (groups.length) {
+    const lines: string[] = []
+    for (const group of groups) {
+      for (const item of group.items) {
+        if (item.value === 'false') continue
+        lines.push(item.value === 'true' ? item.label : `${item.label}：${item.value}`)
+      }
+    }
+    return lines
   }
 
+  const text = (features ?? '').trim()
+  if (!text) return []
+  // 兼容旧形态：JSON 字符串数组
+  try {
+    const parsed = JSON.parse(text) as unknown
+    if (Array.isArray(parsed)) {
+      return parsed.map(item => featureItemLabel(item)).filter((s): s is string => Boolean(s))
+    }
+  } catch {
+    // 忽略，走纯文本拆分
+  }
   return text.split(/\n|；|;|，|,|、/).map(s => s.trim()).filter(Boolean)
 }
 

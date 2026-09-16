@@ -1,19 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { App, Button, Card, Empty, Skeleton, Tag } from 'antd'
-import { CheckCircleOutlined as CheckIcon } from '@ant-design/icons'
+import { CheckCircleFilled } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useRequest } from 'alova/client'
-import {
-  fetchCreateOrder,
-  fetchDowngrade,
-  fetchGetPlans,
-} from '@/service/api/billing'
+import { fetchCreateOrder, fetchDowngrade, fetchGetPlans } from '@/service/api/billing'
 import { useBillingStore } from '@/store/billing'
 import {
   formatMoney,
   getActivePlanInfo,
-  getDurationLabel,
-  parsePlanFeatures,
+  parseFeatureGroups,
   parsePlanSnapshot,
   PAY_ORDER_TYPE,
   resolvePlanIntent,
@@ -32,7 +27,63 @@ const INTENT_NOTE: Partial<Record<PlanIntent, string>> = {
   downgrade: '下期生效 · 到期后按新价续费',
 }
 
-/** 套餐与价格：选购 / 续费 / 升配 / 降配 */
+/** 时长简短文案：0→永久 / 365→1 年 / 其它 N 天 */
+function planTerm(days?: number): string {
+  if (!days) return '永久'
+  if (days === 365) return '1 年'
+  return `${days} 天`
+}
+
+/** 推荐卡：tagText 非空或名称含「推荐」 */
+function isFeatured(plan: Api.Billing.PricingPlanVO): boolean {
+  return Boolean(plan.tagText) || plan.planName.includes('推荐')
+}
+
+interface PlanColumn {
+  plan: Api.Billing.PricingPlanVO
+  intent: PlanIntent
+  featured: boolean
+}
+
+interface CompareSection {
+  groupName: string
+  rows: { label: string; values: string[] }[]
+}
+
+/** 由各套餐权益分组生成对比表：组/行按各套餐首次出现顺序稳定收集，缺失项填空 */
+function buildSections(ordered: Api.Billing.PricingPlanVO[]): CompareSection[] {
+  const parsed = ordered.map(plan => parseFeatureGroups(plan.features))
+
+  const groupOrder: string[] = []
+  for (const groups of parsed) {
+    for (const group of groups) {
+      if (!groupOrder.includes(group.groupName)) groupOrder.push(group.groupName)
+    }
+  }
+
+  return groupOrder.map(groupName => {
+    const labelOrder: string[] = []
+    for (const groups of parsed) {
+      const group = groups.find(x => x.groupName === groupName)
+      if (!group) continue
+      for (const item of group.items) {
+        if (!labelOrder.includes(item.label)) labelOrder.push(item.label)
+      }
+    }
+
+    const rows = labelOrder.map(label => ({
+      label,
+      values: parsed.map(groups => {
+        const group = groups.find(x => x.groupName === groupName)
+        const item = group?.items.find(x => x.label === label)
+        return item ? item.value : ''
+      }),
+    }))
+    return { groupName, rows }
+  })
+}
+
+/** 套餐与价格：定价卡 + 全版本功能对比 */
 export default function BillingPlansPage() {
   const { message, modal } = App.useApp()
   const navigate = useNavigate()
@@ -49,7 +100,6 @@ export default function BillingPlansPage() {
     { immediate: false },
   )
 
-  // 共享订阅：挂载时确保已拉取（布局通常已拉过，幂等）
   useEffect(() => {
     void useBillingStore.getState().refresh()
   }, [])
@@ -67,10 +117,27 @@ export default function BillingPlansPage() {
   const active = getActivePlanInfo(subscription)
   const currentName = parsePlanSnapshot(subscription?.planSnapshot).planName
 
-  const ordered = [...plans].sort((a, b) => a.sortOrder - b.sortOrder)
+  const ordered = useMemo(
+    () => [...plans].sort((a, b) => a.sortOrder - b.sortOrder),
+    [plans],
+  )
+  const columns: PlanColumn[] = useMemo(
+    () =>
+      ordered.map(plan => ({
+        plan,
+        intent: resolvePlanIntent(plan, active),
+        featured: isFeatured(plan),
+      })),
+    [ordered, active],
+  )
+  const sections = useMemo(() => buildSections(ordered), [ordered])
+  const hasSections = sections.length > 0
 
   // 支付类意图：建单后跳转订单详情完成支付
-  const handlePayIntent = (plan: Api.Billing.PricingPlanVO, intent: 'purchase' | 'renew' | 'upgrade') => {
+  const handlePayIntent = (
+    plan: Api.Billing.PricingPlanVO,
+    intent: 'purchase' | 'renew' | 'upgrade',
+  ) => {
     if (pendingCode) return
     setPendingCode(plan.planCode)
     void createOrderRequest
@@ -124,11 +191,14 @@ export default function BillingPlansPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-4">
-      <div>
-        <div className="text-lg font-semibold text-text">套餐与价格</div>
-        <div className="mt-0.5 text-sm text-text-secondary">
-          选择适合的套餐，为您的站点开通线上服务
+    <div className="mx-auto max-w-6xl space-y-6">
+      {/* 页头 */}
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          <div className="text-lg font-semibold text-text">套餐与价格</div>
+          <div className="mt-0.5 text-sm text-text-secondary">
+            选择适合的套餐，为您的站点开通线上服务
+          </div>
         </div>
       </div>
 
@@ -138,8 +208,14 @@ export default function BillingPlansPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <span className="text-sm text-text-secondary">当前套餐</span>
-              <span className="font-medium text-text">{currentName || subscription.planId || '自定义'}</span>
-              <Tag color="success">{subscription.daysLeft === null || subscription.daysLeft === undefined ? '永久有效' : `剩余 ${subscription.daysLeft} 天`}</Tag>
+              <span className="font-medium text-text">
+                {currentName || subscription.planId || '自定义'}
+              </span>
+              <Tag color="success">
+                {subscription.daysLeft === null || subscription.daysLeft === undefined
+                  ? '永久有效'
+                  : `剩余 ${subscription.daysLeft} 天`}
+              </Tag>
             </div>
             <Button type="link" size="small" onClick={() => navigate('/billing/subscription')}>
               查看订阅详情 →
@@ -148,18 +224,19 @@ export default function BillingPlansPage() {
         </Card>
       ) : null}
 
-      {/* 套餐列表 */}
+      {/* 定价卡 */}
       {loading && !plans.length ? (
         <Card>
           <Skeleton active paragraph={{ rows: 6 }} />
         </Card>
       ) : ordered.length ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {ordered.map(plan => (
-            <PlanCard
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {columns.map(({ plan, intent, featured }) => (
+            <PriceCard
               key={plan.planCode}
               plan={plan}
-              intent={resolvePlanIntent(plan, active)}
+              intent={intent}
+              featured={featured}
               loading={pendingCode === plan.planCode}
               onSelect={() => handleSelect(plan)}
             />
@@ -171,6 +248,57 @@ export default function BillingPlansPage() {
         </Card>
       )}
 
+      {/* 全版本功能对比 */}
+      {ordered.length ? (
+        <section>
+          <div className="mb-3 flex items-baseline justify-between gap-3">
+            <h2 className="text-base font-semibold text-text">全部功能与服务对比</h2>
+            <span className="text-xs text-text-tertiary">✓ 表示包含 · — 表示不含</span>
+          </div>
+          {hasSections ? (
+            <Card styles={{ body: { padding: 0 } }} className="overflow-hidden rounded-2xl">
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-180 text-sm">
+                  <thead>
+                    <tr className="border-b border-border-secondary">
+                      <th className="w-56 bg-fill-secondary p-4 pl-6 text-left align-middle text-xs font-medium text-text-tertiary">
+                        功能 / 服务
+                      </th>
+                      {columns.map(({ plan, featured }) => (
+                        <th
+                          key={plan.planCode}
+                          className={`p-4 text-center align-middle ${
+                            featured ? 'bg-primary-bg/40' : ''
+                          }`}
+                        >
+                          <span className="text-base font-semibold text-text">
+                            {plan.planName.replace(/・推荐$/, '')}
+                          </span>
+                          {featured ? (
+                            <Tag className="ml-1.5" color="geekblue">
+                              推荐
+                            </Tag>
+                          ) : null}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border-secondary">
+                    {sections.map(section => (
+                      <CompareGroupRows
+                        key={section.groupName}
+                        section={section}
+                        featured={columns.map(c => c.featured)}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          ) : null}
+        </section>
+      ) : null}
+
       {/* 说明 */}
       <Card size="small" className="rounded-xl">
         <div className="text-sm text-text-secondary">
@@ -178,8 +306,8 @@ export default function BillingPlansPage() {
           <ul className="list-inside list-disc space-y-0.5 text-xs">
             <li>支持支付宝在线支付；支付成功后服务即时开通（升配立即生效）。</li>
             <li>套餐到期前 15 天起将进行站内提醒；到期后站点下线，180 天内续费可恢复并保留原数据。</li>
-            <li>退款按未使用时长折算并扣除已使用部分，审核通过后原路退回。</li>
-            <li>部分套餐与上线操作需完成实名认证（将在后续开放）。</li>
+            <li>退款按当前订阅剩余时长折算（见订阅详情可退金额），审核通过后原路退回。</li>
+            <li>部分套餐与上线操作需完成实名认证（认证通过后即可上线）。</li>
           </ul>
         </div>
       </Card>
@@ -187,68 +315,112 @@ export default function BillingPlansPage() {
   )
 }
 
-interface PlanCardProps {
+/** 定价卡：价格 / 原价 / 时长 / 简介 + 订购 CTA */
+function PriceCard({
+  plan,
+  intent,
+  featured,
+  loading,
+  onSelect,
+}: {
   plan: Api.Billing.PricingPlanVO
   intent: PlanIntent
+  featured: boolean
   loading: boolean
   onSelect: () => void
-}
-
-/** 单个套餐卡片 */
-function PlanCard({ plan, intent, loading, onSelect }: PlanCardProps) {
-  const featured = Boolean(plan.tagText)
-  const features = parsePlanFeatures(plan.features)
-  const priceText = plan.price === 0 ? '免费' : formatMoney(plan.price)
-  const hasDiscount = plan.price > 0 && typeof plan.originalPrice === 'number' && plan.originalPrice > plan.price
-  const note = INTENT_NOTE[intent]
-
+}) {
   return (
     <div
-      className={`flex flex-col rounded-xl border bg-container p-6 transition-shadow hover:shadow-md ${
-        featured ? 'border-primary' : 'border-border-secondary'
+      className={`flex flex-col rounded-2xl border bg-container p-6 transition-shadow hover:shadow-md ${
+        featured ? 'border-primary shadow-sm' : 'border-border-secondary'
       }`}
     >
-      <div className="mb-3 flex items-center justify-between gap-2">
+      <div className="flex items-start justify-between gap-2">
         <div className="text-base font-semibold text-text">{plan.planName}</div>
-        {plan.tagText ? <Tag color="geekblue">{plan.tagText}</Tag> : null}
-      </div>
-
-      <div className="flex items-end gap-2">
-        <span className="text-[28px] font-semibold leading-none text-text">{priceText}</span>
-        {hasDiscount ? (
-          <span className="mb-0.5 text-sm text-text-tertiary line-through">
-            {formatMoney(plan.originalPrice)}
+        {featured ? (
+          <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-medium text-white">
+            {plan.tagText || '推荐'}
           </span>
         ) : null}
       </div>
-      <div className="mt-1.5 text-xs text-text-secondary">{getDurationLabel(plan.durationDays)}</div>
 
-      {plan.description ? (
-        <div className="mt-3 text-sm text-text-secondary">{plan.description}</div>
+      <div className="mt-4 flex items-baseline gap-1.5">
+        {plan.price === 0 ? (
+          <span className="text-3xl font-semibold leading-none text-text">免费</span>
+        ) : (
+          <span className="text-3xl font-semibold leading-none text-text">
+            {formatMoney(plan.price)}
+          </span>
+        )}
+        <span className="text-sm text-text-tertiary">/{planTerm(plan.durationDays)}</span>
+      </div>
+      {typeof plan.originalPrice === 'number' && plan.originalPrice > plan.price ? (
+        <div className="mt-1 text-xs text-text-tertiary line-through">
+          原价 {formatMoney(plan.originalPrice)}
+        </div>
       ) : null}
 
-      {features.length ? (
-        <ul className="mt-4 flex-1 space-y-2">
-          {features.map(feature => (
-            <li key={feature} className="flex items-start gap-2 text-sm text-text-secondary">
-              <CheckIcon className="mt-0.5 shrink-0 text-primary" />
-              <span className="min-w-0">{feature}</span>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <div className="flex-1" />
-      )}
+      {plan.description ? (
+        <p className="mt-4 line-clamp-3 text-sm leading-6 text-text-secondary">{plan.description}</p>
+      ) : null}
+
+      <div className="flex-1" />
 
       <Button
         type={featured ? 'primary' : 'default'}
+        block
         className="mt-6"
         loading={loading}
         onClick={onSelect}
       >
         {INTENT_ACTION[intent]}
       </Button>
-      {note ? <div className="mt-2 text-center text-xs text-text-tertiary">{note}</div> : null}
+      {INTENT_NOTE[intent] ? (
+        <div className="mt-2 text-center text-xs text-text-tertiary">{INTENT_NOTE[intent]}</div>
+      ) : null}
     </div>
   )
+}
+
+/** 对比表某个分组：组头行 + 功能行 */
+function CompareGroupRows({
+  section,
+  featured,
+}: {
+  section: CompareSection
+  featured: boolean[]
+}) {
+  return (
+    <>
+      <tr className="bg-fill-secondary/60">
+        <td colSpan={featured.length + 1} className="p-3 pl-6 text-sm font-medium text-text">
+          {section.groupName}
+        </td>
+      </tr>
+      {section.rows.map((row, ri) => (
+        <tr key={`${section.groupName}-${ri}`} className="transition-colors hover:bg-fill-secondary/40">
+          <td className="p-3.5 pl-8 align-top text-text-secondary">{row.label}</td>
+          {row.values.map((value, pi) => (
+            <td
+              key={pi}
+              className={`p-3.5 text-center align-middle ${
+                featured[pi] ? 'bg-primary-bg/40' : ''
+              }`}
+            >
+              <FeatureValue value={value} />
+            </td>
+          ))}
+        </tr>
+      ))}
+    </>
+  )
+}
+
+/** 布尔与文本取值展示 */
+function FeatureValue({ value }: { value: string }) {
+  if (!value || value === 'false') return <span className="text-text-tertiary">—</span>
+  if (value === 'true') {
+    return <CheckCircleFilled className="text-sm text-primary" />
+  }
+  return <span className="text-text">{value}</span>
 }

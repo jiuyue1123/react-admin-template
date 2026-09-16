@@ -2,9 +2,12 @@ import { useMemo, useState } from 'react'
 import { Button } from 'antd'
 import { ReloadOutlined } from '@ant-design/icons'
 import { Puck } from '@puckeditor/core'
-import { MediaFieldContext, puckConfig } from '@jff/builder-blocks'
+import { puckConfig, setMediaField } from '@jff/builder-blocks'
 import PuckMediaField from '@/components/PuckMediaField'
 import '@puckeditor/core/dist/index.css'
+
+// 注册媒体选择器实现：编辑器中所有图片类字段共用（一次注册，全局生效）
+setMediaField(PuckMediaField)
 
 const STORAGE_KEY = 'puck-test-data'
 
@@ -19,7 +22,7 @@ function loadSaved() {
 
 /**
  * Puck 编辑器测试页:接入全部 builder-blocks 组件,
- * 并通过 MediaFieldContext 注入 PuckMediaField,验证从媒体库选图的完整链路
+ * 并通过 setMediaField 注册 PuckMediaField,验证从媒体库选图的完整链路
  */
 export default function PuckTestPage() {
   const [version, setVersion] = useState(0)
@@ -37,21 +40,19 @@ export default function PuckTestPage() {
 
   return (
     <div className="h-[calc(100vh-6rem)]">
-      <MediaFieldContext.Provider value={PuckMediaField}>
-        <Puck
-          key={version}
-          config={puckConfig}
-          data={initial}
-          height="100%"
-          headerTitle="Puck 编辑器测试"
-          onChange={handleChange}
-          renderHeaderActions={() => (
-            <Button icon={<ReloadOutlined />} onClick={handleReset}>
-              重置
-            </Button>
-          )}
-        />
-      </MediaFieldContext.Provider>
+      <Puck
+        key={version}
+        config={puckConfig}
+        data={initial}
+        height="100%"
+        headerTitle="Puck 编辑器测试"
+        onChange={handleChange}
+        renderHeaderActions={() => (
+          <Button icon={<ReloadOutlined />} onClick={handleReset}>
+            重置
+          </Button>
+        )}
+      />
     </div>
   )
 }

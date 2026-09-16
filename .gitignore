@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Next.js 构建产物
+.next
+out
+
+# TypeScript 增量构建缓存
+*.tsbuildinfo
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

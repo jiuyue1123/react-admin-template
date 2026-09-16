@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useRequest } from 'alova/client'
 import { Puck } from '@puckeditor/core'
 import type { Data } from '@puckeditor/core'
-import { MediaFieldContext, puckConfig } from '@jff/builder-blocks'
+import { puckConfig, setMediaField } from '@jff/builder-blocks'
 import PuckMediaField from '@/components/PuckMediaField'
 import {
   fetchGetPage,
@@ -16,6 +16,9 @@ import {
 } from '@/service/api/sitePage'
 import { getPageStateMeta, PAGE_PREVIEW_LIVE_KEY, parseContent } from '@/utils/sitePage'
 import '@puckeditor/core/dist/index.css'
+
+// 注册媒体选择器实现：编辑器中所有图片类字段共用（一次注册，全局生效）
+setMediaField(PuckMediaField)
 
 /** 格式化时间 */
 function formatDateTime(value: string) {
@@ -181,49 +184,47 @@ export default function PageEditorPage() {
 
   return (
     <div className="h-screen">
-      <MediaFieldContext.Provider value={PuckMediaField}>
-        <Puck
-          key={reloadKey}
-          config={puckConfig}
-          data={contentData}
-          height="100%"
-          headerTitle={pageTitle}
-          onChange={data => setContentData(data as Data)}
-          renderHeaderActions={() => (
-            <div className="flex items-center gap-2">
-              <Tag color={stateMeta.color}>{stateMeta.label}</Tag>
-              {version > 0 && <span className="text-xs text-text-tertiary">v{version}</span>}
-              {dirty && <Tag color="red">未保存</Tag>}
-              <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
-                返回
-              </Button>
-              <Button icon={<HistoryOutlined />} onClick={openVersions}>
-                版本历史
-              </Button>
-              <Button icon={<EyeOutlined />} onClick={handlePreview}>
-                预览
-              </Button>
-              <Button
-                icon={<SendOutlined />}
-                loading={publishRequest.loading}
-                disabled={pageState === 1}
-                onClick={handlePublish}
-              >
-                发布
-              </Button>
-              <Button
-                type="primary"
-                icon={<SaveOutlined />}
-                loading={saveRequest.loading}
-                disabled={!dirty}
-                onClick={handleSave}
-              >
-                保存草稿
-              </Button>
-            </div>
-          )}
-        />
-      </MediaFieldContext.Provider>
+      <Puck
+        key={reloadKey}
+        config={puckConfig}
+        data={contentData}
+        height="100%"
+        headerTitle={pageTitle}
+        onChange={data => setContentData(data as Data)}
+        renderHeaderActions={() => (
+          <div className="flex items-center gap-2">
+            <Tag color={stateMeta.color}>{stateMeta.label}</Tag>
+            {version > 0 && <span className="text-xs text-text-tertiary">v{version}</span>}
+            {dirty && <Tag color="red">未保存</Tag>}
+            <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
+              返回
+            </Button>
+            <Button icon={<HistoryOutlined />} onClick={openVersions}>
+              版本历史
+            </Button>
+            <Button icon={<EyeOutlined />} onClick={handlePreview}>
+              预览
+            </Button>
+            <Button
+              icon={<SendOutlined />}
+              loading={publishRequest.loading}
+              disabled={pageState === 1}
+              onClick={handlePublish}
+            >
+              发布
+            </Button>
+            <Button
+              type="primary"
+              icon={<SaveOutlined />}
+              loading={saveRequest.loading}
+              disabled={!dirty}
+              onClick={handleSave}
+            >
+              保存草稿
+            </Button>
+          </div>
+        )}
+      />
 
       <Drawer title="版本历史" open={versionsOpen} onClose={() => setVersionsOpen(false)} width={420}>
         {versionsLoading && !versions.length ? (

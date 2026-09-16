@@ -2,7 +2,8 @@
 
 > 最后同步：2026-09-03（首次全量探索）。本文件随任务完成持续更新（CLAUDE.md 规则 5）。
 > 若本文件已存在：会话开始时加载本上下文，不再重复全量探索。
-> 最近更新：2026-09-03 完成计费订阅 M1 与 实名认证 / 站点生命周期与上线 / 站内信（M2+M3）；并新增支付结果页（blank、成功倒计时自动关闭）。
+> 最近更新：2026-09-03 完成计费订阅 M1 与 实名认证 / 站点生命周期与上线 / 站内信（M2+M3）；并新增支付结果页（blank、成功倒计时自动关闭）与租户端发票管理（申请 + 查看，见 §5/§6）。
+> 2026-09-16 新增**访客端 `apps/site`**（租户站点渲染端，Next.js 16 SSR，多租户共用部署）——见 §10。`@jff/builder-blocks` 已去除 antd 与图标库依赖、改为内置 SVG + 模块级媒体选择器注册，以满足 RSC 渲染。
 
 ## 1. 产品与定位
 - **简帆坊（Jianfanfang）** —— SaaS 站点搭建的**租户端自助后台**（本仓库即租户后台 admin）。租户以手机号+短信验证码**注册即创建租户**（/register）或登录，自助运营一个营销官网微站：站点设置、页面（Puck 拖拽搭建）、导航菜单、媒体库、个人中心。
@@ -16,8 +17,9 @@ Monorepo：pnpm workspace（pnpm-workspace.yaml → `packages/*`），成员 `@j
 ## 3. 工程结构
 ```
 admin/                      # git remote: github.com/jiuyue1123/react-admin-template.git
-├─ packages/builder-blocks/ # @jff/builder-blocks：Puck 组件库（puckConfig 注册表 + 13 个 *.puck.tsx + media-field）
-├─ docs/                    # theme.md（token 主题）；jff.md（新建未提交：租户端 pages/menus API tarslib 导出）
+├─ apps/site/               # @jff/site：访客端（租户站点渲染端，Next.js 16 SSR）见 §10
+├─ packages/builder-blocks/ # @jff/builder-blocks：Puck 组件库（puckConfig 注册表 + 13 个 *.puck.tsx + 内置 SVG 图标）
+├─ docs/                    # theme.md（token 主题）；jff.md（租户端 pages/menus API tarslib 导出）
 ├─ src/
 │  ├─ components/           # AgreementModal AuthBrandPanel SmsCodeButton MediaPicker PuckMediaField
 │  ├─ layouts/              # base（Sider 菜单+Header）/ blank（仅 Outlet）
@@ -56,8 +58,9 @@ admin/                      # git remote: github.com/jiuyue1123/react-admin-temp
 | 实名认证(M2) | api/verification.ts | verification GET(当前，无记录可 null) · POST(提交，企业/个人) |
 | 站内信(M3) | api/message.ts | messages GET(分页 page/size/unreadOnly) · messages/unread-count · messages/{id}/read PUT · messages/read-all PUT |
 | 站点状态/上线(M2) | api/site.ts（追加） | site/status GET(生命周期+建站进度) · site/publish PUT(需实名且未过期) |
+| 发票(M4) | api/invoice.ts | billing/invoices GET(分页 state/page/size) · POST(提交, 多单合并) · GET /{applyNo}(详情含 orders/files/logs) · POST /{applyNo}/withdraw · invoices/orders GET(可开票) · invoices/headings/default GET(实名默认抬头; enterprise=true 才可选专票) |
 
-**计费枚举（后端补充为准，集中 `utils/billing.ts`）**：orderType 1购买 2续费 3升配 4降配；orderState 0待支付(建单) 1支付中(发起支付) 2已支付(回调/「我已付款」命中) 3已取消 4已失败 5已退款(审核通过退回后) 6待人工确认(「我已付款」未查到) 7退款中(申请退款成功待审核)；payState 0创建 1成功 2失败 3退款；subscriptionState 0已取消 1待激活 2试用中 3生效中 4已过期；changeType(tenant_subscription) 1购买 2续费 3升配 4降配 5人工调整；计费操作日志 opLog.operatorType **1管理员 2租户**（勿与 subscription_change_log 的 1租户混淆）。**订阅变更日志(history 现按 subscription_change_log 返回)**：changeType 1购买 2续费 3升配 4降配 **5退款** 6人工调整（utils 用 CHANGE_LOG_TYPE_META，勿与 tenant_subscription 的 1-5 混）。订阅字段：daysLeft null=永久；planSnapshot/features 为 JSON 字符串，前端**容忍解析**（parsePlanSnapshot/parsePlanFeatures，字段名以后端为准，联调校准）。
+**计费枚举（后端补充为准，集中 `utils/billing.ts`）**：orderType 1购买 2续费 3升配 4降配；orderState 0待支付(建单) 1支付中(发起支付) 2已支付(回调/「我已付款」命中) 3已取消 4已失败 5已退款(审核通过退回后) 6待人工确认(「我已付款」未查到) 7退款中(申请退款成功待审核)；payState 0创建 1成功 2失败 3退款；subscriptionState 0已取消 1待激活 2试用中 3生效中 4已过期；changeType(tenant_subscription) 1购买 2续费 3升配 4降配 5人工调整；计费操作日志 opLog.operatorType **1管理员 2租户**（勿与 subscription_change_log 的 1租户混淆）。**订阅变更日志(history 现按 subscription_change_log 返回)**：changeType 1购买 2续费 3升配 4降配 **5退款** 6人工调整（utils 用 CHANGE_LOG_TYPE_META，勿与 tenant_subscription 的 1-5 混）。订阅变更记录展示：仅迁移类（续费/升配/降配）显示 from→to 箭头；购买/退款忽略后端残留的 from 快照（退款后再购的 from 可能沿用上一套餐编码，避免误读）。订阅字段：daysLeft null=永久；planSnapshot/features 为 JSON 字符串，前端**容忍解析**（parsePlanSnapshot/parsePlanFeatures，字段名以后端为准，联调校准）。
 
 **数据模型关系**：租户(Api.Auth.TenantProfile 有 tenantId/tenantName/tenantCode)拥有 1 个 Site(SiteVO)；Site 下 N 个 SitePage（pageTitle/pagePath/pageState 0草稿|1已发布|2已下线/sortOrder；`content`=Puck JSON 字符串；带版本号+回滚）+ 菜单树 SiteMenu（parentId 自引用，0=顶层；linkType 1=站点页面→linkTarget 存页面 id / 2=自定义 URL）。媒体：MediaAsset(fileType 1图/2视频/3文件) 挂在 MediaFolder(parentId 嵌套)下；**页面以 URL 字符串引用媒体，不存 asset id**。pageState 状态机：0→发布(1)，1→隐藏(2)，2→上线(1)。
 
@@ -70,7 +73,7 @@ admin/                      # git remote: github.com/jiuyue1123/react-admin-temp
 | /profile | base | profile | hideInMenu；改手机号/改密/协议 |
 | /site | base | site | 站点设置（概览 + 生命周期/建站进度/上线 + 表单）；上线需实名且未过期 |
 | /verification | base | verification | 实名认证（企业/个人提交、审核状态、重新认证），order 5 |
-| /billing(/plans\|/subscription\|/orders) | base | billing/* | 费用与订阅：套餐选购/我的订阅/订单记录（order 3 组）；/billing/orders/:orderNo 详情 hideInMenu |
+| /billing(/plans\|/subscription\|/orders\|/invoices) | base | billing/* | 费用与订阅（order 3 组）：套餐选购(当前 hideInMenu)/我的订阅/订单记录/发票管理；/billing/orders/:orderNo、/billing/pay-result 为隐藏路由 |
 | /messages | base | messages | 站内信中心（header 铃铛进入），hideInMenu |
 | /content(/media\|pages\|menu) | base | content/* | 媒体中心/页面管理/菜单管理 |
 | /content/pages/edit\|preview/:pageId | blank | content/pages/edit\|preview | Puck 编辑器 / 预览，hideInMenu |
@@ -86,7 +89,7 @@ Puck 编辑器 edit：包 `<MediaFieldContext.Provider value={PuckMediaField}>`�
 - `components/PuckMediaField.tsx`：`MediaFieldProps{value,onChange}` 宿主实现 → MediaPicker(fileType=1)，onConfirm 取 `item.url`。
 - `utils/media.ts`：MEDIA_FILE_TYPE、getMediaTypeLabel、formatFileSize、getFileExtension、isImageMedia/isVideoMedia。
 - `utils/sitePage.ts`：PAGE_PREVIEW_LIVE_KEY、PAGE_STATE_META/getPageStateMeta、parseContent(Puck JSON 容忍解析)、getPageStateAction。
-- `utils/billing.ts`（M1）：计费枚举 meta（Tag 色）+ getXxxMeta、formatMoney、getDurationLabel、parsePlanFeatures/parsePlanSnapshot、getActivePlanInfo、resolvePlanIntent（购买/续费/升配/降配判定）、getBillingBanner（横幅文案）。
+- `utils/billing.ts`（M1）：计费枚举 meta（Tag 色）+ getXxxMeta、formatMoney、getDurationLabel、parsePlanFeatures/parsePlanSnapshot、getActivePlanInfo、resolvePlanIntent（购买/续费/升配/降配判定）、getBillingBanner（横幅文案）。**features 真实结构 = JSON `{groups:[{groupName,items:[{label,value}]}]}`（value 字符串，布尔 true/false）**：结构化解析 `parseFeatureGroups`（对比表用）；`parsePlanFeatures` 拍平为可见权益行（订阅卡用）。/billing/plans 为分组功能对比表（推荐列高亮、布尔 ✓/—）。
 - `utils/date.ts`（M1）：formatDate/formatDateTime（zh-CN，非法值容错）；`utils/pay.ts`：submitPayForm(payFormHtml)——取返回 HTML 内 `<form>` 设 target=_blank 提交（支付宝电脑站支付）。
 - `utils/verification.ts`（M2）：VERIFY_TYPE/VERIFY_STATE meta + isVerificationPassed（含有效期）。`utils/site.ts`（M2）：SITE_STATE_META(0建设..5归档) / STAGE_META(1设计..4上线) / STAGE_STATE_META + getters。
 - store：`store/messages.ts`（M3）{unreadCount, refreshUnread}——header 铃铛 60s 轮询与消息页共用；`store/billing.ts`（M1）见上。
@@ -95,10 +98,42 @@ Puck 编辑器 edit：包 `<MediaFieldContext.Provider value={PuckMediaField}>`�
 
 ## 8. 工作树状态与隐患（未提交，master 超前 origin 1 commit）
 - 已删除：`pages/system/{user,role}`、`docs/jff-tenant.md`。已新增：上述 content/site/media 模块、builder-blocks、MediaPicker、api/media|site|sitePage|siteMenu|billing、billing 页面（plans/subscription/orders/order-detail）等。
-- 计费订阅 M1 与 实名/站点/站内信 M2+M3 已实现（均未提交）。**产品口径：支付不需实名，仅站点上线需实名**（site/publish 门禁：实名通过且未过期、订阅有效；pay 流程不加认证引导）。未做：在线客服（明确不纳入）、发票/自定义域名/OCR（无 API）、官网访问端、订阅过期内容遮罩（全局横幅 + 后端 403 兜底）。
+- 计费订阅 M1 与 实名/站点/站内信 M2+M3 已实现（均未提交）。**产品口径：支付不需实名，仅站点上线需实名**（site/publish 门禁：实名通过且未过期、订阅有效；pay 流程不加认证引导）。
+- 未做：在线客服（明确不纳入）、发票/自定义域名/OCR（无 API）、订阅过期内容遮罩（全局横幅 + 后端 403 兜底）。~~官网访问端~~ **已于 2026-09-16 实现（见 §10）**。
 - 站点 siteState 语义 0建设中 1待发布 2已上线 3已到期 4已退款 5已归档（M2 起启用，覆盖早期 mock 的 0/1）。
 - 隐患：① puck-test / media-picker-test 对菜单可见（order 8/9）；② README、包名、index.html 仍 `react-admin-template`，品牌未统一；③ docs/jff.md 与新增 api 未入 README 索引；④ 根 typecheck/build 不覆盖 builder-blocks；⑤ .env / .env.test 已提交（含超管角色串）。
 - 排序均为前端重排后批量 `PUT */sort`；页面列表/状态过滤为前端本地过滤。
 
 ## 9. 参考文档
-`docs/theme.md`（token 主题体系）；`docs/jff.md`（租户端全量 API：认证/页面/菜单/媒体/**计费订阅**/实名/站内信/客服，tarslib 导出；SQL 枚举取值为权威映射来源）；`CLAUDE.md`（本仓规则：默认计划模式、验证后完成、教训沉淀、上下文同步）。
+`docs/theme.md`（token 主题体系）；`docs/jff.md`（全量 API：认证/站点/页面/菜单/媒体/计费订阅/实名/站内信/客服/**公开端站点渲染**，tarslib 导出；SQL 枚举取值为权威映射来源）；`apps/site/README.md`（访客端开发/部署/约束）；`CLAUDE.md`（本仓规则：默认计划模式、验证后完成、教训沉淀、上下文同步）。
+
+## 10. 访客端 `apps/site`（@jff/site，2026-09-16 新增）
+**定位**：租户官网站点的对外访问端，即「工程师定制首页 + 自助内页」里的渲染侧。此前完全不存在。
+
+**架构**：Next.js 16 App Router · React 19 · Tailwind v4 · **方案 A 多租户共用一个部署**（后端按请求 Host 解析租户）。`admin/apps/site`，pnpm workspace 加 `apps/*`。
+
+**公开端接口**（后端已实现，匿名，按 Host 解析，仅已上线站点）：
+`GET /public/site`（站点信息 + 导航树 + `defaultPagePath`）· `GET /public/site/pages`（已发布页面列表，不含内容）· `GET /public/site/pages/{pagePath}`（含 Puck JSON）。
+
+**关键机制**
+- **Host 透传**：Node 的 `fetch` 按规范剥离 `Host` 头（实测显式传入也会被忽略），因此 `lib/transport.ts` 用 `node:http` 直发并显式带上原始 Host（同时附带 `X-Forwarded-Host`）。不引入 Route Handler 代理。
+- **站点解析**（`lib/site.ts`）：用 React `cache()` 做请求内去重；解析放在**页面**里而非 layout，页面才能用 `notFound()` 拿到真 404。
+- **首页解析**（`homepages/registry.ts`）：首页恒为 React 页面（Puck 只用于内页）。顺序 = **客户专属首页**（`HOMEPAGES[标签]`，自定义域名走 `DOMAIN_ALIASES`）→ **共享兜底首页**（`FALLBACK_HOMEPAGE` = `homepages/default/`，未注册的站点一律走它）→ `defaultPagePath` 的 Puck 内容（最后一道保险）。
+  - `homepages/default/` **同时服务所有未定制站点**，因此只能消费 `site`（站名/简介/Logo/导航）+ `pages`（已发布页面）自组装，**严禁出现任何行业文案**；换品牌只改 `--jf-accent`。专门手写的客户首页放 `homepages/{客户标签}/`。
+  - 首页外面套 `HomepageBoundary`（`'use client'`，catch 里先 `unstable_rethrow` 以免吞掉 `notFound()`），出错回落 Puck 页而非整站 500。
+- **SSR 渲染 Puck**：`@puckeditor/core` 带 `react-server` 导出条件 → `dist/rsc.mjs` 的 `ServerRender`，无浏览器全局、不引 CSS，内页内容随首屏 HTML 直出（已实测）。
+- **开发态**：`DEV_SITE_HOST` 让 localhost 冒充某个站点 Host；详见 `apps/site/README.md`。
+
+**`@jff/builder-blocks` 的配套改造**（为让区块能在 RSC 服务端渲染）
+- 去 antd：`Button.puck.tsx` 改纯内联样式（保留 hover/active/disabled，用 CSS 变量 + `<style href precedence>` 提升）；`media-field.tsx` 的 antd Input 改原生 input。
+- 去图标库：`@ant-design/icons` 的图标都是 `'use client'` 组件且模块作用域调用 `createContext`，**无法在服务端渲染**。改为内置 SVG（`components/icons.tsx`，24×24 stroke，尺寸 `1em` 使各区块原有 `fontSize` 样式无需改动）。
+- `MediaFieldContext` → `setMediaField()` **模块级注册**（`createContext` 是让整个包无法进 RSC 的根因）。admin 的 `content/pages/edit` 与 `puck-test` 已改为页面顶层调用 `setMediaField(PuckMediaField)`，不再包 Provider。
+- 新增守卫 `pnpm --filter @jff/builder-blocks check:rsc`（已挂在 build 上）：断言产物不含客户端专有 API 与 UI 组件库。
+- 产物运行时依赖现仅 `react` + `react/jsx-runtime`（46 kB / gzip 10.9 kB）。
+
+**本地验证数据**（开发库，2026-09-16 造）
+- 平台种子：`admin/admin123` + 三档套餐（应用 `jff-api/docs/schema.sql` 末尾的初始化 INSERT）。
+- 租户1 `xingchen.jianfanfang.com` = 星辰汽修服务中心（2 页 + 3 导航，含 `tel:`）；租户2 `tianmi.jianfanfang.com` = 甜蜜时光烘焙（1 页，无导航）。两者都未注册专属首页，因此都走共享兜底首页 —— 天然构成「多行业共用一套兜底」的验证样本。
+- 租户3 `hello.jianfanfang.com` = 你好工作室（2 页 + 1 外链导航），**注册了专属首页** `HOMEPAGES.hello` → `homepages/hello/`（暗色海报风示例）。用于对照「客户专属首页 ≠ 共享兜底」。
+- 租户4 `chenxi.jianfanfang.com` = 晨曦花艺（3 页 + 3 导航含 `tel:`），**未注册专属首页**，走共享兜底 —— 与租户1/2 同为兜底样本，但行业不同，用于持续检验「兜底首页行业中立的」这条约束。
+- 验证路径：注册租户 → 提交实名 → 平台端 approve → 建单 → 平台端 `manual-paid` → 发布页面 → 站点上线（跳过支付宝）。验证码从 Redis 取：`sms:code:tenant_register:{phone}`（发送短信**之前**就已写入）。

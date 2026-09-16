@@ -14,7 +14,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && pnpm check:rsc",
+    "check:rsc": "node scripts/check-rsc-safety.mjs",
     "lint": "oxlint",
     "preview": "vite preview"
   },
@@ -32,9 +33,7 @@
     "vite-plugin-dts": "^5.0.3"
   },
   "peerDependencies": {
-    "@ant-design/icons": "^6.3.2",
     "@puckeditor/core": "^0.23.0",
-    "antd": "^6.6.2",
     "react": "^19.2.8",
     "react-demo": "^2.0.0"
   }

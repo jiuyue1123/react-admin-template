@@ -1,5 +1,6 @@
+import type { CSSProperties } from "react";
 import type { ComponentConfig } from "@puckeditor/core";
-import { Button as AntButton } from "antd";
+import { BlockStyles } from "./block-styles";
 import { getIconNode, ICON_OPTIONS } from "./shared";
 
 // ---------------------------------------------------------------------------
@@ -45,23 +46,79 @@ const YES_NO_OPTIONS = [
 ] as const;
 
 // ---------------------------------------------------------------------------
-// variant → antd type/color/variant mapping
+// Design tokens — 对齐 antd 默认调色板，与本包其余区块一致
 // ---------------------------------------------------------------------------
 
-const VARIANT_MAP: Record<
-  ButtonVariant,
-  {
-    type: "primary" | "default";
-    color?: "primary" | "danger" | "default";
-    variant?: "solid" | "outlined" | "dashed" | "text";
-  }
+const PRIMARY = "#1677ff";
+const PRIMARY_HOVER = "#4096ff";
+const PRIMARY_ACTIVE = "#0958d9";
+const DANGER = "#ff4d4f";
+const DANGER_HOVER = "#ff7875";
+const DANGER_ACTIVE = "#d9363e";
+
+const DEFAULT_BORDER = "#d9d9d9";
+const TEXT = "rgba(0, 0, 0, 0.88)";
+const FILL_HOVER = "rgba(0, 0, 0, 0.06)";
+const FILL_ACTIVE = "rgba(0, 0, 0, 0.15)";
+const DISABLED_BG = "rgba(0, 0, 0, 0.04)";
+const DISABLED_FG = "rgba(0, 0, 0, 0.25)";
+
+/** 尺寸预设：对齐 antd 的 controlHeight / paddingInline / borderRadius 三档 */
+const SIZE_MAP: Record<
+  ButtonSize,
+  { height: number; paddingInline: number; fontSize: number; borderRadius: number }
 > = {
-  primary: { type: "primary", color: "primary", variant: "solid" },
-  secondary: { type: "default", variant: "solid" },
-  outline: { type: "default", variant: "outlined" },
-  dashed: { type: "default", variant: "dashed" },
-  text: { type: "default", variant: "text" },
+  small: { height: 24, paddingInline: 7, fontSize: 14, borderRadius: 4 },
+  medium: { height: 32, paddingInline: 15, fontSize: 14, borderRadius: 6 },
+  large: { height: 40, paddingInline: 15, fontSize: 16, borderRadius: 8 },
 };
+
+/** 变体 + 危险态 → 各交互态配色 */
+function resolvePalette(variant: ButtonVariant, isDanger: boolean) {
+  const accent = isDanger ? DANGER : PRIMARY;
+  const accentHover = isDanger ? DANGER_HOVER : PRIMARY_HOVER;
+  const accentActive = isDanger ? DANGER_ACTIVE : PRIMARY_ACTIVE;
+
+  switch (variant) {
+    case "primary":
+      return {
+        bg: accent,
+        border: accent,
+        fg: "#ffffff",
+        hoverBg: accentHover,
+        hoverBorder: accentHover,
+        hoverFg: "#ffffff",
+        activeBg: accentActive,
+        activeBorder: accentActive,
+        activeFg: "#ffffff",
+      };
+    case "text":
+      return {
+        bg: "transparent",
+        border: "transparent",
+        fg: isDanger ? DANGER : TEXT,
+        hoverBg: isDanger ? "rgba(255, 77, 79, 0.1)" : FILL_HOVER,
+        hoverBorder: "transparent",
+        hoverFg: isDanger ? DANGER_HOVER : TEXT,
+        activeBg: isDanger ? "rgba(255, 77, 79, 0.2)" : FILL_ACTIVE,
+        activeBorder: "transparent",
+        activeFg: isDanger ? DANGER_ACTIVE : TEXT,
+      };
+    // secondary / outline / dashed 视觉基底一致，仅边框线型不同
+    default:
+      return {
+        bg: "#ffffff",
+        border: isDanger ? DANGER : DEFAULT_BORDER,
+        fg: isDanger ? DANGER : TEXT,
+        hoverBg: "#ffffff",
+        hoverBorder: accentHover,
+        hoverFg: accentHover,
+        activeBg: "#ffffff",
+        activeBorder: accentActive,
+        activeFg: accentActive,
+      };
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Component config
@@ -90,43 +147,105 @@ export const ButtonConfig: ComponentConfig<ButtonProps> = {
     padding,
     puck,
   }) {
-    const vm = VARIANT_MAP[variant] ?? VARIANT_MAP.primary;
-    const iconNode = getIconNode(icon);
     const isDanger = danger === "yes";
+    const palette = resolvePalette(variant ?? "primary", isDanger);
+    const dims = SIZE_MAP[size] ?? SIZE_MAP.medium;
     const isBlock = block === "yes";
     const isDisabled = disabled === "yes";
+    // 描边类变体才响应「边框色」字段（与 resolveFields 的显隐规则一致）
     const hasBorder = variant === "outline" || variant === "dashed";
-    const br = Number(borderRadius) || undefined;
-    const fs = Number(fontSize) || undefined;
-    const fw = Number(fontWeight) || undefined;
 
-    const style: React.CSSProperties = {};
+    const style: Record<string, string | number> = {
+      height: dims.height,
+      padding: `0 ${dims.paddingInline}px`,
+      fontSize: dims.fontSize,
+      borderRadius: dims.borderRadius,
+      borderWidth: 1,
+      borderStyle: variant === "dashed" ? "dashed" : "solid",
+      backgroundColor: palette.bg,
+      borderColor: palette.border,
+      color: palette.fg,
+      // 交互态由静态样式表读取（见 block-styles.tsx）
+      "--jff-btn-hover-bg": palette.hoverBg,
+      "--jff-btn-hover-border": palette.hoverBorder,
+      "--jff-btn-hover-color": palette.hoverFg,
+      "--jff-btn-active-bg": palette.activeBg,
+      "--jff-btn-active-border": palette.activeBorder,
+      "--jff-btn-active-color": palette.activeFg,
+    };
+
+    // 形状：撑满宽度时圆形/圆角无意义（resolveFields 已隐藏该字段）
+    if (isBlock) {
+      style.width = "100%";
+    } else if (shape === "circle") {
+      style.width = dims.height;
+      style.padding = 0;
+      style.borderRadius = "50%";
+    } else if (shape === "round") {
+      style.borderRadius = 999;
+    }
+
+    if (isDisabled) {
+      style.backgroundColor = DISABLED_BG;
+      style.borderColor = DEFAULT_BORDER;
+      style.color = DISABLED_FG;
+      style.cursor = "not-allowed";
+    }
+
+    // 自定义外观字段优先级最高（与改造前的行为一致）
     if (color) style.color = color;
-    if (backgroundColor) style.background = backgroundColor;
-    if (hasBorder && borderColor)
-      (style as Record<string, string>).borderColor = borderColor;
-    if (br && br > 0) style.borderRadius = br;
-    if (fs && fs > 0) style.fontSize = fs;
-    if (fw && fw > 0) style.fontWeight = fw;
+    if (backgroundColor) style.backgroundColor = backgroundColor;
+    if (hasBorder && borderColor) style.borderColor = borderColor;
+    const br = Number(borderRadius);
+    if (br > 0) style.borderRadius = br;
+    const fs = Number(fontSize);
+    if (fs > 0) style.fontSize = fs;
+    const fw = Number(fontWeight);
+    if (fw > 0) style.fontWeight = fw;
     if (padding) style.padding = padding;
 
-    return (
-      <AntButton
-        ref={puck.dragRef}
-        type={vm.type}
-        color={isDanger ? "danger" : (vm.color ?? "default")}
-        variant={vm.variant}
-        shape={isBlock ? "default" : shape}
-        size={size === "medium" ? "middle" : size}
-        icon={iconNode}
-        disabled={isDisabled}
-        block={isBlock}
-        href={href || undefined}
-        target={href ? (target as "_self" | "_blank") : undefined}
-        style={Object.keys(style).length > 0 ? style : undefined}
-      >
+    const css = style as CSSProperties;
+    const iconNode = getIconNode(icon);
+    const content = (
+      <>
+        {iconNode}
         {text}
-      </AntButton>
+      </>
+    );
+
+    // 有链接且未禁用时用 <a>，保证可被右键/新标签打开；否则退回 <button>
+    if (href && !isDisabled) {
+      return (
+        <>
+          <BlockStyles />
+          <a
+            ref={puck.dragRef}
+            className="jff-btn"
+            style={css}
+            href={href}
+            target={target || undefined}
+            rel={target === "_blank" ? "noopener noreferrer" : undefined}
+          >
+            {content}
+          </a>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <BlockStyles />
+        <button
+          ref={puck.dragRef}
+          className="jff-btn"
+          style={css}
+          type="button"
+          disabled={isDisabled}
+          aria-disabled={isDisabled || undefined}
+        >
+          {content}
+        </button>
+      </>
     );
   },
 

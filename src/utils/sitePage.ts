@@ -15,13 +15,21 @@ export function getPageStateMeta(state: number) {
   return PAGE_STATE_META[state] ?? { label: '未知', color: 'default' }
 }
 
+/** 空文档：Puck 的服务端渲染会访问 `data.root.props`，返回 `{}` 会直接抛
+ *  `TypeError: Cannot use 'in' operator`，因此兜底必须是结构化空文档 */
+const EMPTY_PUCK_DATA: Data = { root: { props: {} }, content: [] }
+
 /** 解析页面内容（Puck JSON 字符串），空或非法时返回空文档 */
 export function parseContent(content: string): Data {
-  if (!content) return {}
+  if (!content) return EMPTY_PUCK_DATA
   try {
-    return JSON.parse(content) as Data
+    const parsed = JSON.parse(content) as Data | null
+    if (!parsed || typeof parsed !== 'object' || !parsed.root || !Array.isArray(parsed.content)) {
+      return EMPTY_PUCK_DATA
+    }
+    return parsed
   } catch {
-    return {}
+    return EMPTY_PUCK_DATA
   }
 }
 

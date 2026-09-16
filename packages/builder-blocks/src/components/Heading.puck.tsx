@@ -40,6 +40,20 @@ const DEFAULT_FONT_SIZES: Record<HeadingLevel, number> = {
   6: 14,
 };
 
+/**
+ * 归一化标题级别
+ *
+ * 区块的 `level` 是直接用模板串拼成标签名的，而 Puck 内容来自接口 / 导入，
+ * 可能存有非法值（例如写成字符串 `"h2"` 会拼出 `<hh2>` 这种无效标签，
+ * 浏览器只报 console 警告、页面结构静默错乱）。这里把不合法的一律回落到 h2。
+ */
+const LEVEL_PATTERN = /^h?([1-6])$/i;
+
+function normalizeLevel(level: unknown): HeadingLevel {
+  const matched = LEVEL_PATTERN.exec(String(level));
+  return matched ? (Number(matched[1]) as HeadingLevel) : 2;
+}
+
 // ---------------------------------------------------------------------------
 // Component config
 // ---------------------------------------------------------------------------
@@ -58,10 +72,11 @@ export const HeadingConfig: ComponentConfig<HeadingProps> = {
     margin,
     puck,
   }) {
-    const Tag = `h${level}` as const;
+    const tagLevel = normalizeLevel(level);
+    const Tag = `h${tagLevel}` as const;
     const style: CSSProperties = {
       textAlign: align,
-      fontSize: DEFAULT_FONT_SIZES[level],
+      fontSize: DEFAULT_FONT_SIZES[tagLevel],
       margin,
     };
     if (color) style.color = color;

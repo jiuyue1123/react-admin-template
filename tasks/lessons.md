@@ -77,6 +77,19 @@ Git Bash 的 `/tmp` 是 `C:/Users/<user>/AppData/Local/Temp`，而 Windows Pytho
 **How to apply**：本地脚本传中文载荷一律**写文件再 `--data-binary @file`**，不要走
 命令行或管道；跨 bash/Python 共享临时文件时用 Windows 绝对路径。
 
+## 7. 文件扩展名必须与内容匹配（`.ts` 不能写 JSX）
+
+**现象**：新建 `src/hooks/useQuotaGate.ts`，里面为 `modal.info` 的 content 写了 JSX，
+dev server 直接报 `Unexpected token, expected ","`，指向 `<div` 那一行。
+
+**Why**：Vite/Babel 按扩展名决定是否启用 JSX 解析，与文件里有没有 React import 无关。
+项目里 `.ts` = 纯逻辑（`utils/*.ts`、`store/*.ts`），`.tsx` = 含 JSX
+（`components/*.tsx`、`pages/**/index.tsx`），这个划分是硬的。
+
+**How to apply**：写文件前先问一句「这里面有 JSX 吗」。有就是 `.tsx`——
+**hook 里渲染弹窗内容同样算**（`hooks/useQuotaGate.tsx`）。
+重命名不需要改引用：项目内 import 都是 extensionless 的。
+
 ---
 
 ## 回顾入口

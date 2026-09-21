@@ -11,6 +11,7 @@ import {
 } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useRequest } from 'alova/client'
+import { useQuotaGate } from '@/hooks/useQuotaGate'
 import {
   fetchCreatePage,
   fetchDeletePage,
@@ -29,6 +30,7 @@ type FilterValue = Api.SitePage.PageState | 'all'
 export default function PagesPage() {
   const { message } = App.useApp()
   const navigate = useNavigate()
+  const { guardPage } = useQuotaGate()
   const [filter, setFilter] = useState<FilterValue>('all')
   const [pageModal, setPageModal] = useState<PageModalState | null>(null)
   const [sorting, setSorting] = useState(false)
@@ -139,14 +141,19 @@ export default function PagesPage() {
         })
         .catch(() => {})
     } else {
-      void createRequest
-        .send({ pageTitle, pagePath, sortOrder: pages.length + 1 })
-        .then(() => {
+      void (async () => {
+        // 额度守卫：内页数超限直接引导升级，不发建页请求
+        if (!(await guardPage())) return
+
+        try {
+          await createRequest.send({ pageTitle, pagePath, sortOrder: pages.length + 1 })
           message.success('页面已创建')
           setPageModal(null)
           void reload()
-        })
-        .catch(() => {})
+        } catch {
+          // 错误已通过 error 状态 effect 提示
+        }
+      })()
     }
   }
 

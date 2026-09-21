@@ -20,7 +20,10 @@ import './globals.css'
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getCurrentSite()
-  if (!site) return { title: '站点不存在', robots: { index: false, follow: false } }
+  // 解析不到站点时不设 title：真 404 由 app/not-found.tsx 给标题；预览态
+  // （用 ?site= 指定了别的租户、当前 Host 解析不到）由页面自己给标题。
+  // 这里若写死一个 title，会把它的 template 也套到页面标题上，拼出奇怪的组合。
+  if (!site) return {}
 
   const host = await getRequestHost()
   const origin = toSiteOrigin(host, process.env.SITE_PUBLIC_PROTO)

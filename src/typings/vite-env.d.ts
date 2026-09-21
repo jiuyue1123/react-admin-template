@@ -45,6 +45,13 @@ declare namespace Env {
         readonly VITE_SERVICE_EXPIRED_TOKEN_CODES: string;
         /** 当路由模式为静态时，定义的超级角色 */
         readonly VITE_SUPER_ROLE: string;
+        /**
+         * 站点预览的源
+         *
+         * 定制首页预览要跳到访客端（另一个应用）。留空则用后端返回的 `siteUrl`（生产）；
+         * 本地联调指向访客端 dev server，例如 `http://localhost:3001`。
+         */
+        readonly VITE_SITE_ORIGIN: string;
     }
 }
 

@@ -720,7 +720,7 @@ PUT /tenant/messages/read-all
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultVoid](#schemaresultvoid)|
 
-<a id="opIdlist_9"></a>
+<a id="opIdlist_10"></a>
 
 ## GET 站内信列表（分页，可按未读筛选）
 
@@ -831,7 +831,7 @@ DELETE /tenant/media/folders/{id}
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultVoid](#schemaresultvoid)|
 
-<a id="opIdlist_3"></a>
+<a id="opIdlist_4"></a>
 
 ## GET 媒体列表
 
@@ -1010,7 +1010,7 @@ PUT /admin/support/leads/{id}/handle
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultSupportLeadVO](#schemaresultsupportleadvo)|
 
-<a id="opIdlist_12"></a>
+<a id="opIdlist_13"></a>
 
 ## GET 线索列表
 
@@ -1101,7 +1101,7 @@ POST /admin/sites/{tenantId}/notify
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultVoid](#schemaresultvoid)|
 
-<a id="opIdlist_13"></a>
+<a id="opIdlist_14"></a>
 
 ## GET 全部租户站点列表
 
@@ -1245,7 +1245,7 @@ DELETE /admin/plans/{planCode}
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultVoid](#schemaresultvoid)|
 
-<a id="opIdlist_6"></a>
+<a id="opIdlist_7"></a>
 
 ## GET 套餐列表
 
@@ -1372,7 +1372,7 @@ DELETE /admin/media/folders/{id}
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultVoid](#schemaresultvoid)|
 
-<a id="opIdlist_7"></a>
+<a id="opIdlist_8"></a>
 
 ## GET 媒体列表
 
@@ -1669,7 +1669,7 @@ PUT /admin/content/documents/{id}/offline
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultContentDocumentVO](#schemaresultcontentdocumentvo)|
 
-<a id="opIdlist_8"></a>
+<a id="opIdlist_9"></a>
 
 ## GET 文档列表
 
@@ -1946,6 +1946,187 @@ POST /tenant/support/conversations/{id}/close
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultVoid](#schemaresultvoid)|
 
+# 租户端 - 定制首页
+
+<a id="opIdlist_3"></a>
+
+## GET 我的定制申请（可按状态筛选，分页）
+
+GET /tenant/site/customizations
+
+### 请求参数
+
+|名称|位置|类型|必选|说明|
+|---|---|---|---|---|
+|state|query|string| 否 |none|
+|page|query|integer(int32)| 否 |none|
+|size|query|integer(int32)| 否 |none|
+
+> 返回示例
+
+> 200 Response
+
+```
+{"code":"string","msg":"string","data":{"total":0,"records":[{"id":0,"requestNo":"string","tenantId":0,"siteId":0,"siteName":"string","requirement":"string","contact":"string","expectAt":"2019-08-24T14:15:22Z","requestState":0,"claimedBy":0,"claimedAt":"2019-08-24T14:15:22Z","acceptedAt":"2019-08-24T14:15:22Z","gmtCreate":"2019-08-24T14:15:22Z","currentDelivery":{"id":0,"homePageKey":"string","mappingState":"[","deliverRemark":"string","deliveredBy":0,"deliveredAt":"2019-08-24T14:15:22Z","acceptedBy":0,"acceptedAt":"2019-08-24T14:15:22Z","rejectedBy":0,"rejectedAt":"2019-08-24T14:15:22Z","rejectReason":"string","gmtCreate":"2019-08-24T14:15:22Z"}}]},"traceId":"string"}
+```
+
+### 返回结果
+
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultPageResultSiteCustomizationVO](#schemaresultpageresultsitecustomizationvo)|
+
+<a id="opIdsubmit_1"></a>
+
+## POST 提交定制首页需求
+
+POST /tenant/site/customizations
+
+> Body 请求参数
+
+```json
+{
+  "requirement": "需要一版科技感首页，含产品/案例/关于三屏",
+  "referenceUrl": "https://example.com",
+  "contact": "string",
+  "expectAt": "2019-08-24T14:15:22Z"
+}
+```
+
+### 请求参数
+
+|名称|位置|类型|必选|说明|
+|---|---|---|---|---|
+|body|body|[SiteCustomizationSubmitRequest](#schemasitecustomizationsubmitrequest)| 是 |none|
+
+> 返回示例
+
+> 200 Response
+
+```
+{"code":"string","msg":"string","data":{"id":0,"requestNo":"string","tenantId":0,"siteId":0,"siteName":"string","requirement":"string","referenceUrl":"string","contact":"string","expectAt":"2019-08-24T14:15:22Z","requestState":0,"claimedBy":0,"claimedAt":"2019-08-24T14:15:22Z","acceptedAt":"2019-08-24T14:15:22Z","cancelOperator":0,"cancelledBy":0,"cancelledAt":"2019-08-24T14:15:22Z","cancelReason":"string","activeHomePageKey":"string","deliveries":[{"id":0,"homePageKey":"string","mappingState":0,"deliverRemark":"string","deliveredBy":0,"deliveredAt":"2019-08-24T14:15:22Z","acceptedBy":0,"acceptedAt":"2019-08-24T14:15:22Z","rejectedBy":0,"rejectedAt":"2019-08-24T14:15:22Z","rejectReason":"string","gmtCreate":"2019-08-24T14:15:22Z"}],"gmtCreate":"2019-08-24T14:15:22Z"},"traceId":"string"}
+```
+
+### 返回结果
+
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultSiteCustomizationDetailVO](#schemaresultsitecustomizationdetailvo)|
+
+<a id="opIdreject"></a>
+
+## POST 验收不通过（附原因，线上首页不变）
+
+POST /tenant/site/customizations/{requestNo}/reject
+
+> Body 请求参数
+
+```json
+{
+  "reason": "string"
+}
+```
+
+### 请求参数
+
+|名称|位置|类型|必选|说明|
+|---|---|---|---|---|
+|requestNo|path|string| 是 |none|
+|body|body|[SiteCustomizationReasonRequest](#schemasitecustomizationreasonrequest)| 是 |none|
+
+> 返回示例
+
+> 200 Response
+
+```
+{"code":"string","msg":"string","data":{"id":0,"requestNo":"string","tenantId":0,"siteId":0,"siteName":"string","requirement":"string","referenceUrl":"string","contact":"string","expectAt":"2019-08-24T14:15:22Z","requestState":0,"claimedBy":0,"claimedAt":"2019-08-24T14:15:22Z","acceptedAt":"2019-08-24T14:15:22Z","cancelOperator":0,"cancelledBy":0,"cancelledAt":"2019-08-24T14:15:22Z","cancelReason":"string","activeHomePageKey":"string","deliveries":[{"id":0,"homePageKey":"string","mappingState":0,"deliverRemark":"string","deliveredBy":0,"deliveredAt":"2019-08-24T14:15:22Z","acceptedBy":0,"acceptedAt":"2019-08-24T14:15:22Z","rejectedBy":0,"rejectedAt":"2019-08-24T14:15:22Z","rejectReason":"string","gmtCreate":"2019-08-24T14:15:22Z"}],"gmtCreate":"2019-08-24T14:15:22Z"},"traceId":"string"}
+```
+
+### 返回结果
+
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultSiteCustomizationDetailVO](#schemaresultsitecustomizationdetailvo)|
+
+<a id="opIdcancel"></a>
+
+## POST 撤销定制申请（交付待验收时不可撤销，需先验收或驳回）
+
+POST /tenant/site/customizations/{requestNo}/cancel
+
+### 请求参数
+
+|名称|位置|类型|必选|说明|
+|---|---|---|---|---|
+|requestNo|path|string| 是 |none|
+|reason|query|string| 否 |none|
+
+> 返回示例
+
+> 200 Response
+
+```
+{"code":"string","msg":"string","data":null,"traceId":"string"}
+```
+
+### 返回结果
+
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultVoid](#schemaresultvoid)|
+
+<a id="opIdaccept"></a>
+
+## POST 验收通过（通过后交付的首页才对外生效）
+
+POST /tenant/site/customizations/{requestNo}/accept
+
+### 请求参数
+
+|名称|位置|类型|必选|说明|
+|---|---|---|---|---|
+|requestNo|path|string| 是 |none|
+
+> 返回示例
+
+> 200 Response
+
+```
+{"code":"string","msg":"string","data":{"id":0,"requestNo":"string","tenantId":0,"siteId":0,"siteName":"string","requirement":"string","referenceUrl":"string","contact":"string","expectAt":"2019-08-24T14:15:22Z","requestState":0,"claimedBy":0,"claimedAt":"2019-08-24T14:15:22Z","acceptedAt":"2019-08-24T14:15:22Z","cancelOperator":0,"cancelledBy":0,"cancelledAt":"2019-08-24T14:15:22Z","cancelReason":"string","activeHomePageKey":"string","deliveries":[{"id":0,"homePageKey":"string","mappingState":0,"deliverRemark":"string","deliveredBy":0,"deliveredAt":"2019-08-24T14:15:22Z","acceptedBy":0,"acceptedAt":"2019-08-24T14:15:22Z","rejectedBy":0,"rejectedAt":"2019-08-24T14:15:22Z","rejectReason":"string","gmtCreate":"2019-08-24T14:15:22Z"}],"gmtCreate":"2019-08-24T14:15:22Z"},"traceId":"string"}
+```
+
+### 返回结果
+
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultSiteCustomizationDetailVO](#schemaresultsitecustomizationdetailvo)|
+
+<a id="opIddetail_1"></a>
+
+## GET 定制申请详情（含待验收的首页标识，供预览）
+
+GET /tenant/site/customizations/{requestNo}
+
+### 请求参数
+
+|名称|位置|类型|必选|说明|
+|---|---|---|---|---|
+|requestNo|path|string| 是 |none|
+
+> 返回示例
+
+> 200 Response
+
+```
+{"code":"string","msg":"string","data":{"id":0,"requestNo":"string","tenantId":0,"siteId":0,"siteName":"string","requirement":"string","referenceUrl":"string","contact":"string","expectAt":"2019-08-24T14:15:22Z","requestState":0,"claimedBy":0,"claimedAt":"2019-08-24T14:15:22Z","acceptedAt":"2019-08-24T14:15:22Z","cancelOperator":0,"cancelledBy":0,"cancelledAt":"2019-08-24T14:15:22Z","cancelReason":"string","activeHomePageKey":"string","deliveries":[{"id":0,"homePageKey":"string","mappingState":0,"deliverRemark":"string","deliveredBy":0,"deliveredAt":"2019-08-24T14:15:22Z","acceptedBy":0,"acceptedAt":"2019-08-24T14:15:22Z","rejectedBy":0,"rejectedAt":"2019-08-24T14:15:22Z","rejectReason":"string","gmtCreate":"2019-08-24T14:15:22Z"}],"gmtCreate":"2019-08-24T14:15:22Z"},"traceId":"string"}
+```
+
+### 返回结果
+
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultSiteCustomizationDetailVO](#schemaresultsitecustomizationdetailvo)|
+
 # 租户端 - 计费
 
 <a id="opIdrefundSubscription"></a>
@@ -2100,7 +2281,7 @@ POST /tenant/billing/downgrade
 > 200 Response
 
 ```
-{"code":"string","msg":"string","data":{"id":0,"planId":0,"changeType":1,"subscriptionState":0,"startAt":"2019-08-24T14:15:22Z","expiredAt":"2019-08-24T14:15:22Z","daysLeft":0,"maxRefundable":0,"planSnapshot":"string","gmtCreate":"2019-08-24T14:15:22Z"},"traceId":"string"}
+{"code":"string","msg":"string","data":{"id":0,"planId":0,"changeType":1,"subscriptionState":0,"startAt":"2019-08-24T14:15:22Z","expiredAt":"2019-08-24T14:15:22Z","daysLeft":0,"maxRefundable":0,"planSnapshot":"string","nextPlanId":0,"nextPlanCode":"string","gmtCreate":"2019-08-24T14:15:22Z"},"traceId":"string"}
 ```
 
 ### 返回结果
@@ -2120,7 +2301,7 @@ GET /tenant/billing/subscriptions
 > 200 Response
 
 ```
-{"code":"string","msg":"string","data":{"id":0,"planId":0,"changeType":1,"subscriptionState":0,"startAt":"2019-08-24T14:15:22Z","expiredAt":"2019-08-24T14:15:22Z","daysLeft":0,"maxRefundable":0,"planSnapshot":"string","gmtCreate":"2019-08-24T14:15:22Z"},"traceId":"string"}
+{"code":"string","msg":"string","data":{"id":0,"planId":0,"changeType":1,"subscriptionState":0,"startAt":"2019-08-24T14:15:22Z","expiredAt":"2019-08-24T14:15:22Z","daysLeft":0,"maxRefundable":0,"planSnapshot":"string","nextPlanId":0,"nextPlanCode":"string","gmtCreate":"2019-08-24T14:15:22Z"},"traceId":"string"}
 ```
 
 ### 返回结果
@@ -2148,6 +2329,26 @@ GET /tenant/billing/subscriptions/history
 |状态码|状态码含义|说明|数据模型|
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultListSubscriptionChangeLog](#schemaresultlistsubscriptionchangelog)|
+
+<a id="opIdquota"></a>
+
+## GET 套餐额度与用量（内页数量/存储空间/定制首页套数；上限为 null 表示不限制）
+
+GET /tenant/billing/quota
+
+> 返回示例
+
+> 200 Response
+
+```
+{"code":"string","msg":"string","data":{"planCode":"string","planName":"string","hasActiveSubscription":true,"pageUsed":0,"pageLimit":0,"storageUsedBytes":0,"storageLimitBytes":0,"homeDeliveryUsed":0,"homeDeliveryLimit":0},"traceId":"string"}
+```
+
+### 返回结果
+
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultTenantQuotaVO](#schemaresulttenantquotavo)|
 
 <a id="opIdplans"></a>
 
@@ -2197,7 +2398,7 @@ GET /tenant/billing/orders/{orderNo}
 
 # 租户端 - 发票
 
-<a id="opIdlist_4"></a>
+<a id="opIdlist_5"></a>
 
 ## GET 我的发票申请（可按状态筛选，分页）
 
@@ -2296,7 +2497,7 @@ POST /tenant/billing/invoices/{applyNo}/withdraw
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultVoid](#schemaresultvoid)|
 
-<a id="opIddetail_1"></a>
+<a id="opIddetail_2"></a>
 
 ## GET 发票申请详情
 
@@ -2649,7 +2850,7 @@ POST /tenant/auth/login/code
 
 # 官网 - 联系我们
 
-<a id="opIdsubmit_1"></a>
+<a id="opIdsubmit_2"></a>
 
 ## POST 提交联系我们表单
 
@@ -2687,7 +2888,7 @@ POST /support/visitor/leads
 
 # 官网 - 在线客服
 
-<a id="opIdlist_5"></a>
+<a id="opIdlist_6"></a>
 
 ## GET 我的会话列表
 
@@ -2876,7 +3077,7 @@ POST /public/billing/alipay/notify
 
 # 平台端 - 实名认证审核
 
-<a id="opIdreject"></a>
+<a id="opIdreject_1"></a>
 
 ## POST 审核驳回
 
@@ -2937,7 +3138,7 @@ POST /admin/verification/{id}/approve
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultVerificationVO](#schemaresultverificationvo)|
 
-<a id="opIdlist_11"></a>
+<a id="opIdlist_12"></a>
 
 ## GET 认证记录列表（可按状态筛选）
 
@@ -3074,7 +3275,7 @@ POST /admin/support/conversations/{id}/close
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultVoid](#schemaresultvoid)|
 
-<a id="opIdaccept"></a>
+<a id="opIdaccept_1"></a>
 
 ## POST 接入会话
 
@@ -3139,6 +3340,181 @@ GET /admin/support/conversations/queue
 |状态码|状态码含义|说明|数据模型|
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultListConversationVO](#schemaresultlistconversationvo)|
+
+# 平台端 - 定制首页
+
+<a id="opIddeliver"></a>
+
+## POST 交付首页标识（交付后待租户验收，验收通过才生效）
+
+POST /admin/sites/customizations/{requestNo}/deliver
+
+> Body 请求参数
+
+```json
+{
+  "homePageKey": "acme-home-v1",
+  "remark": "string"
+}
+```
+
+### 请求参数
+
+|名称|位置|类型|必选|说明|
+|---|---|---|---|---|
+|requestNo|path|string| 是 |none|
+|body|body|[SiteCustomizationDeliverRequest](#schemasitecustomizationdeliverrequest)| 是 |none|
+
+> 返回示例
+
+> 200 Response
+
+```
+{"code":"string","msg":"string","data":{"id":0,"requestNo":"string","tenantId":0,"siteId":0,"siteName":"string","requirement":"string","referenceUrl":"string","contact":"string","expectAt":"2019-08-24T14:15:22Z","requestState":0,"claimedBy":0,"claimedAt":"2019-08-24T14:15:22Z","acceptedAt":"2019-08-24T14:15:22Z","cancelOperator":0,"cancelledBy":0,"cancelledAt":"2019-08-24T14:15:22Z","cancelReason":"string","activeHomePageKey":"string","deliveries":[{"id":0,"homePageKey":"string","mappingState":0,"deliverRemark":"string","deliveredBy":0,"deliveredAt":"2019-08-24T14:15:22Z","acceptedBy":0,"acceptedAt":"2019-08-24T14:15:22Z","rejectedBy":0,"rejectedAt":"2019-08-24T14:15:22Z","rejectReason":"string","gmtCreate":"2019-08-24T14:15:22Z"}],"gmtCreate":"2019-08-24T14:15:22Z"},"traceId":"string"}
+```
+
+### 返回结果
+
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultSiteCustomizationDetailVO](#schemaresultsitecustomizationdetailvo)|
+
+<a id="opIdclose_3"></a>
+
+## POST 关闭定制申请（附原因；可关闭待验收的申请）
+
+POST /admin/sites/customizations/{requestNo}/close
+
+> Body 请求参数
+
+```json
+{
+  "reason": "string"
+}
+```
+
+### 请求参数
+
+|名称|位置|类型|必选|说明|
+|---|---|---|---|---|
+|requestNo|path|string| 是 |none|
+|body|body|[SiteCustomizationReasonRequest](#schemasitecustomizationreasonrequest)| 是 |none|
+
+> 返回示例
+
+> 200 Response
+
+```
+{"code":"string","msg":"string","data":{"id":0,"requestNo":"string","tenantId":0,"siteId":0,"siteName":"string","requirement":"string","referenceUrl":"string","contact":"string","expectAt":"2019-08-24T14:15:22Z","requestState":0,"claimedBy":0,"claimedAt":"2019-08-24T14:15:22Z","acceptedAt":"2019-08-24T14:15:22Z","cancelOperator":0,"cancelledBy":0,"cancelledAt":"2019-08-24T14:15:22Z","cancelReason":"string","activeHomePageKey":"string","deliveries":[{"id":0,"homePageKey":"string","mappingState":0,"deliverRemark":"string","deliveredBy":0,"deliveredAt":"2019-08-24T14:15:22Z","acceptedBy":0,"acceptedAt":"2019-08-24T14:15:22Z","rejectedBy":0,"rejectedAt":"2019-08-24T14:15:22Z","rejectReason":"string","gmtCreate":"2019-08-24T14:15:22Z"}],"gmtCreate":"2019-08-24T14:15:22Z"},"traceId":"string"}
+```
+
+### 返回结果
+
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultSiteCustomizationDetailVO](#schemaresultsitecustomizationdetailvo)|
+
+<a id="opIdclaim"></a>
+
+## POST 受理定制申请（重复受理即改派）
+
+POST /admin/sites/customizations/{requestNo}/claim
+
+### 请求参数
+
+|名称|位置|类型|必选|说明|
+|---|---|---|---|---|
+|requestNo|path|string| 是 |none|
+
+> 返回示例
+
+> 200 Response
+
+```
+{"code":"string","msg":"string","data":{"id":0,"requestNo":"string","tenantId":0,"siteId":0,"siteName":"string","requirement":"string","referenceUrl":"string","contact":"string","expectAt":"2019-08-24T14:15:22Z","requestState":0,"claimedBy":0,"claimedAt":"2019-08-24T14:15:22Z","acceptedAt":"2019-08-24T14:15:22Z","cancelOperator":0,"cancelledBy":0,"cancelledAt":"2019-08-24T14:15:22Z","cancelReason":"string","activeHomePageKey":"string","deliveries":[{"id":0,"homePageKey":"string","mappingState":0,"deliverRemark":"string","deliveredBy":0,"deliveredAt":"2019-08-24T14:15:22Z","acceptedBy":0,"acceptedAt":"2019-08-24T14:15:22Z","rejectedBy":0,"rejectedAt":"2019-08-24T14:15:22Z","rejectReason":"string","gmtCreate":"2019-08-24T14:15:22Z"}],"gmtCreate":"2019-08-24T14:15:22Z"},"traceId":"string"}
+```
+
+### 返回结果
+
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultSiteCustomizationDetailVO](#schemaresultsitecustomizationdetailvo)|
+
+<a id="opIdlist_15"></a>
+
+## GET 定制首页申请列表（可按状态/时间筛选，分页）
+
+GET /admin/sites/customizations
+
+### 请求参数
+
+|名称|位置|类型|必选|说明|
+|---|---|---|---|---|
+|state|query|string| 否 |none|
+|startTime|query|string(date-time)| 否 |none|
+|endTime|query|string(date-time)| 否 |none|
+|page|query|integer(int32)| 否 |none|
+|size|query|integer(int32)| 否 |none|
+
+> 返回示例
+
+> 200 Response
+
+```
+{"code":"string","msg":"string","data":{"total":0,"records":[{"id":0,"requestNo":"string","tenantId":0,"siteId":0,"siteName":"string","requirement":"string","contact":"string","expectAt":"2019-08-24T14:15:22Z","requestState":0,"claimedBy":0,"claimedAt":"2019-08-24T14:15:22Z","acceptedAt":"2019-08-24T14:15:22Z","gmtCreate":"2019-08-24T14:15:22Z","currentDelivery":{"id":0,"homePageKey":"string","mappingState":"[","deliverRemark":"string","deliveredBy":0,"deliveredAt":"2019-08-24T14:15:22Z","acceptedBy":0,"acceptedAt":"2019-08-24T14:15:22Z","rejectedBy":0,"rejectedAt":"2019-08-24T14:15:22Z","rejectReason":"string","gmtCreate":"2019-08-24T14:15:22Z"}}]},"traceId":"string"}
+```
+
+### 返回结果
+
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultPageResultSiteCustomizationVO](#schemaresultpageresultsitecustomizationvo)|
+
+<a id="opIddetail_3"></a>
+
+## GET 定制申请详情（含生效中的首页标识与全部交付记录）
+
+GET /admin/sites/customizations/{requestNo}
+
+### 请求参数
+
+|名称|位置|类型|必选|说明|
+|---|---|---|---|---|
+|requestNo|path|string| 是 |none|
+
+> 返回示例
+
+> 200 Response
+
+```
+{"code":"string","msg":"string","data":{"id":0,"requestNo":"string","tenantId":0,"siteId":0,"siteName":"string","requirement":"string","referenceUrl":"string","contact":"string","expectAt":"2019-08-24T14:15:22Z","requestState":0,"claimedBy":0,"claimedAt":"2019-08-24T14:15:22Z","acceptedAt":"2019-08-24T14:15:22Z","cancelOperator":0,"cancelledBy":0,"cancelledAt":"2019-08-24T14:15:22Z","cancelReason":"string","activeHomePageKey":"string","deliveries":[{"id":0,"homePageKey":"string","mappingState":0,"deliverRemark":"string","deliveredBy":0,"deliveredAt":"2019-08-24T14:15:22Z","acceptedBy":0,"acceptedAt":"2019-08-24T14:15:22Z","rejectedBy":0,"rejectedAt":"2019-08-24T14:15:22Z","rejectReason":"string","gmtCreate":"2019-08-24T14:15:22Z"}],"gmtCreate":"2019-08-24T14:15:22Z"},"traceId":"string"}
+```
+
+### 返回结果
+
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultSiteCustomizationDetailVO](#schemaresultsitecustomizationdetailvo)|
+
+<a id="opIdhomePageKeys"></a>
+
+## GET 可交付的首页标识候选（未配置白名单时返回空列表，前端放开手工输入）
+
+GET /admin/sites/customizations/home-page-keys
+
+> 返回示例
+
+> 200 Response
+
+```
+{"code":"string","msg":"string","data":["string"],"traceId":"string"}
+```
+
+### 返回结果
+
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultListString](#schemaresultliststring)|
 
 # 平台端 - 通知
 
@@ -3311,7 +3687,7 @@ POST /admin/billing/orders/{orderNo}/manual-paid
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultOrderVO](#schemaresultordervo)|
 
-<a id="opIdcancel"></a>
+<a id="opIdcancel_1"></a>
 
 ## POST 手动取消订单
 
@@ -3496,7 +3872,7 @@ POST /admin/billing/invoices/{applyNo}/void
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultInvoiceApplyDetailVO](#schemaresultinvoiceapplydetailvo)|
 
-<a id="opIdreject_1"></a>
+<a id="opIdreject_2"></a>
 
 ## POST 驳回发票申请（附原因）
 
@@ -3571,7 +3947,7 @@ body: {}
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultInvoiceApplyDetailVO](#schemaresultinvoiceapplydetailvo)|
 
-<a id="opIdlist_14"></a>
+<a id="opIdlist_16"></a>
 
 ## GET 发票申请列表（可按状态/类型/租户名/时间筛选，分页）
 
@@ -3603,7 +3979,7 @@ GET /admin/billing/invoices
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|OK|[ResultPageResultInvoiceApplyVO](#schemaresultpageresultinvoiceapplyvo)|
 
-<a id="opIddetail_2"></a>
+<a id="opIddetail_4"></a>
 
 ## GET 发票申请详情（含明细订单 / 回传文件 / 操作日志）
 
@@ -3767,7 +4143,7 @@ GET /public/site
 > 200 Response
 
 ```
-{"code":"string","msg":"string","data":{"siteName":"string","siteIntro":"string","logo":"string","favicon":"string","publishAt":"2019-08-24T14:15:22Z","defaultPagePath":"string","menus":[{"menuName":"string","linkType":1,"linkUrl":"string","children":[{"menuName":null,"linkType":null,"linkUrl":null,"children":null}]}]},"traceId":"string"}
+{"code":"string","msg":"string","data":{"siteName":"string","siteIntro":"string","logo":"string","favicon":"string","publishAt":"2019-08-24T14:15:22Z","defaultPagePath":"string","homePageKey":"string","menus":[{"menuName":"string","linkType":1,"linkUrl":"string","children":[{"menuName":null,"linkType":null,"linkUrl":null,"children":null}]}]},"traceId":"string"}
 ```
 
 ### 返回结果
@@ -3824,7 +4200,7 @@ GET /public/site/pages/{pagePath}
 
 # 公开端 - 套餐目录
 
-<a id="opIdlist_10"></a>
+<a id="opIdlist_11"></a>
 
 ## GET 套餐目录（启用中）
 
@@ -5462,6 +5838,261 @@ GET /content/documents/{docKey}
 |linkType|1|
 |linkType|2|
 
+<h2 id="tocS_SiteCustomizationSubmitRequest">SiteCustomizationSubmitRequest</h2>
+
+<a id="schemasitecustomizationsubmitrequest"></a>
+<a id="schema_SiteCustomizationSubmitRequest"></a>
+<a id="tocSsitecustomizationsubmitrequest"></a>
+<a id="tocssitecustomizationsubmitrequest"></a>
+
+```json
+{
+  "requirement": "需要一版科技感首页，含产品/案例/关于三屏",
+  "referenceUrl": "https://example.com",
+  "contact": "string",
+  "expectAt": "2019-08-24T14:15:22Z"
+}
+
+```
+
+提交定制首页需求请求
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|requirement|string|true|none||需求描述（纯文本，不支持附件）|
+|referenceUrl|string|false|none||参考站点 URL，仅接受 http/https|
+|contact|string|true|none||联系方式（手机号/微信，供平台联系确认需求）|
+|expectAt|string(date-time)|false|none||期望交付时间，可不传|
+
+<h2 id="tocS_ResultSiteCustomizationDetailVO">ResultSiteCustomizationDetailVO</h2>
+
+<a id="schemaresultsitecustomizationdetailvo"></a>
+<a id="schema_ResultSiteCustomizationDetailVO"></a>
+<a id="tocSresultsitecustomizationdetailvo"></a>
+<a id="tocsresultsitecustomizationdetailvo"></a>
+
+```json
+{
+  "code": "string",
+  "msg": "string",
+  "data": {
+    "id": 0,
+    "requestNo": "string",
+    "tenantId": 0,
+    "siteId": 0,
+    "siteName": "string",
+    "requirement": "string",
+    "referenceUrl": "string",
+    "contact": "string",
+    "expectAt": "2019-08-24T14:15:22Z",
+    "requestState": 0,
+    "claimedBy": 0,
+    "claimedAt": "2019-08-24T14:15:22Z",
+    "acceptedAt": "2019-08-24T14:15:22Z",
+    "cancelOperator": 0,
+    "cancelledBy": 0,
+    "cancelledAt": "2019-08-24T14:15:22Z",
+    "cancelReason": "string",
+    "activeHomePageKey": "string",
+    "deliveries": [
+      {
+        "id": 0,
+        "homePageKey": "string",
+        "mappingState": 0,
+        "deliverRemark": "string",
+        "deliveredBy": 0,
+        "deliveredAt": "2019-08-24T14:15:22Z",
+        "acceptedBy": 0,
+        "acceptedAt": "2019-08-24T14:15:22Z",
+        "rejectedBy": 0,
+        "rejectedAt": "2019-08-24T14:15:22Z",
+        "rejectReason": "string",
+        "gmtCreate": "2019-08-24T14:15:22Z"
+      }
+    ],
+    "gmtCreate": "2019-08-24T14:15:22Z"
+  },
+  "traceId": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|code|string|false|none||none|
+|msg|string|false|none||none|
+|data|[SiteCustomizationDetailVO](#schemasitecustomizationdetailvo)|false|none||定制首页申请详情|
+|traceId|string|false|none||none|
+
+<h2 id="tocS_SiteCustomizationDetailVO">SiteCustomizationDetailVO</h2>
+
+<a id="schemasitecustomizationdetailvo"></a>
+<a id="schema_SiteCustomizationDetailVO"></a>
+<a id="tocSsitecustomizationdetailvo"></a>
+<a id="tocssitecustomizationdetailvo"></a>
+
+```json
+{
+  "id": 0,
+  "requestNo": "string",
+  "tenantId": 0,
+  "siteId": 0,
+  "siteName": "string",
+  "requirement": "string",
+  "referenceUrl": "string",
+  "contact": "string",
+  "expectAt": "2019-08-24T14:15:22Z",
+  "requestState": 0,
+  "claimedBy": 0,
+  "claimedAt": "2019-08-24T14:15:22Z",
+  "acceptedAt": "2019-08-24T14:15:22Z",
+  "cancelOperator": 0,
+  "cancelledBy": 0,
+  "cancelledAt": "2019-08-24T14:15:22Z",
+  "cancelReason": "string",
+  "activeHomePageKey": "string",
+  "deliveries": [
+    {
+      "id": 0,
+      "homePageKey": "string",
+      "mappingState": 0,
+      "deliverRemark": "string",
+      "deliveredBy": 0,
+      "deliveredAt": "2019-08-24T14:15:22Z",
+      "acceptedBy": 0,
+      "acceptedAt": "2019-08-24T14:15:22Z",
+      "rejectedBy": 0,
+      "rejectedAt": "2019-08-24T14:15:22Z",
+      "rejectReason": "string",
+      "gmtCreate": "2019-08-24T14:15:22Z"
+    }
+  ],
+  "gmtCreate": "2019-08-24T14:15:22Z"
+}
+
+```
+
+定制首页申请详情
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|id|integer(int64)|false|none||申请ID|
+|requestNo|string|false|none||申请单号|
+|tenantId|integer(int64)|false|none||租户ID|
+|siteId|integer(int64)|false|none||站点ID|
+|siteName|string|false|none||站点名称|
+|requirement|string|false|none||需求描述|
+|referenceUrl|string|false|none||参考站点 URL|
+|contact|string|false|none||联系方式|
+|expectAt|string(date-time)|false|none||期望交付时间|
+|requestState|integer(int32)|false|none||申请状态|
+|claimedBy|integer(int64)|false|none||受理管理员ID|
+|claimedAt|string(date-time)|false|none||受理时间|
+|acceptedAt|string(date-time)|false|none||验收通过时间|
+|cancelOperator|integer(int32)|false|none||取消方|
+|cancelledBy|integer(int64)|false|none||取消操作人ID|
+|cancelledAt|string(date-time)|false|none||取消时间|
+|cancelReason|string|false|none||取消/关闭原因|
+|activeHomePageKey|string|false|none||站点当前生效的首页标识（未交付过则为 null），供平台对照「已上线 X · 待验收 Y」|
+|deliveries|[[SiteHomeDeliveryVO](#schemasitehomedeliveryvo)]|false|none||交付/验收历史（每轮一条，倒序）|
+|gmtCreate|string(date-time)|false|none||创建时间|
+
+#### 枚举值
+
+|属性|值|
+|---|---|
+|requestState|0|
+|requestState|1|
+|requestState|2|
+|requestState|3|
+|requestState|4|
+|requestState|5|
+|cancelOperator|0|
+|cancelOperator|1|
+|cancelOperator|2|
+
+<h2 id="tocS_SiteHomeDeliveryVO">SiteHomeDeliveryVO</h2>
+
+<a id="schemasitehomedeliveryvo"></a>
+<a id="schema_SiteHomeDeliveryVO"></a>
+<a id="tocSsitehomedeliveryvo"></a>
+<a id="tocssitehomedeliveryvo"></a>
+
+```json
+{
+  "id": 0,
+  "homePageKey": "string",
+  "mappingState": 0,
+  "deliverRemark": "string",
+  "deliveredBy": 0,
+  "deliveredAt": "2019-08-24T14:15:22Z",
+  "acceptedBy": 0,
+  "acceptedAt": "2019-08-24T14:15:22Z",
+  "rejectedBy": 0,
+  "rejectedAt": "2019-08-24T14:15:22Z",
+  "rejectReason": "string",
+  "gmtCreate": "2019-08-24T14:15:22Z"
+}
+
+```
+
+定制首页交付记录
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|id|integer(int64)|false|none||交付记录ID|
+|homePageKey|string|false|none||前端首页注册表键（registry key）|
+|mappingState|integer(int32)|false|none||映射状态|
+|deliverRemark|string|false|none||交付说明|
+|deliveredBy|integer(int64)|false|none||交付管理员ID|
+|deliveredAt|string(date-time)|false|none||交付时间|
+|acceptedBy|integer(int64)|false|none||验收人|
+|acceptedAt|string(date-time)|false|none||验收通过时间|
+|rejectedBy|integer(int64)|false|none||驳回人|
+|rejectedAt|string(date-time)|false|none||驳回时间|
+|rejectReason|string|false|none||验收不通过原因|
+|gmtCreate|string(date-time)|false|none||创建时间|
+
+#### 枚举值
+
+|属性|值|
+|---|---|
+|mappingState|0|
+|mappingState|1|
+|mappingState|2|
+|mappingState|3|
+|mappingState|4|
+
+<h2 id="tocS_SiteCustomizationReasonRequest">SiteCustomizationReasonRequest</h2>
+
+<a id="schemasitecustomizationreasonrequest"></a>
+<a id="schema_SiteCustomizationReasonRequest"></a>
+<a id="tocSsitecustomizationreasonrequest"></a>
+<a id="tocssitecustomizationreasonrequest"></a>
+
+```json
+{
+  "reason": "string"
+}
+
+```
+
+附原因的请求体
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|reason|string|true|none||原因|
+
 <h2 id="tocS_MediaAssetVO">MediaAssetVO</h2>
 
 <a id="schemamediaassetvo"></a>
@@ -6156,6 +6787,8 @@ GET /content/documents/{docKey}
     "daysLeft": 0,
     "maxRefundable": 0,
     "planSnapshot": "string",
+    "nextPlanId": 0,
+    "nextPlanCode": "string",
     "gmtCreate": "2019-08-24T14:15:22Z"
   },
   "traceId": "string"
@@ -6190,6 +6823,8 @@ GET /content/documents/{docKey}
   "daysLeft": 0,
   "maxRefundable": 0,
   "planSnapshot": "string",
+  "nextPlanId": 0,
+  "nextPlanCode": "string",
   "gmtCreate": "2019-08-24T14:15:22Z"
 }
 
@@ -6210,6 +6845,8 @@ GET /content/documents/{docKey}
 |daysLeft|integer(int64)|false|none||剩余天数（null 表示永久有效）|
 |maxRefundable|number|false|none||当前订阅剩余可退金额上限（元，全额退款时即为应退总额）|
 |planSnapshot|string|false|none||套餐快照 JSON（含 features）|
+|nextPlanId|integer(int64)|false|none||降配下期套餐ID，0-无（到期时由每日过期任务自动应用并清空）|
+|nextPlanCode|string|false|none||降配下期套餐编码，空串-无|
 |gmtCreate|string(date-time)|false|none||创建时间|
 
 #### 枚举值
@@ -6540,6 +7177,30 @@ Token 请求
 |title|string|true|none||通知标题|
 |content|string|true|none||通知内容|
 
+<h2 id="tocS_SiteCustomizationDeliverRequest">SiteCustomizationDeliverRequest</h2>
+
+<a id="schemasitecustomizationdeliverrequest"></a>
+<a id="schema_SiteCustomizationDeliverRequest"></a>
+<a id="tocSsitecustomizationdeliverrequest"></a>
+<a id="tocssitecustomizationdeliverrequest"></a>
+
+```json
+{
+  "homePageKey": "acme-home-v1",
+  "remark": "string"
+}
+
+```
+
+交付定制首页请求
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|homePageKey|string|true|none||前端首页注册表键（registry key）|
+|remark|string|false|none||交付说明|
+
 <h2 id="tocS_PricingPlanCreateRequest">PricingPlanCreateRequest</h2>
 
 <a id="schemapricingplancreaterequest"></a>
@@ -6811,6 +7472,32 @@ Token 请求
 |名称|类型|必选|约束|中文名|说明|
 |---|---|---|---|---|---|
 |reason|string|true|none||原因|
+
+<h2 id="tocS_InvoiceIssueRequest">InvoiceIssueRequest</h2>
+
+<a id="schemainvoiceissuerequest"></a>
+<a id="schema_InvoiceIssueRequest"></a>
+<a id="tocSinvoiceissuerequest"></a>
+<a id="tocsinvoiceissuerequest"></a>
+
+```json
+{
+  "invoiceNo": "string",
+  "invoiceCode": "string",
+  "issueRemark": "string"
+}
+
+```
+
+开票请求
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|invoiceNo|string|true|none||发票号码|
+|invoiceCode|string|false|none||发票代码（选填）|
+|issueRemark|string|false|none||开票备注（选填）|
 
 <h2 id="tocS_TokenRequest">TokenRequest</h2>
 
@@ -7240,6 +7927,189 @@ Token 请求
 |msg|string|false|none||none|
 |data|[[SiteMenuVO](#schemasitemenuvo)]|false|none||[站点导航菜单信息]|
 |traceId|string|false|none||none|
+
+<h2 id="tocS_PageResultSiteCustomizationVO">PageResultSiteCustomizationVO</h2>
+
+<a id="schemapageresultsitecustomizationvo"></a>
+<a id="schema_PageResultSiteCustomizationVO"></a>
+<a id="tocSpageresultsitecustomizationvo"></a>
+<a id="tocspageresultsitecustomizationvo"></a>
+
+```json
+{
+  "total": 0,
+  "records": [
+    {
+      "id": 0,
+      "requestNo": "string",
+      "tenantId": 0,
+      "siteId": 0,
+      "siteName": "string",
+      "requirement": "string",
+      "contact": "string",
+      "expectAt": "2019-08-24T14:15:22Z",
+      "requestState": 0,
+      "claimedBy": 0,
+      "claimedAt": "2019-08-24T14:15:22Z",
+      "acceptedAt": "2019-08-24T14:15:22Z",
+      "gmtCreate": "2019-08-24T14:15:22Z",
+      "currentDelivery": {
+        "id": 0,
+        "homePageKey": "string",
+        "mappingState": 0,
+        "deliverRemark": "string",
+        "deliveredBy": 0,
+        "deliveredAt": "2019-08-24T14:15:22Z",
+        "acceptedBy": 0,
+        "acceptedAt": "2019-08-24T14:15:22Z",
+        "rejectedBy": 0,
+        "rejectedAt": "2019-08-24T14:15:22Z",
+        "rejectReason": "string",
+        "gmtCreate": "2019-08-24T14:15:22Z"
+      }
+    }
+  ]
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|total|integer(int64)|false|none||none|
+|records|[[SiteCustomizationVO](#schemasitecustomizationvo)]|false|none||[定制首页申请]|
+
+<h2 id="tocS_ResultPageResultSiteCustomizationVO">ResultPageResultSiteCustomizationVO</h2>
+
+<a id="schemaresultpageresultsitecustomizationvo"></a>
+<a id="schema_ResultPageResultSiteCustomizationVO"></a>
+<a id="tocSresultpageresultsitecustomizationvo"></a>
+<a id="tocsresultpageresultsitecustomizationvo"></a>
+
+```json
+{
+  "code": "string",
+  "msg": "string",
+  "data": {
+    "total": 0,
+    "records": [
+      {
+        "id": 0,
+        "requestNo": "string",
+        "tenantId": 0,
+        "siteId": 0,
+        "siteName": "string",
+        "requirement": "string",
+        "contact": "string",
+        "expectAt": "2019-08-24T14:15:22Z",
+        "requestState": 0,
+        "claimedBy": 0,
+        "claimedAt": "2019-08-24T14:15:22Z",
+        "acceptedAt": "2019-08-24T14:15:22Z",
+        "gmtCreate": "2019-08-24T14:15:22Z",
+        "currentDelivery": {
+          "id": 0,
+          "homePageKey": "string",
+          "mappingState": "[",
+          "deliverRemark": "string",
+          "deliveredBy": 0,
+          "deliveredAt": "2019-08-24T14:15:22Z",
+          "acceptedBy": 0,
+          "acceptedAt": "2019-08-24T14:15:22Z",
+          "rejectedBy": 0,
+          "rejectedAt": "2019-08-24T14:15:22Z",
+          "rejectReason": "string",
+          "gmtCreate": "2019-08-24T14:15:22Z"
+        }
+      }
+    ]
+  },
+  "traceId": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|code|string|false|none||none|
+|msg|string|false|none||none|
+|data|[PageResultSiteCustomizationVO](#schemapageresultsitecustomizationvo)|false|none||none|
+|traceId|string|false|none||none|
+
+<h2 id="tocS_SiteCustomizationVO">SiteCustomizationVO</h2>
+
+<a id="schemasitecustomizationvo"></a>
+<a id="schema_SiteCustomizationVO"></a>
+<a id="tocSsitecustomizationvo"></a>
+<a id="tocssitecustomizationvo"></a>
+
+```json
+{
+  "id": 0,
+  "requestNo": "string",
+  "tenantId": 0,
+  "siteId": 0,
+  "siteName": "string",
+  "requirement": "string",
+  "contact": "string",
+  "expectAt": "2019-08-24T14:15:22Z",
+  "requestState": 0,
+  "claimedBy": 0,
+  "claimedAt": "2019-08-24T14:15:22Z",
+  "acceptedAt": "2019-08-24T14:15:22Z",
+  "gmtCreate": "2019-08-24T14:15:22Z",
+  "currentDelivery": {
+    "id": 0,
+    "homePageKey": "string",
+    "mappingState": 0,
+    "deliverRemark": "string",
+    "deliveredBy": 0,
+    "deliveredAt": "2019-08-24T14:15:22Z",
+    "acceptedBy": 0,
+    "acceptedAt": "2019-08-24T14:15:22Z",
+    "rejectedBy": 0,
+    "rejectedAt": "2019-08-24T14:15:22Z",
+    "rejectReason": "string",
+    "gmtCreate": "2019-08-24T14:15:22Z"
+  }
+}
+
+```
+
+定制首页申请
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|id|integer(int64)|false|none||申请ID|
+|requestNo|string|false|none||申请单号|
+|tenantId|integer(int64)|false|none||租户ID|
+|siteId|integer(int64)|false|none||站点ID|
+|siteName|string|false|none||站点名称（批量填充）|
+|requirement|string|false|none||需求描述|
+|contact|string|false|none||联系方式|
+|expectAt|string(date-time)|false|none||期望交付时间|
+|requestState|integer(int32)|false|none||申请状态|
+|claimedBy|integer(int64)|false|none||受理管理员ID|
+|claimedAt|string(date-time)|false|none||受理时间|
+|acceptedAt|string(date-time)|false|none||验收通过时间|
+|gmtCreate|string(date-time)|false|none||创建时间|
+|currentDelivery|[SiteHomeDeliveryVO](#schemasitehomedeliveryvo)|false|none||当前轮交付记录（待验收或已生效的那条），无交付时为 null|
+
+#### 枚举值
+
+|属性|值|
+|---|---|
+|requestState|0|
+|requestState|1|
+|requestState|2|
+|requestState|3|
+|requestState|4|
+|requestState|5|
 
 <h2 id="tocS_InAppMessage">InAppMessage</h2>
 
@@ -8311,6 +9181,80 @@ Token 请求
 |gmtCreate|string(date-time)|false|none||创建时间|
 |gmtModified|string(date-time)|false|none||修改时间|
 
+<h2 id="tocS_ResultTenantQuotaVO">ResultTenantQuotaVO</h2>
+
+<a id="schemaresulttenantquotavo"></a>
+<a id="schema_ResultTenantQuotaVO"></a>
+<a id="tocSresulttenantquotavo"></a>
+<a id="tocsresulttenantquotavo"></a>
+
+```json
+{
+  "code": "string",
+  "msg": "string",
+  "data": {
+    "planCode": "string",
+    "planName": "string",
+    "hasActiveSubscription": true,
+    "pageUsed": 0,
+    "pageLimit": 0,
+    "storageUsedBytes": 0,
+    "storageLimitBytes": 0,
+    "homeDeliveryUsed": 0,
+    "homeDeliveryLimit": 0
+  },
+  "traceId": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|code|string|false|none||none|
+|msg|string|false|none||none|
+|data|[TenantQuotaVO](#schematenantquotavo)|false|none||租户套餐额度|
+|traceId|string|false|none||none|
+
+<h2 id="tocS_TenantQuotaVO">TenantQuotaVO</h2>
+
+<a id="schematenantquotavo"></a>
+<a id="schema_TenantQuotaVO"></a>
+<a id="tocStenantquotavo"></a>
+<a id="tocstenantquotavo"></a>
+
+```json
+{
+  "planCode": "string",
+  "planName": "string",
+  "hasActiveSubscription": true,
+  "pageUsed": 0,
+  "pageLimit": 0,
+  "storageUsedBytes": 0,
+  "storageLimitBytes": 0,
+  "homeDeliveryUsed": 0,
+  "homeDeliveryLimit": 0
+}
+
+```
+
+租户套餐额度
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|planCode|string|false|none||当前套餐编码，无生效订阅为 null|
+|planName|string|false|none||当前套餐名称，无生效订阅为 null|
+|hasActiveSubscription|boolean|false|none||是否存在生效订阅；false 时三项上限均为 null（不限制）|
+|pageUsed|integer(int64)|false|none||已用内页数量|
+|pageLimit|integer(int32)|false|none||内页数量上限，null-不限制|
+|storageUsedBytes|integer(int64)|false|none||已用存储空间（字节）|
+|storageLimitBytes|integer(int64)|false|none||存储空间上限（字节），null-不限制|
+|homeDeliveryUsed|integer(int64)|false|none||已验收的定制首页套数（终身累计）|
+|homeDeliveryLimit|integer(int32)|false|none||定制首页交付套数上限，null-不限制|
+
 <h2 id="tocS_PublicPricingPlanVO">PublicPricingPlanVO</h2>
 
 <a id="schemapublicpricingplanvo"></a>
@@ -8919,6 +9863,7 @@ Token 请求
   "favicon": "string",
   "publishAt": "2019-08-24T14:15:22Z",
   "defaultPagePath": "string",
+  "homePageKey": "string",
   "menus": [
     {
       "menuName": "string",
@@ -8952,6 +9897,7 @@ Token 请求
 |favicon|string|false|none||站点 Favicon URL|
 |publishAt|string(date-time)|false|none||站点上线时间|
 |defaultPagePath|string|false|none||默认落地页路径（首个已发布页面），无已发布页面时为 null|
+|homePageKey|string|false|none||定制首页标识（前端首页注册表键）；非空时前端应优先渲染 registry 中该键对应的手写首页，为空才回退 defaultPagePath 的 Puck 页面|
 |menus|[[PublicSiteMenuVO](#schemapublicsitemenuvo)]|false|none||导航树，无导航为空数组|
 
 <h2 id="tocS_ResultPublicSiteVO">ResultPublicSiteVO</h2>
@@ -8972,6 +9918,7 @@ Token 请求
     "favicon": "string",
     "publishAt": "2019-08-24T14:15:22Z",
     "defaultPagePath": "string",
+    "homePageKey": "string",
     "menus": [
       {
         "menuName": "string",
@@ -9545,6 +10492,34 @@ Token 请求
 |stageState|1|
 |stageState|2|
 
+<h2 id="tocS_ResultListString">ResultListString</h2>
+
+<a id="schemaresultliststring"></a>
+<a id="schema_ResultListString"></a>
+<a id="tocSresultliststring"></a>
+<a id="tocsresultliststring"></a>
+
+```json
+{
+  "code": "string",
+  "msg": "string",
+  "data": [
+    "string"
+  ],
+  "traceId": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|code|string|false|none||none|
+|msg|string|false|none||none|
+|data|[string]|false|none||none|
+|traceId|string|false|none||none|
+
 <h2 id="tocS_ResultListPricingPlanVO">ResultListPricingPlanVO</h2>
 
 <a id="schemaresultlistpricingplanvo"></a>
@@ -9838,30 +10813,4 @@ Token 请求
 |username|string|false|none||用户名|
 |roles|[string]|false|none||角色编码列表|
 |buttons|[string]|false|none||权限标识码列表（按钮权限）|
-
-<h2 id="tocS_InvoiceIssueRequest">InvoiceIssueRequest</h2>
-
-<a id="schemainvoiceissuerequest"></a>
-<a id="schema_InvoiceIssueRequest"></a>
-<a id="tocSinvoiceissuerequest"></a>
-<a id="tocsinvoiceissuerequest"></a>
-
-```json
-{
-  "invoiceNo": "string",
-  "invoiceCode": "string",
-  "issueRemark": "string"
-}
-
-```
-
-开票请求
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|invoiceNo|string|true|none||发票号码|
-|invoiceCode|string|false|none||发票代码（选填）|
-|issueRemark|string|false|none||开票备注（选填）|
 

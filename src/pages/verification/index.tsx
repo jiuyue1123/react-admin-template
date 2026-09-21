@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useRequest } from 'alova/client'
+import { useQuotaGate } from '@/hooks/useQuotaGate'
 import { fetchGetVerification, fetchSubmitVerification } from '@/service/api/verification'
 import { fetchUploadMedia } from '@/service/api/media'
 import {
@@ -371,6 +372,7 @@ function UploadUrlField({
   hint?: string
 }) {
   const { message } = App.useApp()
+  const { guardStorage } = useQuotaGate()
   const uploadRequest = useRequest(
     ({ file }: { file: File }) => fetchUploadMedia(file),
     { immediate: false },
@@ -381,15 +383,18 @@ function UploadUrlField({
   }, [uploadRequest.error, message])
 
   const handleFile = (file: File) => {
-    void uploadRequest
-      .send({ file })
-      .then(created => {
+    void (async () => {
+      // 额度守卫：存储超额直接引导升级，不发上传请求
+      if (!(await guardStorage(file.size))) return
+
+      try {
+        const created = await uploadRequest.send({ file })
         onChange?.(created.url)
         message.success('上传成功')
-      })
-      .catch(() => {
+      } catch {
         // 错误已通过 error 状态 effect 提示
-      })
+      }
+    })()
     return false
   }
 

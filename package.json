@@ -18,6 +18,7 @@
     "@tailwindcss/vite": "^4.3.3",
     "alova": "^3.5.5",
     "antd": "^6.6.1",
+    "dayjs": "^1.11.23",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-markdown": "^10.1.0",

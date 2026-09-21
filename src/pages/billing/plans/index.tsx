@@ -19,12 +19,12 @@ const INTENT_ACTION: Record<PlanIntent, string> = {
   purchase: '立即购买',
   renew: '立即续费',
   upgrade: '升配并支付',
-  downgrade: '降配（下期生效）',
+  downgrade: '降配（到期自动切换）',
 }
 
 const INTENT_NOTE: Partial<Record<PlanIntent, string>> = {
   upgrade: '立即生效 · 按剩余天数折算差价',
-  downgrade: '下期生效 · 到期后按新价续费',
+  downgrade: '到期自动切换 · 按新价续费',
 }
 
 /** 时长简短文案：0→永久 / 365→1 年 / 其它 N 天 */
@@ -152,15 +152,15 @@ export default function BillingPlansPage() {
       .finally(() => setPendingCode(null))
   }
 
-  // 降配：不建支付单，记录下期生效
+  // 降配：不建支付单，记录到期自动切换
   const handleDowngrade = (plan: Api.Billing.PricingPlanVO) => {
     if (pendingCode) return
     modal.confirm({
       title: '确认降配',
       content: (
         <div className="text-sm text-text-secondary">
-          下期将切换至「{plan.planName}」。当前套餐保持有效至到期日，<b className="text-text">不退还差价</b>；
-          到期续费时按新套餐价格计费，并生成新的订阅记录。
+          到期后将自动切换到「{plan.planName}」。当前套餐保持有效至到期日，
+          <b className="text-text">不退还差价</b>；切换后按新套餐价格计费，并生成新的订阅记录。
         </div>
       ),
       okText: '确认降配',
@@ -170,7 +170,7 @@ export default function BillingPlansPage() {
         return downgradeRequest
           .send({ planCode: plan.planCode })
           .then(() => {
-            message.success('已记录降配，到期后自动按新套餐生效')
+            message.success(`已记录，到期将自动切换到「${plan.planName}」`)
             void useBillingStore.getState().refresh(true)
           })
           .catch(() => {

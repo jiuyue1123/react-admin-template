@@ -25,6 +25,13 @@ export interface PublicSite {
   publishAt: string | null
   /** 默认落地页路径（首个已发布页面），无已发布页面时为 null */
   defaultPagePath: string | null
+  /**
+   * 前端首页注册表键（registry key）
+   *
+   * 由平台端交付、租户验收通过后生效；未定制（或尚未验收）时为 null，
+   * 此时首页走共享兜底。形如 `acme-home-v1` —— 每次重新交付会给一个新 key。
+   */
+  homePageKey: string | null
   menus: PublicSiteMenu[]
 }
 

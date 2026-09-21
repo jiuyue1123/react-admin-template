@@ -3,14 +3,15 @@ import type { HomepageComponent } from '../registry'
 import { ActionIcon, actionLinkProps, collectSiteActions } from '../shared'
 
 /**
- * 客户专属首页示例 —— 「HELLO 海报」
+ * 定制首页示例 —— 「HELLO 海报」（registry key: `hello-home-v1`）
  *
- * 与 `homepages/default/`（共享兜底）不同，**客户专属首页可以硬编码文案**，
+ * 与 `homepages/default/`（共享兜底）不同，**定制首页可以硬编码文案**，
  * 因为一套只服务一个客户。这里刻意做成暗色海报气质，与兜底首页的
  * 暖纸编辑风拉开距离，也用来演示「定制首页 ≠ 模板」这件事。
  *
- * 复制本目录成 `homepages/<客户标签>/` 即可作为新客户的起点。仍需保持 RSC
- * （不要用 hooks / 事件处理），动效一律走 CSS。
+ * 目录名 = registry key，约定 `<客户>-home-v<版本>`（见后端示例 `acme-home-v1`）。
+ * 新增一套的完整流程见 registry.ts。仍需保持 RSC（不要用 hooks / 事件处理），
+ * 动效一律走 CSS。
  */
 
 const HOMEPAGE_CSS = `

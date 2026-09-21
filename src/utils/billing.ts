@@ -9,6 +9,17 @@ interface MetaItem {
   color: string
 }
 
+/**
+ * 套餐展示名：去掉后端用于标记主推的「・推荐」后缀
+ *
+ * 后端把营销标记拼在了 planName 里（如「标准版・推荐」），
+ * 展示时应去掉它、把「推荐」单独用 Tag 呈现，否则会出现在
+ * 「当前套餐」「下期套餐」这类地方，读起来别扭。
+ */
+export function getPlanDisplayName(planName?: string | null): string {
+  return (planName ?? '').replace(/・推荐$/, '')
+}
+
 /** 订单类型：1-购买 2-续费 3-升配 4-降配 */
 export const ORDER_TYPE_META: Record<number, MetaItem> = {
   1: { label: '购买', color: 'geekblue' },
@@ -334,7 +345,7 @@ export const PAY_ORDER_TYPE: Record<'purchase' | 'renew' | 'upgrade', Api.Billin
  * - 无生效订阅（含已过期 / 取消）→ 购买（恢复）
  * - 当前生效且同套餐 → 续费
  * - 当前生效且目标更贵 → 升配（立即生效、按剩余天数折算差价）
- * - 当前生效且目标更便宜 → 降配（下期生效，不退还差价）
+ * - 当前生效且目标更便宜 → 降配（到期自动切换，不退还差价）
  * - 无法比对价格时兜底为续费，联调校准
  */
 export function resolvePlanIntent(

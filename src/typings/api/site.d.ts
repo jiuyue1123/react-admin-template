@@ -19,6 +19,10 @@ declare namespace Api {
             logo: string;
             /** 站点 Favicon URL */
             favicon: string;
+            /** 平台子域名标签 */
+            subdomain?: string;
+            /** 站点公开访问地址 */
+            siteUrl?: string;
             /** 站点状态（生命周期）：0-建设中 1-待发布 2-已上线 3-已到期 4-已退款 5-已归档 */
             siteState: number;
             /** 发布时间 */

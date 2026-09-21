@@ -162,8 +162,41 @@ declare namespace Api {
             maxRefundable?: number | null
             /** 套餐快照 JSON（含 features），结构以后端为准，前端容忍解析 */
             planSnapshot?: string
+            /** 降配下期套餐ID，0-无（到期时由每日过期任务自动应用并清空） */
+            nextPlanId?: number
+            /** 降配下期套餐编码，空串-无。注意后端没有 nextPlanName，要显示中文名需查套餐目录 */
+            nextPlanCode?: string
             /** 创建时间 */
             gmtCreate: string
+        }
+
+        /**
+         * 租户套餐额度（对齐 TenantQuotaVO）
+         *
+         * ⚠️ 三个上限字段为 `null` 表示**不限制**（不是 -1、不是 0）。
+         * 无生效订阅时 `hasActiveSubscription=false` 且三项上限全为 null，
+         * 但 `xxxUsed` 仍是真实用量（未付费租户会看到 used>0、limit=null）——
+         * 因此不要看到 used>0 就引导升级，判「不限」必须用 `== null`。
+         */
+        interface TenantQuotaVO {
+            /** 当前套餐编码，无生效订阅为 null */
+            planCode?: string | null
+            /** 当前套餐名称，无生效订阅为 null */
+            planName?: string | null
+            /** 是否存在生效订阅；false 时三项上限均为 null（不限制） */
+            hasActiveSubscription: boolean
+            /** 已用内页数量 */
+            pageUsed: number
+            /** 内页数量上限，null-不限制 */
+            pageLimit?: number | null
+            /** 已用存储空间（字节） */
+            storageUsedBytes: number
+            /** 存储空间上限（字节），null-不限制 */
+            storageLimitBytes?: number | null
+            /** 已验收的定制首页套数（终身累计） */
+            homeDeliveryUsed: number
+            /** 定制首页交付套数上限，null-不限制 */
+            homeDeliveryLimit?: number | null
         }
 
         /** 订阅变更日志（对齐 SubscriptionChangeLog；字段名联调核对） */

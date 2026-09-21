@@ -42,7 +42,6 @@ DEV_SITE_HOST=xingchen.jianfanfang.com   # 换成任意已上线站点的域名
 |---|---|
 | `SITE_API_ORIGIN` | 后端地址（仅服务端可见）。默认 `http://localhost:8080` |
 | `SITE_API_SUCCESS_CODE` | 后端成功码，默认 `0000` |
-| `SITE_BASE_DOMAIN` | 平台基础域名，用于把 `acme.jianfanfang.com` 还原成站点标签 `acme`。默认 `jianfanfang.com` |
 | `SITE_PUBLIC_PROTO` | 站点对外协议，用于生成 canonical / sitemap 的绝对 URL。默认 `https` |
 | `DEV_SITE_HOST` | **仅开发期**：localhost 访问时冒充的站点 Host |
 
@@ -54,52 +53,132 @@ DEV_SITE_HOST=xingchen.jianfanfang.com   # 换成任意已上线站点的域名
 
 | 路径 | 行为 |
 |---|---|
-| `/` | 工程师定制的 **React 首页**（产品规则：首页恒为 React 页面，Puck 只用于内页）。解析顺序：客户专属首页 → 共享兜底首页 → `defaultPagePath` 的 Puck 内容（最后一道保险） |
+| `/` | 工程师定制的 **React 首页**（产品规则：首页恒为 React 页面，Puck 只用于内页）。用哪一套由后端的 `homePageKey` 决定，见下节 |
 | `/{slug}` | 按 `pagePath` 取已发布页面，SSR 渲染 Puck 内容；不存在则 404 |
+| `/?preview=<key>` | **预览态**：用该 key 覆盖站点生效的首页，供租户验收前查看交付效果；加 `noindex` |
+| `/?preview=<key>&site=<host>` | 预览态 + 显式指定租户（本地开发用，见下） |
 | `/sitemap.xml` `/robots.txt` | 按 Host 生成 |
 | 站点不存在 / 未上线 | 404（不是软 404） |
+
+**预览态的用途**：后端语义是「交付未验收期间线上首页不变」，所以租户验收前只能通过预览
+看到待验收的版本。租户后台的「定制首页」页会在交付后给出预览入口（链接形如
+`https://acme.jianfanfang.com/?preview=acme-home-v1`）。未知 key 会打 warn 并回落到
+共享兜底首页，不会白屏。
+
+**`&site=` 是干什么的**：租户后台本地跑在 `localhost:5173`、本应用跑在 `localhost:3001`，
+请求 Host 是 localhost，判断不出要渲染哪个租户，于是由后台把站点的 host 显式带过来
+（链接形如 `http://localhost:3001/?preview=acme-home-v1&site=acme.jianfanfang.com`）。
+对应地，租户后台用 `VITE_SITE_ORIGIN` 指向本应用的 dev server（见 `.env.test`）。
+
+> 该参数**只在同时带 `preview` 时才被采纳**，避免变成一个可以任意切换租户的开关；
+> 而且 `/public/site` 本就只返回已上线站点，能看到的都是公开内容。
+
+> **预览参数是开放的（已确认的设计决定，不是疏漏）**
+>
+> `?preview=<key>` 不做鉴权：知道或猜到 key 的人都能看到**尚未验收**的设计。
+>
+> - **为什么这样定**：访客端是匿名请求，它没有任何办法判断「这个 key 该不该给你看」。
+>   要判断就必须有凭据 —— 要么开放，要么引入令牌。而验收通过后这套设计本来就公开，
+>   窗口期只有「交付 → 验收」之间，为此引入一套签名与共享密钥不划算。
+> - **残余风险**：设计被否掉、或改版尚未上线时提前曝光。key 的命名约定
+>   （`<客户>-home-v<N>`）是公开的，所以 key 是可猜的。
+> - **要收紧的话**：后端在交付详情里签发短时效令牌（HMAC 签 `{siteId, homePageKey, exp}`），
+>   本应用验签 + 校验有效期后才渲染。需要后端加签发逻辑并与本应用共享密钥。
+>   零后端改动的临时缓解：给 key 加随机后缀（`demo-home-v1-7f3a`），让预览链接不可猜。
 
 **全量 SSR**：`@puckeditor/core` 带 `react-server` 导出条件，在 RSC 中解析到专用的
 `ServerRender` 实现，区块内容随首屏 HTML 直出，不需要客户端二次渲染。
 
 ---
 
-## 首页：两套不同的东西
+## 首页：由后端的 `homePageKey` 决定
 
-| | 用途 | 内容来源 |
-|---|---|---|
-| `homepages/{客户标签}/` | **客户专属**首页，工程师手写 | 自由发挥，可为该客户硬编码文案 |
-| `homepages/default/` | **共享兜底**，所有未安排定制方案的站点共用 | **只能消费站点自身数据**，严禁出现任何行业文案（汽修/烘焙/装修都不能提）——它同时服务所有行业 |
+首页恒为工程师手写的 React 页面（Puck 只用于内页）。**用哪一套不靠前端猜**：
+`/public/site` 返回 `homePageKey`，它就是 `src/homepages/` 下的目录名。
 
-### 新增一套客户专属首页
-
-```bash
-mkdir src/homepages/<客户标签>
-# 编写 index.tsx，默认导出 ({ site, pages }) => ReactNode 的组件（保持 RSC，不要用 hooks）
+```
+site.homePageKey ──┬── 命中 HOMEPAGES      → 该站点的定制首页
+                   ├── 为空 / key 未注册    → homepages/default（共享兜底）
+                   └── 兜底也加载失败        → defaultPagePath 的 Puck 内容（最后保险）
 ```
 
-然后在 `src/homepages/registry.ts` 注册：
+`homePageKey` 由平台端交付、租户验收通过后才生效（全流程在后端）：
+
+```
+租户提交定制需求 → 平台受理 → 平台交付 {homePageKey} → 租户验收通过 → 生效
+```
+
+交付了但还没验收的站点，`homePageKey` 仍是旧值（或空），线上首页不变——所以交付是
+可预览、可驳回的，不影响正在跑的站点。
+
+### 新增一套定制首页
+
+```bash
+mkdir src/homepages/acme-home-v1        # 目录名 = registry key
+# 编写 index.tsx，默认导出 ({ site, pages }) => ReactNode（保持 RSC，不要用 hooks）
+```
+
+在 `src/homepages/registry.ts` 注册同一个 key：
 
 ```ts
 export const HOMEPAGES = {
-  <客户标签>: () => import('./<客户标签>'),
+  'acme-home-v1': () => import('./acme-home-v1'),
 }
 ```
 
-客户标签默认取子域名（`acme.jianfanfang.com` → `acme`）；自定义域名可在 `DOMAIN_ALIASES`
-里映射到同一个标签，让两个入口共用一套首页。**未命中 `HOMEPAGES` 的站点一律走共享兜底首页**
-（`FALLBACK_HOMEPAGE`），不需要显式注册。
+然后：
 
-`homepages/hello/` 是一个可直接对照的完整示例（暗色海报风），对应的测试站点是
-`hello.jianfanfang.com`。公共工具（从导航提取联系方式、动作图标）在
-`homepages/shared.tsx`，新写首页时直接用，不要重复实现。
+1. **发版** —— 此时还没有站点引用这个 key，**影响面为零**
+2. 平台端把它交付给对应站点，租户验收后即时生效（不需要再发版）
+
+key 命名约定见后端示例 `acme-home-v1`：`<客户>-home-v<版本>`。重新交付会给新 key，
+旧 key 保留即可随时回滚。
+
+`homepages/hello-home-v1/` 是可直接对照的完整示例（暗色海报风）。公共工具（从导航
+提取联系方式、动作图标）在 `homepages/shared.tsx`，新写首页时直接用，不要重复实现。
+
+### 本地开发一套定制首页
+
+工程师写首页的循环**不需要任何发布机制**——本应用的 dev server 就是开发环境，
+`?preview=` 绕过了「交付 → 验收才生效」的限制，所以不用先交付就能看：
+
+```bash
+pnpm --filter @jff/site dev          # 访客端，http://localhost:3001
+```
+
+1. `mkdir src/homepages/demo-home-v1/`，写 `index.tsx`
+2. 在 `registry.ts` 注册 `'demo-home-v1'`
+3. 浏览器打开
+   `http://localhost:3001/?preview=demo-home-v1&site=demosite.jianfanfang.com`
+4. 改代码即时热更，实时看效果
+5. 满意后发版 → 平台端交付这个 key → 租户验收后生效
+
+`&site=` 只有本地需要（见上文预览态说明），生产环境 Host 本身就是租户域名。
+
+> **热更新**：改已有首页的内容是纯热更，改完即见；**新增首页目录 + 在 `registry.ts`
+> 注册**属于模块图变化，热更新有时接不住，遇到就重启一次 dev server。
+
+### 首页可以声明 `needsPages`
+
+页面列表（`pages`）只有做「站点索引」的首页才需要。给组件挂上静态标记：
+
+```ts
+MyHomepage.needsPages = true
+```
+
+不声明则 `app/page.tsx` 不会去取它——**共享兜底首页恰好是最常见的渲染路径**，
+省下这一次后端调用是净收益。
 
 ### 共享兜底首页的设计约束
 
-`homepages/default/` 能拿到的只有：`site.siteName`、`site.siteIntro`、`site.logo`、
-`site.favicon`、`site.menus`，以及 `pages`（已发布页面列表）。它靠这些数据自组装
-（报头 + 导航里的联系方式 + 站点索引），换品牌的唯一开关是里面的 `--jf-accent`。
-改它等于改所有兜底站点的门面，务必保持行业中立的措辞与配色。
+`homepages/default/` 是**所有 `homePageKey` 为空的站点共用的**，所以它是一张
+**「网站建设中」占位页**，不是完整的营销页：
+
+- 只显示站点名、状态说明、以及导航里配了的联系方式
+- 不做页面索引、不做营销版式——「尚未定制」这件事应该对访客是显式的
+- **严禁任何行业文案**（汽修/烘焙/装修都不能提），它同时服务所有行业
+
+要真正好看的门面，那是 `homepages/<key>/` 里逐像素手写的定制首页。
 
 ---
 

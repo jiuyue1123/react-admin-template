@@ -1,22 +1,29 @@
 import type { ComponentType } from 'react'
-import { resolveSiteLabel } from '@/lib/host'
 import type { PublicSite, PublicSitePageListItem } from '@/lib/types'
 
 /**
  * 定制首页注册表
  *
- * 产品规则：「首页由工程师手写源码（独一无二），内页由租户用可视化编辑器自助搭建」。
- * 因此首页是一套套手写的 React 页面，而不是 Puck 数据。
+ * 首页恒为工程师手写的 React 页面（Puck 只用于内页）。**用哪个首页由后端决定**：
+ * `/public/site` 返回 `homePageKey`（registry key），这里是 key → 组件的对照表。
+ *
+ * 交付链路（全部在后端完成，前端只消费结果）：
+ *   租户提交定制需求 → 平台受理 → 平台交付 {homePageKey} → 租户验收通过 → 生效
+ * 未定制、或交付了但尚未验收通过的站点，`homePageKey` 为 null，走共享兜底首页。
  *
  * 解析顺序：
- *   1. `HOMEPAGES[站点标签]` —— 该客户专属的定制首页
- *   2. `FALLBACK_HOMEPAGE`   —— 共享兜底首页（未安排定制方案的站点都用它）
- *   3. 兜底首页本身加载失败     —— 由页面回落到 `defaultPagePath` 的 Puck 页，避免整站 500
+ *   1. `HOMEPAGES[homePageKey]` —— 该站点已验收生效的定制首页
+ *   2. `FALLBACK_HOMEPAGE`     —— 共享兜底（未定制 / 验收未通过 / key 不认识）
+ *   3. 兜底首页本身加载失败      —— 由页面回落到 `defaultPagePath` 的 Puck 页，避免整站 500
  *
- * 工程师新增一套客户定制首页的流程：
- *   1. `mkdir src/homepages/<标签>` 并编写 `index.tsx`（默认导出首页组件）
- *   2. 在下面 HOMEPAGES 注册一行
- *   3. 提交并发版 —— 该站点即刻生效，无需改后端
+ * 工程师新增一套定制首页的流程：
+ *   1. `mkdir src/homepages/<key>` 并编写 `index.tsx`（默认导出首页组件）
+ *   2. 在下面 HOMEPAGES 注册同一个 key
+ *   3. 发版 —— 此时还没有站点引用它，**影响面为零**
+ *   4. 平台端交付该 key 给对应站点，租户验收后生效（不需要再发版）
+ *
+ * key 命名约定见后端示例 `acme-home-v1`：`<客户>-home-v<版本>`。重新交付会给新 key，
+ * 旧 key 保留一段时间，便于回滚。
  */
 
 export type HomepageProps = {
@@ -38,26 +45,17 @@ export type HomepageComponent = ComponentType<HomepageProps> & {
 
 type HomepageLoader = () => Promise<{ default: HomepageComponent }>
 
-/** 客户专属定制首页：站点标签 → 实现 */
+/** registry key → 定制首页实现 */
 export const HOMEPAGES: Record<string, HomepageLoader> = {
-  // 示例：先生成一个标签为 hello 的站点，访问 hello.jianfanfang.com 即可看到
-  hello: () => import('./hello'),
+  // 示例：平台端把该 key 交付给某站点并验收通过后，该站点首页即换成它
+  'hello-home-v1': () => import('./hello-home-v1'),
 }
-
-/**
- * 自定义域名 → 站点标签
- *
- * `subdomain` 字段允许填完整域名，因此同一个站点可能同时有
- * `acme.jianfanfang.com` 与 `www.acme.com` 两个入口；这里让它们共用同一套首页。
- */
-export const DOMAIN_ALIASES: Record<string, string> = {}
 
 /**
  * 共享兜底首页
  *
- * 所有没被上面映射命中的站点都用它。它必须是**行业中立的**：
- * 不能出现任何特定行业的文案，只能消费站点自身的数据
- * （站点名、简介、Logo、导航、已发布页面）。
+ * 所有 `homePageKey` 为空（或指向未注册的 key）的站点都用它。它必须是**行业中立的**：
+ * 不能出现任何特定行业的文案，只能消费站点自身的数据。
  */
 export const FALLBACK_HOMEPAGE: HomepageLoader = () => import('./default')
 
@@ -73,12 +71,22 @@ async function loadHomepage(loader: HomepageLoader | undefined, label: string) {
   }
 }
 
-/** 按请求 Host 解析出该站点应使用的首页 */
-export async function resolveHomepage(host: string): Promise<HomepageComponent | null> {
-  const key = DOMAIN_ALIASES[host] ?? resolveSiteLabel(host)
+/**
+ * 按后端给的 registry key 解析出该站点应使用的首页
+ *
+ * key 为空或未注册时回落到共享兜底 —— 后端交付了一个前端还没发布的 key 时，
+ * 站点不应该白屏，而是先显示兜底页。
+ */
+export async function resolveHomepage(
+  homePageKey: string | null | undefined,
+): Promise<HomepageComponent | null> {
+  const key = homePageKey?.trim()
 
-  const custom = await loadHomepage(HOMEPAGES[key], key)
-  if (custom) return custom
+  if (key) {
+    const custom = await loadHomepage(HOMEPAGES[key], key)
+    if (custom) return custom
+    console.warn(`[site] 未知的 homePageKey：${key}，回落到共享兜底首页`)
+  }
 
   return loadHomepage(FALLBACK_HOMEPAGE, 'default')
 }

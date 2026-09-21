@@ -102,12 +102,20 @@ const routes: RouteConfigs = [
     ],
   },
   {
+    path: '/customization',
+    layout: '@/layouts/base',
+    component: 'customization',
+    title: '定制首页',
+    icon: 'HighlightOutlined',
+    order: 5,
+  },
+  {
     path: '/verification',
     layout: '@/layouts/base',
     component: 'verification',
     title: '实名认证',
     icon: 'IdcardOutlined',
-    order: 5,
+    order: 6,
   },
   {
     path: '/messages',

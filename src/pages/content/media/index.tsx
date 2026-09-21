@@ -15,6 +15,7 @@ import {
   UploadOutlined,
 } from '@ant-design/icons'
 import { useRequest, useWatcher } from 'alova/client'
+import { useQuotaGate } from '@/hooks/useQuotaGate'
 import {
   fetchCreateFolder,
   fetchDeleteFolder,
@@ -46,6 +47,7 @@ type FolderModalState =
 /** 媒体中心：统一管理文件（上传 / 文件夹 / 预览 / 删除） */
 export default function MediaCenterPage() {
   const { message } = App.useApp()
+  const { guardStorage } = useQuotaGate()
   const [activeFolderId, setActiveFolderId] = useState<number | null>(null)
   const [fileType, setFileType] = useState<number | undefined>(undefined)
   const [uploading, setUploading] = useState(false)
@@ -101,17 +103,21 @@ export default function MediaCenterPage() {
 
   // 上传：beforeUpload 返回 false 阻止自动上传，手动调用接口
   const handleUpload = (file: File) => {
-    setUploading(true)
-    void uploadRequest
-      .send({ file, folderId: activeFolderId ?? undefined })
-      .then(() => {
+    void (async () => {
+      // 额度守卫：存储超额直接引导升级，不发上传请求
+      if (!(await guardStorage(file.size))) return
+
+      setUploading(true)
+      try {
+        await uploadRequest.send({ file, folderId: activeFolderId ?? undefined })
         message.success('上传成功')
         void reloadMedia()
-      })
-      .catch(() => {
+      } catch {
         // 错误已通过 error 状态 effect 提示
-      })
-      .finally(() => setUploading(false))
+      } finally {
+        setUploading(false)
+      }
+    })()
     return false
   }
 

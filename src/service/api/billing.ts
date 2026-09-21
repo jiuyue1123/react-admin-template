@@ -5,6 +5,16 @@ export function fetchGetPlans() {
   return request.Get<Api.Billing.PricingPlanVO[]>('/tenant/billing/plans')
 }
 
+/**
+ * 当前租户的套餐额度（已用 / 上限）
+ *
+ * 用量口径与后端执法点同源（页面显示与拦截行为不会不一致），
+ * 因此这是「额度」唯一的数据源，不要自己统计。上限 null 表示不限制。
+ */
+export function fetchGetQuota() {
+  return request.Get<Api.Billing.TenantQuotaVO>('/tenant/billing/quota')
+}
+
 /** 创建订单（orderType：1-购买 2-续费 3-升配 4-降配） */
 export function fetchCreateOrder(params: Api.Billing.OrderCreateParams) {
   return request.Post<Api.Billing.OrderVO>('/tenant/billing/orders', params)

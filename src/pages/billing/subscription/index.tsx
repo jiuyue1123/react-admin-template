@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import { App, Button, Card, Dropdown, Empty, Skeleton, Table, Tag } from 'antd'
+import { useEffect, useMemo } from 'react'
+import { Alert, App, Button, Card, Dropdown, Empty, Skeleton, Table, Tag } from 'antd'
 import type { MenuProps, TableProps } from 'antd'
 import {
   CheckCircleOutlined as CheckIcon,
@@ -8,20 +8,25 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { useRequest } from 'alova/client'
 import {
+  fetchGetPlans,
   fetchGetSubscriptionsHistory,
   fetchSubscriptionRefund,
 } from '@/service/api/billing'
 import { useBillingStore } from '@/store/billing'
+import { useQuotaStore } from '@/store/quota'
 import {
   formatMoney,
   getActivePlanInfo,
   getChangeLogTypeMeta,
   getChangeTypeMeta,
   getDurationLabel,
+  getPlanDisplayName,
   getSubscriptionStateMeta,
   parsePlanSnapshot,
 } from '@/utils/billing'
 import { formatDate, formatDateTime } from '@/utils/date'
+import { formatQuotaBytes, formatQuotaUsage, getQuotaHint, getQuotaTone } from '@/utils/quota'
+import type { QuotaTone } from '@/utils/quota'
 
 /**
  * 套餐变更列文案：仅“迁移类”变更（续费/升配/降配）显示 from → to 箭头；
@@ -45,13 +50,21 @@ export default function SubscriptionPage() {
   const billingLoading = useBillingStore(state => state.loading)
   const billingLoadedAt = useBillingStore(state => state.loadedAt)
 
+  const quota = useQuotaStore(state => state.quota)
+
   const { data: history = [], loading: historyLoading, error } =
     useRequest(fetchGetSubscriptionsHistory, { immediate: true })
+  // 套餐目录：后端只给 nextPlanCode，没有 nextPlanName，中文名要靠它映射
+  const { data: plans = [] } = useRequest(fetchGetPlans, { immediate: true })
   const refundRequest = useRequest(fetchSubscriptionRefund, { immediate: false })
 
   // 确保当前订阅已拉取（支付 / 退款后此页也会因 refresh(true) 获得最新值）
   useEffect(() => {
     void useBillingStore.getState().refresh()
+  }, [])
+  // 额度：与各处的操作前校验共用同一份数据
+  useEffect(() => {
+    void useQuotaStore.getState().refresh()
   }, [])
 
   useEffect(() => {
@@ -65,6 +78,45 @@ export default function SubscriptionPage() {
   const snapshot = parsePlanSnapshot(subscription?.planSnapshot)
   const stateMeta = getSubscriptionStateMeta(subscription?.subscriptionState)
   const changeMeta = getChangeTypeMeta(subscription?.changeType)
+
+  /** 降配安排的下期套餐（后端空串表示无） */
+  const nextPlanCode = subscription?.nextPlanCode?.trim() || ''
+  const planNameByCode = useMemo(
+    () => new Map(plans.map(plan => [plan.planCode, getPlanDisplayName(plan.planName)])),
+    [plans],
+  )
+
+  /** 额度三项：上限为 null 表示不限制 */
+  const quotaRows: {
+    label: string
+    used: number
+    limit?: number | null
+    format: (value: number) => string
+  }[] = quota
+    ? [
+        { label: '内页', used: quota.pageUsed, limit: quota.pageLimit, format: String },
+        {
+          label: '存储空间',
+          used: quota.storageUsedBytes,
+          limit: quota.storageLimitBytes,
+          format: formatQuotaBytes as (value: number) => string,
+        },
+        {
+          label: '定制首页交付',
+          used: quota.homeDeliveryUsed,
+          limit: quota.homeDeliveryLimit,
+          format: String,
+        },
+      ]
+    : []
+
+  /** 需要提醒的额度项（接近或已达上限）；normal 的 hint 为 null，直接过滤 */
+  const quotaAlerts: { tone: QuotaTone; hint: string }[] = []
+  for (const row of quotaRows) {
+    const tone = getQuotaTone(row.used, row.limit)
+    const hint = getQuotaHint(tone, row.label)
+    if (hint) quotaAlerts.push({ tone, hint })
+  }
   // 仅生效中且后端给出可退上限时允许申请（整体退剩余，涉及订单置退款中）
   const canRefund =
     subscription?.subscriptionState === 3 &&
@@ -198,7 +250,7 @@ export default function SubscriptionPage() {
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xl font-semibold text-text">
-                  {snapshot.planName || `套餐 #${subscription.planId}`}
+                  {getPlanDisplayName(snapshot.planName) || `套餐 #${subscription.planId}`}
                 </span>
                 <Tag color={stateMeta.color}>{stateMeta.label}</Tag>
               </div>
@@ -246,8 +298,56 @@ export default function SubscriptionPage() {
               tone={subscription.daysLeft === null || subscription.daysLeft === undefined ? 'normal' : subscription.daysLeft <= 0 ? 'danger' : subscription.daysLeft <= 15 ? 'warning' : 'normal'}
             />
           </div>
+
+          {/* 降配已安排：到期自动切换（此前前端读不到这两个字段，租户看不到） */}
+          {nextPlanCode ? (
+            <div className="mt-4 flex flex-wrap items-center gap-2 rounded-lg border border-border-secondary bg-fill px-3 py-2 text-sm">
+              <span className="text-text-tertiary">下期套餐</span>
+              <span className="font-semibold text-text">
+                {planNameByCode.get(nextPlanCode) ?? nextPlanCode}
+              </span>
+              <Tag color="processing">到期自动切换</Tag>
+            </div>
+          ) : null}
         </Card>
       )}
+
+      {/*
+        用量与额度：数据来自 quota 接口，与操作前的拦截校验同源。
+        只在有生效订阅时展示 —— 未开通订阅时后端三项上限全为 null（表示不限制），
+        直接渲染会显示成「已用 3 · 不限」，看着像「你不限量」，
+        而实际语义是「还没开通、额度概念尚未生效」。此时上方订阅卡已给出开通引导。
+      */}
+      {quota?.hasActiveSubscription ? (
+        <Card title="用量与额度">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {quotaRows.map(row => (
+              <StatBlock
+                key={row.label}
+                label={row.label}
+                value={formatQuotaUsage(row.used, row.limit, row.format)}
+                tone={getQuotaTone(row.used, row.limit)}
+              />
+            ))}
+          </div>
+          {quotaAlerts.length > 0 ? (
+            <Alert
+              className="mt-4"
+              type={quotaAlerts.some(item => item.tone === 'danger') ? 'error' : 'warning'}
+              showIcon
+              message={quotaAlerts.map(item => item.hint).join('；')}
+              action={
+                <Button size="small" onClick={() => navigate('/billing/plans')}>
+                  去升级套餐
+                </Button>
+              }
+            />
+          ) : null}
+          <div className="mt-3 text-xs text-text-tertiary">
+            「不限」表示当前套餐不限制该项；达到上限后需升级套餐才能继续。
+          </div>
+        </Card>
+      ) : null}
 
       {/* 订阅变更记录 */}
       <Card title="订阅变更记录">
@@ -273,7 +373,7 @@ export default function SubscriptionPage() {
           <ul className="list-inside list-disc space-y-0.5 text-xs">
             <li>到期前 15 天起每日站内提醒续费；到期后站点立即下线。</li>
             <li>到期后 180 天内续费可恢复站点，按新套餐重新计算有效期，原数据保留。</li>
-            <li>升配立即生效（按剩余天数折算差价）；降配下期生效，不退还差价。</li>
+            <li>升配立即生效（按剩余天数折算差价）；降配到期自动切换，不退还差价。</li>
             <li>如需退订，可在订阅卡片右上角「更多」菜单操作；申请后涉及的支付订单进入退款中，审核通过后原路退回（见订单记录）。</li>
           </ul>
         </div>

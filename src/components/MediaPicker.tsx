@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { App, Button, Empty, Modal, Select, Skeleton, Upload } from 'antd'
 import { AppstoreOutlined, CheckOutlined, FolderOutlined, PlayCircleOutlined, UploadOutlined } from '@ant-design/icons'
 import { useRequest, useWatcher } from 'alova/client'
+import { useQuotaGate } from '@/hooks/useQuotaGate'
 import { fetchGetFolders, fetchGetMedia, fetchUploadMedia } from '@/service/api/media'
 import {
   formatFileSize,
@@ -43,6 +44,7 @@ export default function MediaPicker({
   title = '选择媒体',
 }: MediaPickerProps) {
   const { message } = App.useApp()
+  const { guardStorage } = useQuotaGate()
   const [filter, setFilter] = useState<number | undefined>(fileType)
   const [folderId, setFolderId] = useState<number | undefined>(undefined)
   const [selected, setSelected] = useState<Api.Media.MediaAssetVO[]>([])
@@ -88,16 +90,19 @@ export default function MediaPicker({
   }
 
   const handleUpload = (file: File) => {
-    void uploadRequest
-      .send({ file, folderId })
-      .then(created => {
+    void (async () => {
+      // 额度守卫：存储超额直接引导升级，不发上传请求
+      if (!(await guardStorage(file.size))) return
+
+      try {
+        const created = await uploadRequest.send({ file, folderId })
         message.success('上传成功')
         setSelected(prev => (multiple ? [...prev, created] : [created]))
         void reload()
-      })
-      .catch(() => {
+      } catch {
         // 错误已通过 error 状态 effect 提示
-      })
+      }
+    })()
     return false
   }
 

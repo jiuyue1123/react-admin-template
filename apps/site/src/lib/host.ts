@@ -39,32 +39,8 @@ export function resolveSiteHost(rawHost: string | null | undefined): string {
   return host
 }
 
-/** 站点基础域名，用于把 `acme.jianfanfang.com` 还原成标签 `acme` */
-export function getBaseDomain(): string {
-  return normalizeHost(process.env.SITE_BASE_DOMAIN) || 'jianfanfang.com'
-}
-
-/**
- * 解析站点标签：子域名取最左一段，自定义域名取完整 host
- *
- * - `acme.jianfanfang.com` → `acme`
- * - `www.acme.com`         → `www.acme.com`（非平台子域，整体作为标签）
- */
-export function resolveSiteLabel(host: string): string {
-  const normalized = normalizeHost(host)
-  if (!normalized) return ''
-  const base = getBaseDomain()
-  const suffix = `.${base}`
-  return normalized.endsWith(suffix) ? normalized.slice(0, -suffix.length) : normalized
-}
-
 /** 由 host 推导站点公开地址（用于 canonical 等绝对 URL） */
 export function toSiteOrigin(host: string, proto?: string | null): string {
   const scheme = proto?.split(',')[0]?.trim().toLowerCase() === 'http' ? 'http' : 'https'
   return `${scheme}://${normalizeHost(host)}`
-}
-
-/** 判断是否为合法可渲染的站点 host（空值、IP、本地地址均不具备租户语义） */
-export function isRenderableHost(host: string): boolean {
-  return !!host && !LOCAL_HOSTS.has(host)
 }

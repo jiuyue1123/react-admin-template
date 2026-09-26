@@ -173,3 +173,15 @@ Puck 编辑器 edit：包 `<MediaFieldContext.Provider value={PuckMediaField}>`�
 > 两个坑同源：**TS 的上下文类型推断依赖显式标注**。同一个函数写在带标注的对象里能过，拆成裸字面量就报逆变错误，而报错信息（`Type X is not assignable to type Y`）完全不提示这一点。
 
 修复前本轮只能用「不新增错误」当闸门（基线 admin 6 / site 1）；现在两端可做真正的构建验证。
+
+## 12. antd 6 / Puck 0.23 废弃项迁移（2026-09-26）
+**排查手段**：先跑 `npx antd lint src --format json` —— 它会一次性列出全部 `deprecated` / `usage` / `a11y` 问题，比等运行时警告逐个冒出来高效得多（本次它额外挖出了一个我们没遇到的 `Select.optionFilterProp`）。改动前用 `antd info <Component> --format json` 查 API，**不要凭记忆**。
+
+已迁移：`Alert.message`→`title`（18 处）· `Drawer.width`→`size`（5 处）· `Space.direction`→`orientation`（3 处）· `Select.optionFilterProp`→`showSearch.optionFilterProp`（1 处）· Puck `renderHeaderActions`→`overrides.headerActions`（2 处）· 移除 3 处 Puck CSS 静态导入。
+
+**三个非显然的陷阱（都不是简单改名）**：
+1. **同名的 prop 在不同组件上废弃状态不同**。`width` 只在 `Drawer` 上废弃；`Modal` 与 `Sider` 的 `width` 依然有效。批量替换前必须逐处确认宿主组件——本仓库 `MediaPicker`、`AgreementModal`、`content/media` 用的是 `Modal`，`layouts/base` 用的是 `Sider`，都不该改。
+2. **`Select` 的搜索不能只删 `optionFilterProp`**。裸写 `showSearch` 会让 `optionFilterProp` 退回默认的 `value`，**按 label 搜索当场失效**。必须整体写成 `showSearch={{ optionFilterProp: 'label' }}`。
+3. **Puck 的 `overrides.headerActions` 是「覆盖」而非「追加」**。产物实现里未提供时默认是 `DefaultOverride`（什么都不渲染），所以迁移时只返回自己的按钮即可；**渲染 `{children}` 会把 Puck 的默认动作混进来，凭空改变界面**。旧的 `renderHeaderActions` 收到的 `{state, dispatch}` 在新 API 里要用 `usePuck()` 取。
+
+**刻意未改**：`service/request/index.ts` 的静态 `Modal.confirm` / `message.error`（`antd lint` 会报 2 条 usage 警告）。拦截器运行在 React 之外、拿不到 `App.useApp()`，且项目定过「勿改拦截器」——这两条警告是已知且接受的。

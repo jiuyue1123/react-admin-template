@@ -45,7 +45,7 @@ export default function PuckTestPage() {
         config={puckConfig}
         data={initial}
         height="100%"
-        headerTitle="Puck 编辑器测试"
+        headerTitle="区块编辑器测试"
         onChange={handleChange}
         renderHeaderActions={() => (
           <Button icon={<ReloadOutlined />} onClick={handleReset}>

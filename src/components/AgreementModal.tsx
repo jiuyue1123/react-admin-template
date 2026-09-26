@@ -89,7 +89,7 @@ export default function AgreementModal({ open, title, docKey, onClose }: Agreeme
         </div>
       ) : (
         <Empty
-          description={<span className="text-text-tertiary">该文档暂未发布，请稍后再试</span>}
+          description={<span className="text-text-tertiary">该文档暂未发布</span>}
           className="py-10"
         />
       )}

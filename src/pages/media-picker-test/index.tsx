@@ -97,7 +97,7 @@ function SelectedItem({
         <img src={media.url} alt={media.fileName} className="h-14 w-14 shrink-0 rounded-lg object-cover" />
       ) : (
         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-primary-bg text-xs uppercase text-primary">
-          {getFileExtension(media.fileName) || 'file'}
+          {getFileExtension(media.fileName) || '文件'}
         </div>
       )}
       <div className="min-w-0 flex-1">

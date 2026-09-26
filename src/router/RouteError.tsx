@@ -13,7 +13,15 @@ export default function RouteError() {
       <Result
         status="error"
         title="页面出错了"
-        subTitle={error instanceof Error ? error.message : '发生了未知错误'}
+        subTitle={
+          <div>
+            <div>页面加载出错，请刷新重试；如果反复出现，请联系我们。</div>
+            {/* 技术细节保留在小字里：它是排查问题的唯一线索，但不该是用户先看到的东西 */}
+            {error instanceof Error ? (
+              <div className="mt-2 break-all text-xs text-text-tertiary">{error.message}</div>
+            ) : null}
+          </div>
+        }
         extra={
           <Button type="primary" onClick={() => navigate('/')}>
             回到首页

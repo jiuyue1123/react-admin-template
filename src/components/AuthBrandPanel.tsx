@@ -5,9 +5,9 @@ import {
 } from '@ant-design/icons'
 
 const FEATURES = [
-  { icon: <ApartmentOutlined />, title: '多租户管理', desc: '组织空间独立，数据安全隔离' },
-  { icon: <SafetyCertificateOutlined />, title: '安全认证', desc: '短信验证码 + 双令牌保障' },
-  { icon: <CustomerServiceOutlined />, title: '在线客服', desc: '问题实时响应，服务不间断' },
+  { icon: <ApartmentOutlined />, title: '独立空间', desc: '组织空间独立，数据安全隔离' },
+  { icon: <SafetyCertificateOutlined />, title: '安全认证', desc: '短信验证码登录，登录状态加密保存' },
+  { icon: <CustomerServiceOutlined />, title: '在线客服', desc: '有问题随时联系我们' },
 ]
 
 /**
@@ -46,7 +46,7 @@ export default function AuthBrandPanel() {
           </div>
           <div>
             <div className="text-lg font-semibold leading-tight">简帆坊</div>
-            <div className="text-xs tracking-[0.28em] text-white/60">TENANT PORTAL</div>
+            <div className="text-xs tracking-[0.28em] text-white/60">租户端</div>
           </div>
         </div>
 
@@ -56,15 +56,15 @@ export default function AuthBrandPanel() {
             className="jff-anim text-[1.75rem] font-semibold leading-snug"
             style={{ animationDelay: '160ms' }}
           >
-            多租户 SaaS 管理平台
+            站点搭建与运营平台
             <br />
-            让企业管理更简单
+            让站点管理更简单
           </h2>
           <p
             className="jff-anim mt-4 max-w-sm text-sm leading-6 text-white/70"
             style={{ animationDelay: '240ms' }}
           >
-            简帆坊租户端，一站式完成账号注册、登录与自助管理。
+            在这里管理您的站点、套餐与账号。
           </p>
 
           <ul className="mt-10 space-y-5">

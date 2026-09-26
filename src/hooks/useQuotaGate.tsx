@@ -21,7 +21,7 @@ type QuotaKind = 'page' | 'storage' | 'homeDelivery' | 'form'
 
 const QUOTA_META: Record<QuotaKind, { label: string; hint: string }> = {
   page: { label: '内页数量', hint: '升级套餐后可继续添加内页。' },
-  storage: { label: '存储空间', hint: '升级套餐可扩容；也可以先删除一些不再使用的素材。' },
+  storage: { label: '存储空间', hint: '升级套餐可扩容，也可以先删除不再使用的素材。' },
   homeDelivery: { label: '定制首页交付套数', hint: '升级套餐后可继续交付定制首页。' },
   form: { label: '表单数量', hint: '升级套餐后可继续创建表单。' },
 }

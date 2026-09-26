@@ -60,7 +60,7 @@ function refreshAccessToken(): Promise<void> {
         refreshing = (async () => {
             const { token, refreshToken } = useAuthStore.getState()
             if (!token?.refreshToken) {
-                throw new Error('缺少刷新令牌，请重新登录')
+                throw new Error('登录状态已失效，请重新登录')
             }
             await refreshToken(token)
         })().finally(() => {
@@ -92,7 +92,9 @@ const alovaInstance = createAlova({
         /** 请求成功拦截器：处理 HTTP 状态、业务 code，成功后解包返回业务数据 */
         onSuccess: async (response, method) => {
             if (response.status >= 400) {
-                throw new Error(response.statusText)
+                // 不用 response.statusText：它是英文的 HTTP 状态文本（如 Bad Gateway），
+                // 界面全中文时会在 toast 里蹦出英文
+                throw new Error('服务暂时不可用，请稍后重试')
             }
 
             const json = (await response.json()) as App.Service.Response
@@ -111,7 +113,7 @@ const alovaInstance = createAlova({
                     await refreshAccessToken()
                     return method.send()
                 }
-                throw new Error(json.msg || `请求失败（code: ${json.code}）`)
+                throw new Error(json.msg || '请求失败，请稍后重试')
             }
 
             // 成功：返回业务数据（解包）
@@ -120,7 +122,7 @@ const alovaInstance = createAlova({
 
         /** 请求失败拦截器：统一错误提示 */
         onError: err => {
-            message.error(err instanceof Error ? err.message : '网络请求失败')
+            message.error(err instanceof Error ? err.message : '网络异常，请检查网络后重试')
         },
     },
 })

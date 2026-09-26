@@ -251,7 +251,7 @@ function SelectableCard({
             {isVideo ? (
               <PlayCircleOutlined className="text-3xl" />
             ) : (
-              <span className="text-xs uppercase">{ext || 'file'}</span>
+              <span className="text-xs uppercase">{ext || '文件'}</span>
             )}
           </div>
         )}

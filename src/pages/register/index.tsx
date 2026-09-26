@@ -84,7 +84,7 @@ export default function RegisterPage() {
           <div className="jff-anim mb-4" style={{ animationDelay: '100ms' }}>
             <h1 className="text-2xl font-semibold text-text">注册账号</h1>
             <p className="mt-1.5 text-sm text-text-secondary">
-              注册即开通租户空间，开始管理您的业务
+              注册后即可搭建并运营您的站点
             </p>
           </div>
 

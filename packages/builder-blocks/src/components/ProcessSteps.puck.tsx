@@ -11,8 +11,8 @@ export type ProcessStepsProps = { title: string; subtitle: string; items: StepIt
 
 const SAMPLE_ITEMS: StepItem[] = [
   { title: "需求沟通", description: "了解您的业务目标与需求" },
-  { title: "方案设计", description: "输出定制化解决方案" },
-  { title: "实施交付", description: "开发部署并持续优化" },
+  { title: "方案设计", description: "按需求输出方案" },
+  { title: "实施交付", description: "开发并部署上线" },
 ];
 
 // ---------------------------------------------------------------------------
@@ -57,7 +57,7 @@ export const ProcessStepsConfig: ComponentConfig<ProcessStepsProps> = {
 
   defaultProps: {
     title: "合作流程",
-    subtitle: "三步轻松开启合作",
+    subtitle: "从沟通到上线",
     items: SAMPLE_ITEMS,
   },
 

@@ -65,7 +65,7 @@ export const LogoCloudConfig: ComponentConfig<LogoCloudProps> = {
 
   defaultProps: {
     title: "合作伙伴",
-    subtitle: "我们与众多优秀企业保持合作",
+    subtitle: "以下是我们合作的部分企业",
     items: SAMPLE_ITEMS,
   },
 

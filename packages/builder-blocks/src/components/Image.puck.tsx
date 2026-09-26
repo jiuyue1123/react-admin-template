@@ -134,7 +134,7 @@ export const ImageConfig: ComponentConfig<ImageProps> = {
       label: "图片",
       render: ({ value, onChange }) => <MediaField value={value} onChange={onChange} />,
     },
-    alt: { type: "text", label: "替代文字" },
+    alt: { type: "text", label: "图片描述" },
     href: { type: "text", label: "链接地址" },
     target: { type: "radio", label: "打开方式", options: [...TARGET_OPTIONS] },
     width: { type: "select", label: "宽度", options: [...WIDTH_OPTIONS] },

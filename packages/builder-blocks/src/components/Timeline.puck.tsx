@@ -55,7 +55,7 @@ export const TimelineConfig: ComponentConfig<TimelineProps> = {
 
   defaultProps: {
     title: "发展历程",
-    subtitle: "一路走来的重要时刻",
+    subtitle: "发展中的关键节点",
     items: SAMPLE_ITEMS,
   },
 

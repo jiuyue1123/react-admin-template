@@ -68,7 +68,7 @@ export const TextBlockConfig: ComponentConfig<TextBlockProps> = {
   inline: true,
 
   defaultProps: {
-    text: "这里是正文内容，支持配置字号、颜色、行高、对齐方式等。",
+    text: "这里是正文内容。",
     align: "left",
     fontSize: "14",
     color: "",

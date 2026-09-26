@@ -10,9 +10,9 @@ export type ValueItem = { icon: string; title: string; description: string };
 export type ValuesCardsProps = { title: string; subtitle: string; items: ValueItem[] };
 
 const SAMPLE_ITEMS: ValueItem[] = [
-  { icon: "heart", title: "客户第一", description: "始终把客户的需求和体验放在首位。" },
-  { icon: "bulb", title: "持续创新", description: "拥抱变化，用创新驱动产品进步。" },
-  { icon: "team", title: "团队协作", description: "开放透明，彼此成就，共同成长。" },
+  { icon: "heart", title: "客户第一", description: "把客户需求放在首位。" },
+  { icon: "bulb", title: "持续创新", description: "跟进变化，持续改进产品。" },
+  { icon: "team", title: "团队协作", description: "开放透明，互相成就。" },
 ];
 
 // ---------------------------------------------------------------------------
@@ -56,7 +56,7 @@ export const ValuesCardsConfig: ComponentConfig<ValuesCardsProps> = {
 
   defaultProps: {
     title: "我们的价值观",
-    subtitle: "指引我们前行的信条",
+    subtitle: "我们做事的原则",
     items: SAMPLE_ITEMS,
   },
 

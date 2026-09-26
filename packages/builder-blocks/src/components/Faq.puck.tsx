@@ -10,9 +10,9 @@ export type FaqItem = { question: string; answer: string };
 export type FaqProps = { title: string; subtitle: string; items: FaqItem[] };
 
 const SAMPLE_ITEMS: FaqItem[] = [
-  { question: "你们的服务怎么收费？", answer: "我们提供灵活的套餐方案，可根据业务规模选择，具体价格请联系销售团队。" },
+  { question: "服务怎么收费？", answer: "方案按业务规模分档，具体价格请联系我们。" },
   { question: "支持哪些付款方式？", answer: "支持支付宝、微信支付及企业对公转账，可开具增值税发票。" },
-  { question: "多久可以上线？", answer: "标准方案在签约后 7 个工作日内即可完成部署上线。" },
+  { question: "多久可以上线？", answer: "签约后即可部署上线。" },
 ];
 
 // ---------------------------------------------------------------------------
@@ -56,7 +56,7 @@ export const FaqConfig: ComponentConfig<FaqProps> = {
 
   defaultProps: {
     title: "常见问题",
-    subtitle: "关于我们的服务，您可能想了解这些",
+    subtitle: "关于我们，您可能想了解这些",
     items: SAMPLE_ITEMS,
   },
 

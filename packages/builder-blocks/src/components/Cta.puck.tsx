@@ -77,8 +77,8 @@ export const CtaConfig: ComponentConfig<CtaProps> = {
   },
 
   defaultProps: {
-    title: "准备好开始了吗？",
-    subtitle: "立即联系我们，获取专属解决方案",
+    title: "想聊聊您的项目？",
+    subtitle: "联系我们，聊聊您的需求",
     buttonText: "联系我们",
     buttonLink: "",
     backgroundColor: "#f5f7fa",

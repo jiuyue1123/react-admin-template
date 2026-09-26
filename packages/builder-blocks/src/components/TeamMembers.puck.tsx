@@ -11,7 +11,7 @@ export type MemberItem = { avatar: string; name: string; role: string; bio: stri
 export type TeamMembersProps = { title: string; subtitle: string; items: MemberItem[] };
 
 const SAMPLE_ITEMS: MemberItem[] = [
-  { avatar: "", name: "张三", role: "创始人 / CEO", bio: "十年行业经验，带领团队从 0 到 1。" },
+  { avatar: "", name: "张三", role: "创始人 / CEO", bio: "十年行业经验，带队从零搭建产品体系。" },
   { avatar: "", name: "李四", role: "技术总监", bio: "负责整体技术架构与研发团队管理。" },
   { avatar: "", name: "王五", role: "产品负责人", bio: "专注于用户体验与产品迭代。" },
 ];
@@ -82,7 +82,7 @@ export const TeamMembersConfig: ComponentConfig<TeamMembersProps> = {
 
   defaultProps: {
     title: "我们的团队",
-    subtitle: "一群热爱产品的人",
+    subtitle: "以下是团队主要成员",
     items: SAMPLE_ITEMS,
   },
 

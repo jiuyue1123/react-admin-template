@@ -10,9 +10,9 @@ export type ServiceItem = { icon: string; title: string; description: string };
 export type ServicesGridProps = { title: string; subtitle: string; items: ServiceItem[] };
 
 const SAMPLE_ITEMS: ServiceItem[] = [
-  { icon: "rocket", title: "快速部署", description: "开箱即用，数小时内完成上线，无需从零搭建。" },
-  { icon: "safety", title: "安全可靠", description: "银行级数据加密与权限体系，保障您的业务数据安全。" },
-  { icon: "team", title: "专业支持", description: "资深顾问全程跟进，提供持续的技术与运营支持。" },
+  { icon: "rocket", title: "快速部署", description: "开箱即用，无需从零搭建。" },
+  { icon: "safety", title: "安全可靠", description: "数据加密与权限体系。" },
+  { icon: "team", title: "专业支持", description: "顾问全程跟进，提供技术与运营支持。" },
 ];
 
 // ---------------------------------------------------------------------------
@@ -43,7 +43,7 @@ export const ServicesGridConfig: ComponentConfig<ServicesGridProps> = {
 
   defaultProps: {
     title: "我们的服务",
-    subtitle: "提供一站式解决方案",
+    subtitle: "我们能为您做这些",
     items: SAMPLE_ITEMS,
   },
 

@@ -275,7 +275,7 @@ export const ButtonConfig: ComponentConfig<ButtonProps> = {
     text: { type: "text", label: "文字" },
     variant: {
       type: "radio",
-      label: "变体",
+      label: "按钮类型",
       options: [
         { label: "主要", value: "primary" },
         { label: "次要", value: "secondary" },

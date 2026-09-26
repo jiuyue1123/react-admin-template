@@ -78,7 +78,7 @@ export const FormConfig: ComponentConfig<FormBlockProps> = {
               {formKey ? `表单：${formKey}` : "尚未选择表单"}
             </div>
             <div style={{ fontSize: 12, color: "rgba(0, 0, 0, 0.45)", marginTop: 6, lineHeight: 1.6 }}>
-              前台将按该表单的字段定义渲染，访客提交的内容会成为一条线索
+              前台按该表单的字段渲染，访客提交后生成一条线索
             </div>
           </div>
         </div>

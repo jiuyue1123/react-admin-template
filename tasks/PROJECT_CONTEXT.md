@@ -164,9 +164,12 @@ Puck 编辑器 edit：包 `<MediaFieldContext.Provider value={PuckMediaField}>`�
 - **刻意未做**：改写本就简洁准确的串（「上传失败」「验证码为 6 位数字」「删除后不可恢复」等，改了只是 churn）；`mock` 页的文案润色（根因是这些页不该上线，见 §8 隐患①）；区块默认内容里的样板数字（「客户数突破 1000 家」「A 轮融资」——按用户决定保留）。**遗留风险**：样板数字若租户未改写即发布，会成为对外声明。
 - 完整来源清单（改文案前必查）见 `docs/copy-inventory.md`。
 
-### ⚠️ 发现的两个阻断问题（既有，非本次文案引入）
-**两个应用当前都无法构建**：
-- admin：`pnpm build` 的 `tsc -b` 失败于 6 个错误 —— `billing/invoices/index.tsx:47`（未用的 `modal`）、`content/pages/index.tsx:187`（未用的 `record`）、`:258/:261/:262/:263`（`FilterValue` 类型）→ `&&` 短路，vite build 不执行。
-- `apps/site`：`next build` 失败于 `PuckContent.tsx:56`（Form 覆盖组件不满足 Puck 的 `Config` 类型）。
+### 类型错误与构建（2026-09-26 已修复）
+文案优化期间发现**两个应用都无法构建** —— 共 **7 个既有类型错误**（来自在途的表单工作，与文案无关），已全部修复，两端 `typecheck` 与 `build` 均通过：
 
-三处 `typecheck` 均不通过，因此本次文案改动只能用「**不新增错误**」作为验证闸门（基线：admin 6 条 / site 1 条）。
+- **admin 6 条**：`billing/invoices/index.tsx:47` 解构出未使用的 `modal`（删）；`content/pages/index.tsx:187` 未使用的 `record`（→ `_record`）；`:258/:261/:262/:263` 的 `Segmented` 报 TS2322 —— 根因是 options 写成**内联字面量**时 TS 推不出 `FilterValue` 联合类型，**修法是提为模块级常量并显式标注类型**（照 `invoices` 页 `filterOptions` 的既有写法）。
+- **`apps/site` 1 条**：`PuckContent.tsx` 覆盖表单区块时，`render` 写在**裸对象字面量**里拿不到 Puck 的上下文类型，参数逆变检查失败。**修法：把覆盖对象显式标注为 `ComponentConfig<FormBlockProps>`** —— 区块库里的 `FormConfig` 能通过检查，靠的正是同一个标注。
+
+> 两个坑同源：**TS 的上下文类型推断依赖显式标注**。同一个函数写在带标注的对象里能过，拆成裸字面量就报逆变错误，而报错信息（`Type X is not assignable to type Y`）完全不提示这一点。
+
+修复前本轮只能用「不新增错误」当闸门（基线 admin 6 / site 1）；现在两端可做真正的构建验证。

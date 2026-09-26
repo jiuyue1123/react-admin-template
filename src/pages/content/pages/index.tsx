@@ -26,6 +26,19 @@ type PageModalState = { mode: 'create' } | { mode: 'edit'; page: Api.SitePage.Si
 
 type FilterValue = Api.SitePage.PageState | 'all'
 
+/**
+ * 状态筛选选项
+ *
+ * 显式标注类型：若写成 Segmented 的**内联字面量**，TS 推不出 `FilterValue` 这个联合类型，
+ * 会把 value 当成 `string` 而报 TS2322（同 invoices 页 `filterOptions` 的写法）
+ */
+const FILTER_OPTIONS: { label: string; value: FilterValue }[] = [
+  { label: '全部', value: 'all' },
+  { label: '已发布', value: 1 },
+  { label: '草稿', value: 0 },
+  { label: '已下线', value: 2 },
+]
+
 /** 页面管理：新增、删除、排序、隐藏页面 */
 export default function PagesPage() {
   const { message } = App.useApp()
@@ -184,7 +197,7 @@ export default function PagesPage() {
       title: '排序',
       key: 'sort',
       width: 96,
-      render: (_, record, index) => (
+      render: (_, _record, index) => (
         <div className="flex items-center">
           <Button
             type="text"
@@ -256,12 +269,7 @@ export default function PagesPage() {
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <Segmented
             value={filter}
-            options={[
-              { label: '全部', value: 'all' },
-              { label: '已发布', value: 1 },
-              { label: '草稿', value: 0 },
-              { label: '已下线', value: 2 },
-            ]}
+            options={FILTER_OPTIONS}
             onChange={value => setFilter(value as FilterValue)}
           />
           <Button type="primary" icon={<PlusOutlined />} onClick={() => setPageModal({ mode: 'create' })}>

@@ -1,5 +1,5 @@
 import { Render } from '@puckeditor/core'
-import type { Data } from '@puckeditor/core'
+import type { ComponentConfig, Data } from '@puckeditor/core'
 import { FormConfig, puckConfig } from '@jff/builder-blocks'
 import type { FormBlockProps } from '@jff/builder-blocks'
 import { isEmptyPuckData } from '@/lib/puck'
@@ -35,21 +35,27 @@ export default function PuckContent({
     return <EmptyPage pageTitle={pageTitle} />
   }
 
+  // 覆盖对象要显式标注为 `ComponentConfig<FormBlockProps>`：写成裸对象字面量时，
+  // 里面的 render 箭头拿不到 Puck 的上下文类型，参数逆变检查会失败（TS2322），
+  // 因为 Puck 要求的签名是 `(props: WithId<WithPuckProps<FormBlockProps>>) => …`。
+  // 区块库里的 `FormConfig` 能通过类型检查，靠的正是同一个显式标注。
+  const formOverride: ComponentConfig<FormBlockProps> = {
+    ...FormConfig,
+    render: ({ formKey, title, description }) => (
+      <SiteFormBlock
+        formKey={formKey}
+        title={title}
+        description={description}
+        sourcePage={sourcePage}
+      />
+    ),
+  }
+
   const config = {
     ...puckConfig,
     components: {
       ...puckConfig.components,
-      Form: {
-        ...FormConfig,
-        render: ({ formKey, title, description }: FormBlockProps) => (
-          <SiteFormBlock
-            formKey={formKey}
-            title={title}
-            description={description}
-            sourcePage={sourcePage}
-          />
-        ),
-      },
+      Form: formOverride,
     },
   }
 

@@ -44,7 +44,7 @@ type FilterValue = Api.Invoice.ApplyState | 'all'
 
 /** 发票管理：申请发票 / 查看发票申请 */
 export default function BillingInvoicesPage() {
-  const { message, modal } = App.useApp()
+  const { message } = App.useApp()
   const [filter, setFilter] = useState<FilterValue>('all')
   const [page, setPage] = useState(1)
   const [applyOpen, setApplyOpen] = useState(false)

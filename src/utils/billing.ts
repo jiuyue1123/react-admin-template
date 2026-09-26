@@ -380,7 +380,7 @@ export function getBillingBanner(sub?: Api.Billing.SubscriptionVO | null): Billi
     return {
       type: 'error',
       message:
-        '您的套餐已到期，站点已下线。到期后 180 天内续费可恢复站点，原数据保留；超过 180 天将进入归档流程。',
+        '您的套餐已到期，站点已下线。180 天内续费可恢复站点，原数据保留；超过 180 天将进入归档。',
     }
   }
 

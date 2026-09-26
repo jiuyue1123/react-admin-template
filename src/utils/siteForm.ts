@@ -16,7 +16,7 @@ interface MetaItem {
  */
 export const FORM_STATE_META: Record<number, MetaItem> = {
   0: { label: '已停用', color: 'default' },
-  1: { label: '启用中', color: 'success' },
+  1: { label: '已启用', color: 'success' },
 }
 
 /** 线索状态：0-待跟进 1-已联系 2-已关闭（2 是**终态，不可退回**） */

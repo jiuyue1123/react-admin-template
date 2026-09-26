@@ -19,7 +19,7 @@ const INTENT_ACTION: Record<PlanIntent, string> = {
   purchase: '立即购买',
   renew: '立即续费',
   upgrade: '升配并支付',
-  downgrade: '降配（到期自动切换）',
+  downgrade: '降配',
 }
 
 const INTENT_NOTE: Partial<Record<PlanIntent, string>> = {
@@ -160,7 +160,7 @@ export default function BillingPlansPage() {
       content: (
         <div className="text-sm text-text-secondary">
           到期后将自动切换到「{plan.planName}」。当前套餐保持有效至到期日，
-          <b className="text-text">不退还差价</b>；切换后按新套餐价格计费，并生成新的订阅记录。
+          <b className="text-text">不退还差价</b>；切换后按新套餐价格计费。
         </div>
       ),
       okText: '确认降配',
@@ -244,7 +244,7 @@ export default function BillingPlansPage() {
         </div>
       ) : (
         <Card>
-          <Empty description="暂无可购套餐，请稍后再来" className="py-16" />
+          <Empty description="暂无可购套餐" className="py-16" />
         </Card>
       )}
 
@@ -305,9 +305,9 @@ export default function BillingPlansPage() {
           <div className="mb-1 font-medium text-text">订购须知</div>
           <ul className="list-inside list-disc space-y-0.5 text-xs">
             <li>支持支付宝在线支付；支付成功后服务即时开通（升配立即生效）。</li>
-            <li>套餐到期前 15 天起将进行站内提醒；到期后站点下线，180 天内续费可恢复并保留原数据。</li>
-            <li>退款按当前订阅剩余时长折算（见订阅详情可退金额），审核通过后原路退回。</li>
-            <li>部分套餐与上线操作需完成实名认证（认证通过后即可上线）。</li>
+            <li>到期前 15 天起会发送站内提醒；到期后站点下线，180 天内续费可恢复站点并保留原数据。</li>
+            <li>退款按当前订阅剩余时长折算（见订阅详情的可退金额），审核通过后原路退回。</li>
+            <li>站点上线需完成实名认证。</li>
           </ul>
         </div>
       </Card>

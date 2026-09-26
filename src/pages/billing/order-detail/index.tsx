@@ -118,7 +118,7 @@ export default function OrderDetailPage() {
       message.success('支付成功，服务已开通')
       void useBillingStore.getState().refresh(true)
     } else if (state === 6) {
-      message.info('订单已转人工确认，将为您尽快核实')
+      message.info('订单已转人工确认，我们会尽快核实')
     } else if (state === 5) {
       message.info('订单已退款')
     }
@@ -155,7 +155,7 @@ export default function OrderDetailPage() {
     void paidConfirmRequest
       .send(orderNo)
       .then(result => {
-        message.success('已提交，正在为您核实付款结果')
+        message.success('已提交，正在核实付款结果')
         reloadRef.current()
         if (result.orderState !== 2 && result.orderState !== 5) {
           setPolling(true)
@@ -207,7 +207,7 @@ export default function OrderDetailPage() {
             </div>
             <div className="mt-2 text-2xl font-semibold text-text">{order.planName}</div>
             <div className="mt-1 text-sm text-text-secondary">
-              {typeMeta.label} · 套餐 {order.planCode}
+              {typeMeta.label}
               {order.durationDays ? ` · ${order.durationDays} 天` : ''} · {formatDateTime(order.gmtCreate)}
             </div>
           </div>
@@ -253,7 +253,7 @@ export default function OrderDetailPage() {
             className="mt-4"
             type="warning"
             showIcon
-            message="订单已转人工确认，请耐心等待；若您已完成付款，可再次点击「我已付款」加速核实。"
+            message="订单已转人工确认；若您已完成付款，可再次点击「我已付款」加速核实。"
           />
         ) : null}
         {state === 7 ? (
@@ -261,7 +261,7 @@ export default function OrderDetailPage() {
             className="mt-4"
             type="info"
             showIcon
-            message="退款申请已提交，等待管理员审核；审核通过后将按原路退回。"
+            message="退款申请已提交，审核通过后将原路退回。"
           />
         ) : null}
         {state === 5 && order.refundAmount ? (
@@ -320,7 +320,7 @@ function buildDescriptions(order: Api.Billing.OrderVO) {
     { key: 'planCode', label: '套餐编码', children: order.planCode },
     { key: 'planName', label: '套餐名称', children: order.planName },
     { key: 'durationDays', label: '有效期', children: order.durationDays ? `${order.durationDays} 天` : '-' },
-    { key: 'payChannel', label: '支付渠道', children: order.payChannel || 'alipay' },
+    { key: 'payChannel', label: '支付渠道', children: order.payChannel || '支付宝' },
     { key: 'payTime', label: '支付时间', children: order.payTime ? formatDateTime(order.payTime) : '-' },
     { key: 'createdAt', label: '创建时间', children: formatDateTime(order.gmtCreate) },
   ]

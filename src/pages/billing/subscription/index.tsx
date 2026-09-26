@@ -129,7 +129,7 @@ export default function SubscriptionPage() {
       title: '确认退订',
       content: (
         <div className="text-sm text-text-secondary">
-          退订后将停止当前套餐服务（站点下线 / 降级），涉及的支付订单进入退款中待管理员审核；退款将按平台核算的剩余部分原路退回。请确认是否继续？
+          退订后将停止当前套餐服务（站点下线 / 降级），涉及的订单进入退款审核；退款按剩余时长折算，审核通过后原路退回。
         </div>
       ),
       okText: '确认退订',
@@ -209,6 +209,9 @@ export default function SubscriptionPage() {
       render: (_, record) => {
         if (!record.operatorType) return '-'
         return (
+          // ⚠️ 此处的 operatorType 来自「订阅变更日志」，语义是 1-租户 / 2-管理员，
+          // 与「操作日志」的 OP_LOG_OPERATOR_TYPE_META（1-管理员 / 2-租户）**恰好相反**。
+          // 别把它「统一」成那个共享 META —— 会让整列标签静默反转，而 TS 拦不住。
           <Tag color={record.operatorType === 1 ? 'default' : 'purple'}>
             {record.operatorType === 1 ? '租户' : '管理员'}
           </Tag>
@@ -236,7 +239,7 @@ export default function SubscriptionPage() {
             description={
               <div className="text-text-secondary">
                 <div className="text-sm">尚未订购套餐</div>
-                <div className="mt-1 text-xs">开通后即可发布站点并享受对应权益</div>
+                <div className="mt-1 text-xs">开通后即可发布站点并使用套餐权益</div>
               </div>
             }
           >
@@ -251,7 +254,7 @@ export default function SubscriptionPage() {
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xl font-semibold text-text">
-                  {getPlanDisplayName(snapshot.planName) || `套餐 #${subscription.planId}`}
+                  {getPlanDisplayName(snapshot.planName) || '未知套餐'}
                 </span>
                 <Tag color={stateMeta.color}>{stateMeta.label}</Tag>
               </div>
@@ -373,9 +376,9 @@ export default function SubscriptionPage() {
           <div className="mb-1 font-medium text-text">续费与到期说明</div>
           <ul className="list-inside list-disc space-y-0.5 text-xs">
             <li>到期前 15 天起每日站内提醒续费；到期后站点立即下线。</li>
-            <li>到期后 180 天内续费可恢复站点，按新套餐重新计算有效期，原数据保留。</li>
+            <li>到期后 180 天内续费可恢复站点，有效期按新套餐重新计算，原数据保留。</li>
             <li>升配立即生效（按剩余天数折算差价）；降配到期自动切换，不退还差价。</li>
-            <li>如需退订，可在订阅卡片右上角「更多」菜单操作；申请后涉及的支付订单进入退款中，审核通过后原路退回（见订单记录）。</li>
+            <li>如需退订，可在订阅卡片右上角的「更多」菜单操作；申请后涉及的订单进入退款审核，审核通过后原路退回（见订单记录）。</li>
           </ul>
         </div>
       </Card>

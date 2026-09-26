@@ -192,7 +192,7 @@ export default function BillingInvoicesPage() {
         <div>
           <div className="text-lg font-semibold text-text">发票管理</div>
           <div className="mt-0.5 text-sm text-text-secondary">
-            对已支付订单申请开票，并随时查看处理进度
+            对已支付订单申请开票，并查看处理进度
           </div>
         </div>
       </div>
@@ -412,7 +412,7 @@ function ApplyInvoiceDrawer({
         {!heading?.enterprise && (
           <div className="-mt-2 mb-2 text-xs text-text-tertiary">
             增值税专用发票需企业实名认证通过后才能申请
-            {!heading?.fromVerification ? '，可先前往「实名认证」完成认证' : ''}
+            {!heading?.fromVerification ? '，可先到「实名认证」办理' : ''}
           </div>
         )}
 
@@ -443,7 +443,7 @@ function ApplyInvoiceDrawer({
             { max: 50, message: '不超过 50 个字符' },
           ]}
         >
-          <Input placeholder="普票可空" maxLength={50} />
+          <Input placeholder="普通发票可不填" maxLength={50} />
         </Form.Item>
 
         {isVat ? (
@@ -637,7 +637,7 @@ function InvoiceDetailDrawer({
               </ul>
             ) : (
               <div className="text-sm text-text-secondary">
-                {detail.applyState === 1 ? '暂无回传文件' : '开票后将在此提供电子发票文件'}
+                {detail.applyState === 1 ? '暂无发票文件' : '开票后将在此提供电子发票文件'}
               </div>
             )}
           </Section>

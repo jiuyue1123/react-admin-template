@@ -198,7 +198,7 @@ function SuccessBody({
         <div className="mt-2 text-xs text-text-tertiary">支付时间：{formatDateTime(payTime)}</div>
       ) : null}
       <div className="mt-6 rounded-lg bg-fill-secondary px-4 py-2.5 text-xs text-text-secondary">
-        本页将在 <span className="font-semibold text-text">{countdown}</span> 秒后自动关闭，无需手动操作
+        本页将在 <span className="font-semibold text-text">{countdown}</span> 秒后自动关闭
       </div>
       <Button className="mt-4" type="link" onClick={onView}>
         查看订单详情

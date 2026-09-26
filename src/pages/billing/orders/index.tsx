@@ -137,7 +137,7 @@ export default function BillingOrdersPage() {
           />
         ) : (
           <Empty
-            description={filter === 'all' ? '暂无订单，选购套餐后开始您的服务' : '该状态下暂无订单'}
+            description={filter === 'all' ? '暂无订单，选购套餐后即可开始使用' : '该状态下暂无订单'}
             className="py-16"
           />
         )}

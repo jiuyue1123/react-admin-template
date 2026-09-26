@@ -349,7 +349,7 @@ export default function CustomizationPage() {
               name="requirement"
               label="需求描述"
               rules={[
-                { required: true, message: '请描述你想要的首页' },
+                { required: true, message: '请描述您想要的首页' },
                 { max: 2000, message: '不超过 2000 字' },
               ]}
             >
@@ -366,7 +366,7 @@ export default function CustomizationPage() {
               label="参考站点"
               rules={[{ pattern: URL_PATTERN, message: '请填写 http/https 开头的网址' }]}
             >
-              <Input placeholder="选填，你喜欢的网站，便于工程师理解你的偏好" maxLength={512} />
+              <Input placeholder="选填，您喜欢的网站，便于工程师理解您的偏好" maxLength={512} />
             </Form.Item>
 
             <Form.Item
@@ -377,7 +377,7 @@ export default function CustomizationPage() {
                 { max: 128, message: '不超过 128 个字符' },
               ]}
             >
-              <Input placeholder="手机号 / 微信，工程师会用它与你确认需求" maxLength={128} />
+              <Input placeholder="手机号 / 微信，工程师会用它与您确认需求" maxLength={128} />
             </Form.Item>
 
             <Form.Item name="expectAt" label="期望交付时间">
@@ -402,8 +402,8 @@ export default function CustomizationPage() {
           <div className="text-sm text-text-secondary">
             <div className="mb-1 font-medium text-text">流程说明</div>
             <ul className="list-inside list-disc space-y-0.5 text-xs">
-              <li>提交后平台会先与你确认需求，受理后进入定制。</li>
-              <li>工程师完成交付后，你可以先预览效果，再决定验收通过或提出调整意见。</li>
+              <li>提交后平台会先与您确认需求，受理后进入定制。</li>
+              <li>工程师完成交付后，您可以先预览效果，再决定验收通过或提出调整意见。</li>
               <li>只有验收通过的首页才会对外生效；验收前的修改不影响线上站点。</li>
             </ul>
           </div>
@@ -481,7 +481,7 @@ export default function CustomizationPage() {
           showIcon
           icon={<ClockCircleFilled />}
           message="已提交，等待平台受理"
-          description="平台会先与你确认需求，受理后进入定制。"
+          description="平台会先与您确认需求，受理后进入定制。"
         />
       ) : null}
       {state === 1 ? (
@@ -490,7 +490,7 @@ export default function CustomizationPage() {
           showIcon
           icon={<ClockCircleFilled />}
           message="工程师正在定制"
-          description="定制完成后会在此交付，届时你可以先预览再验收。"
+          description="定制完成后会在此交付，届时您可以先预览再验收。"
         />
       ) : null}
       {state === 2 ? (
@@ -520,9 +520,7 @@ export default function CustomizationPage() {
           showIcon
           icon={<CheckCircleFilled />}
           message="已验收，首页已生效"
-          description={
-            detail?.activeHomePageKey ? `当前生效的首页：${detail.activeHomePageKey}` : undefined
-          }
+          description={detail?.activeHomePageKey ? '该定制版本已在线上生效' : undefined}
         />
       ) : null}
       {state === 5 ? (

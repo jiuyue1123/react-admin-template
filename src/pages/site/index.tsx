@@ -127,7 +127,7 @@ export default function SitePage() {
       modal.info({
         title: billingExpired ? '套餐已到期' : '暂未开通服务',
         content: billingExpired
-          ? '您的套餐已到期，站点处于下线状态。请在到期后 180 天内续费以恢复服务。'
+          ? '您的套餐已到期，站点已下线。180 天内续费可恢复站点。'
           : '开通套餐后即可上线站点。',
         okText: '去续费 / 开通',
         onOk: () => navigate('/billing/plans'),
@@ -233,7 +233,7 @@ export default function SitePage() {
 
         {!isOnline && !(site?.siteState === 3 || status?.siteState === 3) ? (
           <div className="mt-4 text-xs text-text-tertiary">
-            上线前请确保：已开通套餐、完成实名认证并审核通过、站点内容已准备就绪。
+            上线前请确保：套餐已开通、实名认证已通过、站点内容已就绪。
           </div>
         ) : null}
 
@@ -275,13 +275,13 @@ export default function SitePage() {
             />
           </Form.Item>
           <Form.Item name="logo" label="站点 Logo">
-            <SiteAssetField label="上传 Logo" hint="建议透明背景 PNG，展示于站点头部" />
+            <SiteAssetField label="上传 Logo" hint="建议使用透明背景的 PNG，展示在站点头部" />
           </Form.Item>
           <Form.Item name="favicon" label="站点 Favicon">
             <SiteAssetField
               label="上传 Favicon"
               accept=".png,.jpg,.jpeg,.webp,.svg,.ico"
-              hint="建议 64×64 的 .ico 或 .png，展示于浏览器标签页"
+              hint="建议 64×64 的 .ico 或 .png，展示在浏览器标签页"
             />
           </Form.Item>
 

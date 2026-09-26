@@ -113,7 +113,7 @@ export default function VerificationPage() {
         <div className="text-sm text-text-secondary">
           请确保提交的信息与{' '}
           <b className="text-text">{type === 1 ? '营业执照' : '身份证'}</b>{' '}
-          一致。信息将用于认证审核与站点上线，提交后进入人工审核。
+          一致。信息用于认证审核与站点上线，提交后进入人工审核。
         </div>
       ),
       okText: '确认提交',
@@ -165,7 +165,7 @@ export default function VerificationPage() {
               </div>
               <div className="mt-1 text-sm text-text-secondary">
                 {v.legalName}
-                {v.verifiedAt ? ` · 通过于 ${formatDate(v.verifiedAt)}` : ''}
+                {v.verifiedAt ? ` · 通过日期：${formatDate(v.verifiedAt)}` : ''}
                 {v.verifiedExpireAt ? ` · 有效期至 ${formatDate(v.verifiedExpireAt)}` : ''}
               </div>
             </div>
@@ -188,7 +188,7 @@ export default function VerificationPage() {
             type="info"
             showIcon
             icon={<ClockCircleFilled />}
-            message="认证资料审核中，通常 1-2 个工作日完成，请耐心等待"
+            message="审核中，通常 1-2 个工作日完成"
           />
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <Tag color={stateMeta.color}>{stateMeta.label}</Tag>

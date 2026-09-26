@@ -150,7 +150,7 @@ export default function SiteFormSubmit({
     return (
       <div className="rounded-xl border border-line bg-canvas px-6 py-10 text-center">
         <div className="text-[17px] font-semibold text-ink">
-          {form.successText || '提交成功，我们会尽快联系你'}
+          {form.successText || '提交成功，我们会尽快联系您'}
         </div>
       </div>
     )

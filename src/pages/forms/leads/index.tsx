@@ -139,7 +139,7 @@ export default function FormLeadsPage() {
       title: '关闭这条线索？',
       content: (
         <div className="text-sm text-text-secondary">
-          关闭后<b className="text-text">不可再改回</b>待跟进或已联系（终态）。
+          关闭后<b className="text-text">不可再改回</b>待跟进或已联系。
           如果只是暂时处理不了，建议标记为「已联系」。
         </div>
       ),

@@ -299,7 +299,7 @@ export default function FormsPage() {
             title="删除该表单？"
             description={
               record.submissionCount > 0
-                ? `该表单的 ${record.submissionCount} 条线索将无法再查看（数据仍在库中，但后台没有入口）`
+                ? `该表单的 ${record.submissionCount} 条线索将无法再查看（数据不会被删除）`
                 : '删除后不可恢复'
             }
             okText="删除"
@@ -385,7 +385,7 @@ export default function FormsPage() {
             <Form.Item
               name="formKey"
               label="表单标识"
-              tooltip="站点上引用该表单用的标识。只能用小写字母、数字和连字符，创建后不可修改。"
+              tooltip="表单在站点上的标识。仅支持小写字母、数字和连字符，创建后不可修改。"
               // 校验放到失焦：pattern 不允许首尾连字符，若逐字符校验，打到 `contact-`
               // 就会中途报错——而那时用户还没输完
               validateTrigger="onBlur"
@@ -408,7 +408,7 @@ export default function FormsPage() {
                 <Input placeholder="默认「提交」" maxLength={64} />
               </Form.Item>
               <Form.Item name="successText" label="提交成功提示" rules={[{ max: 128, message: '不超过 128 字' }]}>
-                <Input placeholder="默认「提交成功，我们会尽快联系你」" maxLength={128} />
+                <Input placeholder="默认「提交成功，我们会尽快联系您」" maxLength={128} />
               </Form.Item>
             </div>
 

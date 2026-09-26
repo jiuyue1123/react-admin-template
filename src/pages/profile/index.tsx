@@ -53,7 +53,7 @@ export default function ProfilePage() {
       <div className="mx-auto max-w-4xl">
         <Card>
           <div className="py-12 text-center text-text-secondary">
-            暂无可展示的租户资料，请稍后重试
+            暂无租户资料
           </div>
         </Card>
       </div>

@@ -246,7 +246,7 @@ function FieldRow({
                 ) : null}
 
                 <span className="ml-auto font-mono text-xs text-text-quaternary">
-                    {locked ? `标识 ${fieldKey}（不可改）` : fieldKey}
+                    {locked ? `标识 ${fieldKey}（创建后不可修改）` : fieldKey}
                 </span>
             </div>
 

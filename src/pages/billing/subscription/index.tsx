@@ -107,6 +107,7 @@ export default function SubscriptionPage() {
           limit: quota.homeDeliveryLimit,
           format: String,
         },
+        { label: '表单数量', used: quota.formUsed, limit: quota.formLimit, format: String },
       ]
     : []
 
@@ -320,7 +321,7 @@ export default function SubscriptionPage() {
       */}
       {quota?.hasActiveSubscription ? (
         <Card title="用量与额度">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {quotaRows.map(row => (
               <StatBlock
                 key={row.label}

@@ -197,6 +197,10 @@ declare namespace Api {
             homeDeliveryUsed: number
             /** 定制首页交付套数上限，null-不限制 */
             homeDeliveryLimit?: number | null
+            /** 已建表单数量（软删即释放，口径与后端执法点同源） */
+            formUsed: number
+            /** 表单数量上限，null-不限制 */
+            formLimit?: number | null
         }
 
         /** 订阅变更日志（对齐 SubscriptionChangeLog；字段名联调核对） */

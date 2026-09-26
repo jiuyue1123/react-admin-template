@@ -118,6 +118,32 @@ const routes: RouteConfigs = [
     order: 6,
   },
   {
+    path: '/forms',
+    layout: '@/layouts/base',
+    title: '表单与线索',
+    icon: 'FormOutlined',
+    order: 7,
+    // 分组节点自身不渲染页面；访问 /forms 时跳到第一个子项
+    redirect: '/forms/list',
+    // 子路由继承父级布局（base），只声明路径与页面组件
+    children: [
+      {
+        path: '/forms/list',
+        component: 'forms',
+        title: '表单管理',
+        icon: 'ProfileOutlined',
+        order: 1,
+      },
+      {
+        path: '/forms/leads',
+        component: 'forms/leads',
+        title: '线索管理',
+        icon: 'InboxOutlined',
+        order: 2,
+      },
+    ],
+  },
+  {
     path: '/messages',
     layout: '@/layouts/base',
     component: 'messages',

@@ -5,7 +5,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useRequest } from 'alova/client'
 import { Puck } from '@puckeditor/core'
 import type { Data } from '@puckeditor/core'
-import { puckConfig, setMediaField } from '@jff/builder-blocks'
+import { puckConfig, setFormField, setMediaField } from '@jff/builder-blocks'
+import PuckFormField from '@/components/PuckFormField'
 import PuckMediaField from '@/components/PuckMediaField'
 import {
   fetchGetPage,
@@ -19,6 +20,8 @@ import '@puckeditor/core/dist/index.css'
 
 // 注册媒体选择器实现：编辑器中所有图片类字段共用（一次注册，全局生效）
 setMediaField(PuckMediaField)
+// 注册表单选择器实现：表单区块的「选择表单」字段（同上，模块级一次注册）
+setFormField(PuckFormField)
 
 /** 格式化时间 */
 function formatDateTime(value: string) {

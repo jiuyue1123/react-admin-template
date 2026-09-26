@@ -61,6 +61,10 @@ admin/                      # git remote: github.com/jiuyue1123/react-admin-temp
 | 发票(M4) | api/invoice.ts | billing/invoices GET(分页 state/page/size) · POST(提交, 多单合并) · GET /{applyNo}(详情含 orders/files/logs) · POST /{applyNo}/withdraw · invoices/orders GET(可开票) · invoices/headings/default GET(实名默认抬头; enterprise=true 才可选专票) |
 | 定制首页（租户端**已接入**，平台端未接入） | api/siteCustomization.ts | 租户端 `/tenant/site/customizations` GET(分页) · POST(提交 requirement/referenceUrl/contact/expectAt) · GET /{requestNo}(含待验收 key，供预览) · POST /{requestNo}/accept · /reject{reason} · /cancel?reason(注意 reason 是 query)；平台端 `/admin/sites/customizations` GET · GET /{requestNo} · POST /{requestNo}/claim(受理，重复即改派) · /deliver{homePageKey,remark} · /close{reason} · GET /home-page-keys(候选 key) |
 
+| 表单与线索（**前后端均已实现**） | api/siteForm.ts | 租户端 `/tenant/site/forms` GET(列表，**不分页**，带 submissionCount/pendingCount) · POST(建，**创建即启用**) · GET/PUT/DELETE /{id} · PUT /{id}/state · GET /{id}/submissions(分页 page/size≤100/leadState) · PUT /{id}/submissions/{submissionId}/state；公开端 `GET /public/site/forms/{formKey}` · `POST /public/site/forms/{formKey}/submissions` |
+
+**表单与线索（2026-09-26，前端 admin + 访客端 + 区块库三侧）**：`pages/forms`（顶级菜单「表单与线索」order 7，分组 redirect 到 `/forms/list`；子项 表单管理 + 线索管理，图标 `FormOutlined`/`InboxOutlined` 需登记 iconMap）。契约细节见 `docs/site-forms-plan.md` §3（**易踩点集中在那里**：`formState` 只有 0/1、租户端 `formState` vs 公开端 `state` 刻意不一致、`maxLength`/`options` 不需要时返回 `null`、`answers` 请求/响应同名不同形、`remark` 只在传了才覆盖）。三处实现要点：① 字段设计器用 `Form.List`，`key` 与 option `value` **只读**（跨编辑不可变）；② 线上渲染由访客端在 `PuckContent` 里**覆盖 `components.Form`** 注入（区块库受 RSC 守卫约束装不下提交逻辑），提交走站点端**第一个 POST Route Handler** + `backendPost`；③ 幂等靠前端生成并在重试时复用的 `clientMsgId`。额度：`TenantQuotaVO.formUsed/formLimit` + `useQuotaGate.guardForm()`。
+
 **定制首页页面**：`pages/customization`（顶级菜单「定制首页」，order 5；实名认证顺延为 6，图标 `HighlightOutlined` 需在 `layouts/base` 的 iconMap 手动登记）。单页按 `requestState` 早返回切视图：无申请→表单；0 待处理 / 1 定制中→等待态；2 已交付→**预览 + 验收通过 / 验收不通过**；3 已驳回→展示验收意见；4 已验收 / 5 已取消→终态 + 再次申请。撤销仅 0/1/3 可用（见 `utils/siteCustomization.ts` 的 `canCancelRequest`）。预览 = `window.open({siteUrl}?preview={key})`（本地用 `VITE_SITE_ORIGIN` 指向访客端 dev server，并追加 `&site=<host>` 指定租户），访客端支持该参数（`apps/site/src/app/page.tsx`，带 noindex）。**`?preview=` 不做鉴权是已确认的设计决定**：访客端匿名、无法判断 key 该不该给看，而验收通过后设计本就公开、窗口期只有「交付→验收」之间；残余风险（设计被否/改版未上线时提前曝光）已知并接受。要收紧需后端签发短时效令牌。**平台侧受理/交付无界面，联调需用 curl。**
 
 **定制首页领域模型**：`SiteCustomization`(需求单：requestNo/requirement/referenceUrl/expectAt/requestState/claimedBy/acceptedAt/cancelReason/**activeHomePageKey**) + `SiteCustomizationDelivery`(交付记录：homePageKey/mappingState/deliverRemark/交付·驳回·验收的 by+at/rejectReason)。**`activeHomePageKey` 只在租户验收通过后才落值**，它就是 `/public/site` 返回给访客端的 `homePageKey`。交付了但未验收 → 线上首页不变（可预览、可驳回）。
@@ -114,7 +118,7 @@ Puck 编辑器 edit：包 `<MediaFieldContext.Provider value={PuckMediaField}>`�
 - 排序均为前端重排后批量 `PUT */sort`；页面列表/状态过滤为前端本地过滤。
 
 ## 9. 参考文档
-`docs/theme.md`（token 主题体系）；`docs/jff.md`（全量 API：认证/站点/页面/菜单/媒体/计费订阅/实名/站内信/客服/**公开端站点渲染**，tarslib 导出；SQL 枚举取值为权威映射来源）；`apps/site/README.md`（访客端开发/部署/约束）；`CLAUDE.md`（本仓规则：默认计划模式、验证后完成、教训沉淀、上下文同步）。
+`docs/theme.md`（token 主题体系）；`docs/jff.md`（全量 API：认证/站点/页面/菜单/媒体/计费订阅/实名/站内信/客服/**公开端站点渲染**，tarslib 导出；SQL 枚举取值为权威映射来源）；`apps/site/README.md`（访客端开发/部署/约束）；`docs/site-forms-plan.md`（**租户自定义表单 + 线索收集方案**，接口契约已冻结、后端已实现、前端进行中）；`docs/copy-inventory.md`（**用户可见文案来源清单**，2026-09-26：租户端 + 访客端全量文案清点，含「改文案要不要动后端」逐链路归属表、前端文案单一来源文件索引、以及一批易踩坑点 —— 如 opLog 与 subscription_change_log 两套**同形反义**的 `operatorType`、套餐到期文案的两份副本、HTTP ≥400 弹英文 `statusText`）；`CLAUDE.md`（本仓规则：默认计划模式、验证后完成、教训沉淀、上下文同步）。
 
 ## 10. 访客端 `apps/site`（@jff/site，2026-09-16 新增）
 **定位**：租户官网站点的对外访问端，即「工程师定制首页 + 自助内页」里的渲染侧。此前完全不存在。

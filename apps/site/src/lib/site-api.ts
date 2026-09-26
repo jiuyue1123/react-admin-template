@@ -1,5 +1,12 @@
-import { backendGet } from './transport'
-import type { PublicSite, PublicSitePageDetail, PublicSitePageListItem } from './types'
+import { backendGet, backendPost } from './transport'
+import type {
+  PublicSite,
+  PublicSiteForm,
+  PublicSitePageDetail,
+  PublicSitePageListItem,
+  SubmitErrorItem,
+  SubmitFormParams,
+} from './types'
 
 /**
  * 访客端取数（公开接口，匿名，无鉴权）
@@ -34,4 +41,43 @@ export async function getPage(host: string, pagePath: string): Promise<PublicSit
   const res = await backendGet(path, host)
   if (res.code === SUCCESS_CODE && res.data) return res.data as PublicSitePageDetail
   return null
+}
+
+/**
+ * 按 formKey 取表单定义（供 Form 区块渲染）
+ *
+ * 表单**停用**时后端仍返回 200，但 `state = 0` 且 `fields` 为空数组 —— 页面里嵌的
+ * 区块会真实被访客访问到，所以要能区分「停用」与「不存在」并渲染不同提示。
+ */
+export async function getForm(formKey: string, host: string): Promise<PublicSiteForm | null> {
+  const res = await backendGet(`/public/site/forms/${encodeURIComponent(formKey)}`, host)
+  if (res.code === SUCCESS_CODE && res.data) return res.data as PublicSiteForm
+  return null
+}
+
+/** 提交结果：成功，或失败（带后端给的结构化字段级错误） */
+export type SubmitFormResult =
+  | { ok: true }
+  | { ok: false; message: string; errors?: SubmitErrorItem[] }
+
+/**
+ * 提交表单
+ *
+ * 幂等由 `clientMsgId` 保证：**同一 id 重复提交后端返回成功且不新增行**，
+ * 所以「网络抖动后重试」是安全的 —— 但**必须复用同一个 id**。
+ */
+export async function submitForm(
+  formKey: string,
+  host: string,
+  params: SubmitFormParams,
+): Promise<SubmitFormResult> {
+  const res = await backendPost(
+    `/public/site/forms/${encodeURIComponent(formKey)}/submissions`,
+    host,
+    params,
+  )
+  if (res.code === SUCCESS_CODE) return { ok: true }
+
+  const errors = (res.data as { errors?: SubmitErrorItem[] } | null)?.errors
+  return { ok: false, message: res.msg || '提交失败，请稍后重试', errors }
 }

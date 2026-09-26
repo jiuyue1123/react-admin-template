@@ -3,6 +3,7 @@ import { ButtonConfig } from "./components/Button.puck.tsx";
 import { CtaConfig } from "./components/Cta.puck.tsx";
 import { DividerConfig } from "./components/Divider.puck.tsx";
 import { FaqConfig } from "./components/Faq.puck.tsx";
+import { FormConfig } from "./components/Form.puck.tsx";
 import { HeadingConfig } from "./components/Heading.puck.tsx";
 import { ImageConfig } from "./components/Image.puck.tsx";
 import { LogoCloudConfig } from "./components/LogoCloud.puck.tsx";
@@ -27,6 +28,7 @@ const components = {
     Cta: CtaConfig,
     Divider: DividerConfig,
     Faq: FaqConfig,
+    Form: FormConfig,
     Heading: HeadingConfig,
     Image: ImageConfig,
     LogoCloud: LogoCloudConfig,
@@ -70,6 +72,7 @@ const categories = {
         components: [
             "Cta",
             "Faq",
+            "Form",
             "LogoCloud",
             "ProcessSteps",
             "ServicesGrid",
@@ -110,6 +113,10 @@ export { ImageConfig } from "./components/Image.puck.tsx";
 export type { ImageProps } from "./components/Image.puck.tsx";
 export { MediaField, setMediaField } from "./components/media-field.tsx";
 export type { MediaFieldProps, MediaFieldComponent } from "./components/media-field.tsx";
+export { FormField, setFormField } from "./components/form-field.tsx";
+export type { FormFieldProps, FormFieldComponent } from "./components/form-field.tsx";
+export { FormConfig } from "./components/Form.puck.tsx";
+export type { FormBlockProps } from "./components/Form.puck.tsx";
 export { BlockStyles } from "./components/block-styles.tsx";
 export { CtaConfig } from "./components/Cta.puck.tsx";
 export type { CtaProps } from "./components/Cta.puck.tsx";

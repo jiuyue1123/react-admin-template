@@ -45,7 +45,12 @@ export default async function SiteInnerPage({ params }: { params: Promise<PagePa
 
   return (
     <SiteShell site={site}>
-      <PuckContent data={parsePuckContent(page.content)} pageTitle={page.pageTitle} />
+      <PuckContent
+        data={parsePuckContent(page.content)}
+        pageTitle={page.pageTitle}
+        // 表单区块提交时要带上来源页面（后端不读 Referer）
+        sourcePage={`/${slug}`}
+      />
     </SiteShell>
   )
 }

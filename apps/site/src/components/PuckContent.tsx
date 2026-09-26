@@ -1,7 +1,9 @@
 import { Render } from '@puckeditor/core'
 import type { Data } from '@puckeditor/core'
-import { puckConfig } from '@jff/builder-blocks'
+import { FormConfig, puckConfig } from '@jff/builder-blocks'
+import type { FormBlockProps } from '@jff/builder-blocks'
 import { isEmptyPuckData } from '@/lib/puck'
+import SiteFormBlock from './SiteFormBlock'
 
 /**
  * Puck 内容渲染（服务端）
@@ -10,20 +12,48 @@ import { isEmptyPuckData } from '@/lib/puck'
  * 专用的 `ServerRender` 实现（无浏览器全局、不引 CSS），因此内页内容是
  * 真正随首屏 HTML 直出的，而不是客户端二次渲染。
  *
- * `@jff/builder-blocks` 与编辑器共用同一份区块实现 —— 单一真源，
- * 不存在「编辑器预览对、线上渲染不对」的漂移（该包有 check:rsc 守卫保证
- * 产物不含客户端专有 API）。
+ * `@jff/builder-blocks` 与编辑器共用同一份区块实现 —— 单一真源。唯一的例外是
+ * **表单区块**：它有客户端交互，而区块库受 RSC 守卫约束装不下 `useState`，所以
+ * 这里**覆盖它的 `render`**，换成站点端实现（服务端拉表单定义 + 内嵌客户端提交组件）。
+ * 覆盖的只是渲染实现，区块的数据（`formKey`）两边完全一致。
  *
  * 注意：**不要**引入 `@puckeditor/core/dist/index.css` —— 它首行是
  * `@import "https://rsms.me/inter/inter.css"`，会把访客首屏阻塞在外网字体上。
  * 区块全部使用内联样式，渲染端不需要任何 Puck 样式表。
  */
-export default function PuckContent({ data, pageTitle }: { data: Data; pageTitle?: string }) {
+export default function PuckContent({
+  data,
+  pageTitle,
+  /** 当前页面 path，供表单区块在提交时带上来源（后端不读 Referer） */
+  sourcePage = '/',
+}: {
+  data: Data
+  pageTitle?: string
+  sourcePage?: string
+}) {
   if (isEmptyPuckData(data)) {
     return <EmptyPage pageTitle={pageTitle} />
   }
 
-  return <Render config={puckConfig} data={data} />
+  const config = {
+    ...puckConfig,
+    components: {
+      ...puckConfig.components,
+      Form: {
+        ...FormConfig,
+        render: ({ formKey, title, description }: FormBlockProps) => (
+          <SiteFormBlock
+            formKey={formKey}
+            title={title}
+            description={description}
+            sourcePage={sourcePage}
+          />
+        ),
+      },
+    },
+  }
+
+  return <Render config={config} data={data} />
 }
 
 /** 页面尚无内容时的空态 */

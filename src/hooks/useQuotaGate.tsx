@@ -17,12 +17,13 @@ import { formatQuotaBytes } from '@/utils/quota'
  * 真超了后端会拦下并给出「升级套餐后可继续」的文案。
  */
 
-type QuotaKind = 'page' | 'storage' | 'homeDelivery'
+type QuotaKind = 'page' | 'storage' | 'homeDelivery' | 'form'
 
 const QUOTA_META: Record<QuotaKind, { label: string; hint: string }> = {
   page: { label: '内页数量', hint: '升级套餐后可继续添加内页。' },
   storage: { label: '存储空间', hint: '升级套餐可扩容；也可以先删除一些不再使用的素材。' },
   homeDelivery: { label: '定制首页交付套数', hint: '升级套餐后可继续交付定制首页。' },
+  form: { label: '表单数量', hint: '升级套餐后可继续创建表单。' },
 }
 
 export function useQuotaGate() {
@@ -94,5 +95,17 @@ export function useQuotaGate() {
     return false
   }
 
-  return { guardPage, guardStorage, guardHomeDelivery }
+  /** 创建表单前守卫：表单数已达上限则引导升级 */
+  const guardForm = async (): Promise<boolean> => {
+    const quota = await refresh(true)
+    if (!quota) return true
+
+    const { formUsed, formLimit } = quota
+    if (formLimit == null || formUsed < formLimit) return true
+
+    showUpgrade('form', `${formUsed} / ${formLimit}`, quota.planName)
+    return false
+  }
+
+  return { guardPage, guardStorage, guardHomeDelivery, guardForm }
 }

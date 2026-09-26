@@ -49,12 +49,32 @@ function readBody(res: IncomingMessage): Promise<string> {
 /**
  * 以访客的真实 Host 请求后端公开接口
  *
- * @param path 以 `/` 开头的后端路径，如 `/public/site`
- * @param host 访客请求的 Host（已规范化），后端据此解析租户
+ * 为什么用 `node:http` 而不是 `fetch`：undici 按 fetch 规范**会剥离 `Host` 头**
+ * （实测显式传入也会被忽略），后端就解析不出租户了。
  */
-export async function backendGet(path: string, host: string): Promise<BackendEnvelope> {
+async function backendRequest(
+  path: string,
+  host: string,
+  options: { method: 'GET' | 'POST'; body?: unknown },
+): Promise<BackendEnvelope> {
   const url = new URL(path, getOrigin())
   const send = url.protocol === 'https:' ? httpsRequest : httpRequest
+
+  const payload =
+    options.body === undefined ? undefined : Buffer.from(JSON.stringify(options.body), 'utf8')
+
+  const headers: Record<string, string | number> = {
+    // 关键：保留访客 Host，后端据此解析租户
+    Host: host,
+    'X-Forwarded-Host': host,
+    'X-Forwarded-Proto': process.env.SITE_PUBLIC_PROTO?.trim() || 'https',
+    Accept: 'application/json',
+    'Accept-Encoding': 'identity',
+  }
+  if (payload) {
+    headers['Content-Type'] = 'application/json; charset=utf-8'
+    headers['Content-Length'] = payload.byteLength
+  }
 
   const body = await new Promise<string>((resolve, reject) => {
     const req = send(
@@ -63,15 +83,8 @@ export async function backendGet(path: string, host: string): Promise<BackendEnv
         hostname: url.hostname,
         port: url.port || (url.protocol === 'https:' ? 443 : 80),
         path: `${url.pathname}${url.search}`,
-        method: 'GET',
-        headers: {
-          // 关键：保留访客 Host，后端据此解析租户
-          Host: host,
-          'X-Forwarded-Host': host,
-          'X-Forwarded-Proto': process.env.SITE_PUBLIC_PROTO?.trim() || 'https',
-          Accept: 'application/json',
-          'Accept-Encoding': 'identity',
-        },
+        method: options.method,
+        headers,
       },
       (res) => {
         readBody(res).then(resolve, reject)
@@ -84,6 +97,7 @@ export async function backendGet(path: string, host: string): Promise<BackendEnv
     req.on('error', (err) => {
       reject(err instanceof BackendRequestError ? err : new BackendRequestError(`请求后端失败：${path}`, { cause: err }))
     })
+    if (payload) req.write(payload)
     req.end()
   })
 
@@ -92,4 +106,19 @@ export async function backendGet(path: string, host: string): Promise<BackendEnv
   } catch (err) {
     throw new BackendRequestError(`后端返回非 JSON：${path}`, { cause: err })
   }
+}
+
+/** GET 公开接口 */
+export function backendGet(path: string, host: string): Promise<BackendEnvelope> {
+  return backendRequest(path, host, { method: 'GET' })
+}
+
+/**
+ * POST 公开接口（表单提交）
+ *
+ * ⚠️ 这是站点端唯一的写通道。`body` 里**不要放任何租户标识** —— 租户只由 Host 解析，
+ * 后端也不接受客户端传入 tenantId/siteId。
+ */
+export function backendPost(path: string, host: string, body: unknown): Promise<BackendEnvelope> {
+  return backendRequest(path, host, { method: 'POST', body })
 }

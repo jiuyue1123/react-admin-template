@@ -350,7 +350,7 @@ export default function FormsPage() {
 
       <Drawer
         title={isEdit ? '编辑表单' : '新建表单'}
-        width={720}
+        size={720}
         open={Boolean(editor)}
         onClose={() => setEditor(null)}
         destroyOnHidden

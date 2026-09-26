@@ -18,7 +18,7 @@ export default function MediaPickerTestPage() {
     <div className="mx-auto max-w-3xl space-y-4">
       {/* 单选 */}
       <Card title="单选">
-        <Space direction="vertical" size="middle" className="w-full">
+        <Space orientation="vertical" size="middle" className="w-full">
           <Button type="primary" onClick={() => setSingleOpen(true)}>
             从媒体库选择（单选）
           </Button>
@@ -32,7 +32,7 @@ export default function MediaPickerTestPage() {
 
       {/* 多选 */}
       <Card title="多选">
-        <Space direction="vertical" size="middle" className="w-full">
+        <Space orientation="vertical" size="middle" className="w-full">
           <Button type="primary" onClick={() => setMultiOpen(true)}>
             从媒体库选择（多选）
           </Button>
@@ -50,7 +50,7 @@ export default function MediaPickerTestPage() {
 
       {/* 限制类型 */}
       <Card title="限制类型（仅图片）">
-        <Space direction="vertical" size="middle" className="w-full">
+        <Space orientation="vertical" size="middle" className="w-full">
           <Button type="primary" onClick={() => setImageOpen(true)}>
             选择图片（仅图片可选）
           </Button>

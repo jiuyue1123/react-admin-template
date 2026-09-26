@@ -302,7 +302,7 @@ export default function FormLeadsPage() {
         )}
       </Card>
 
-      <Drawer title="线索详情" width={560} open={Boolean(detail)} onClose={() => setDetail(null)}>
+      <Drawer title="线索详情" size={560} open={Boolean(detail)} onClose={() => setDetail(null)}>
         <Descriptions column={2} size="small" colon={false} items={detailItems} />
       </Drawer>
     </div>

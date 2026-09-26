@@ -386,9 +386,10 @@ function MenuModal({ modal, pages, parentOptions, loading, onClose, onFinish }: 
         >
           {linkType === 1 ? (
             <Select
-              showSearch
+              // antd 6：`optionFilterProp` 已废弃，改由 `showSearch` 对象承载。
+              // 注意不能只写 `showSearch`——那样默认按 value 过滤，搜索就失效了
+              showSearch={{ optionFilterProp: 'label' }}
               placeholder="选择站点页面"
-              optionFilterProp="label"
               options={pages.map(page => ({ label: page.pageTitle, value: String(page.id) }))}
             />
           ) : (

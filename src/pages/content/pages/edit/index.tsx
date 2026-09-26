@@ -16,7 +16,6 @@ import {
   fetchUpdatePage,
 } from '@/service/api/sitePage'
 import { getPageStateMeta, PAGE_PREVIEW_LIVE_KEY, parseContent } from '@/utils/sitePage'
-import '@puckeditor/core/dist/index.css'
 
 // 注册媒体选择器实现：编辑器中所有图片类字段共用（一次注册，全局生效）
 setMediaField(PuckMediaField)
@@ -194,42 +193,47 @@ export default function PageEditorPage() {
         height="100%"
         headerTitle={pageTitle}
         onChange={data => setContentData(data as Data)}
-        renderHeaderActions={() => (
-          <div className="flex items-center gap-2">
-            <Tag color={stateMeta.color}>{stateMeta.label}</Tag>
-            {version > 0 && <span className="text-xs text-text-tertiary">v{version}</span>}
-            {dirty && <Tag color="red">未保存</Tag>}
-            <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
-              返回
-            </Button>
-            <Button icon={<HistoryOutlined />} onClick={openVersions}>
-              版本历史
-            </Button>
-            <Button icon={<EyeOutlined />} onClick={handlePreview}>
-              预览
-            </Button>
-            <Button
-              icon={<SendOutlined />}
-              loading={publishRequest.loading}
-              disabled={pageState === 1}
-              onClick={handlePublish}
-            >
-              发布
-            </Button>
-            <Button
-              type="primary"
-              icon={<SaveOutlined />}
-              loading={saveRequest.loading}
-              disabled={!dirty}
-              onClick={handleSave}
-            >
-              保存草稿
-            </Button>
-          </div>
-        )}
+        // Puck 0.23：`renderHeaderActions` 已废弃 → `overrides.headerActions`。
+        // 这是**覆盖**语义（未提供时默认什么都不渲染），所以只返回本页自己的按钮即可 ——
+        // 不要渲染 `{children}`，否则会把 Puck 的默认动作混进来、改变现有界面。
+        overrides={{
+          headerActions: () => (
+            <div className="flex items-center gap-2">
+              <Tag color={stateMeta.color}>{stateMeta.label}</Tag>
+              {version > 0 && <span className="text-xs text-text-tertiary">v{version}</span>}
+              {dirty && <Tag color="red">未保存</Tag>}
+              <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
+                返回
+              </Button>
+              <Button icon={<HistoryOutlined />} onClick={openVersions}>
+                版本历史
+              </Button>
+              <Button icon={<EyeOutlined />} onClick={handlePreview}>
+                预览
+              </Button>
+              <Button
+                icon={<SendOutlined />}
+                loading={publishRequest.loading}
+                disabled={pageState === 1}
+                onClick={handlePublish}
+              >
+                发布
+              </Button>
+              <Button
+                type="primary"
+                icon={<SaveOutlined />}
+                loading={saveRequest.loading}
+                disabled={!dirty}
+                onClick={handleSave}
+              >
+                保存草稿
+              </Button>
+            </div>
+          ),
+        }}
       />
 
-      <Drawer title="版本历史" open={versionsOpen} onClose={() => setVersionsOpen(false)} width={420}>
+      <Drawer title="版本历史" open={versionsOpen} onClose={() => setVersionsOpen(false)} size={420}>
         {versionsLoading && !versions.length ? (
           <Skeleton active paragraph={{ rows: 4 }} />
         ) : versions.length ? (

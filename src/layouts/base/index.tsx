@@ -102,7 +102,7 @@ function BillingBanner() {
     <div className="mb-4">
       <Alert
         type={banner.type}
-        message={banner.message}
+        title={banner.message}
         showIcon
         action={
           <Button size="small" type="primary" onClick={() => navigate("/billing/plans")}>

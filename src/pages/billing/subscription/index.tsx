@@ -339,7 +339,7 @@ export default function SubscriptionPage() {
               className="mt-4"
               type={quotaAlerts.some(item => item.tone === 'danger') ? 'error' : 'warning'}
               showIcon
-              message={quotaAlerts.map(item => item.hint).join('；')}
+              title={quotaAlerts.map(item => item.hint).join('；')}
               action={
                 <Button size="small" onClick={() => navigate('/billing/plans')}>
                   去升级套餐

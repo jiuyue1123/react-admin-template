@@ -226,7 +226,7 @@ export default function SitePage() {
             className="mt-4"
             type="error"
             showIcon
-            message="站点已到期并下线，续费后可恢复上线"
+            title="站点已到期并下线，续费后可恢复上线"
             action={<GoRenewButton />}
           />
         ) : null}

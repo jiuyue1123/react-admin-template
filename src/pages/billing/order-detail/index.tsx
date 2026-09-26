@@ -246,14 +246,14 @@ export default function OrderDetailPage() {
         </div>
 
         {state === 1 || polling ? (
-          <Alert className="mt-4" type="info" showIcon message="支付处理中，订单状态将自动刷新，请稍候…" />
+          <Alert className="mt-4" type="info" showIcon title="支付处理中，订单状态将自动刷新，请稍候…" />
         ) : null}
         {state === 6 ? (
           <Alert
             className="mt-4"
             type="warning"
             showIcon
-            message="订单已转人工确认；若您已完成付款，可再次点击「我已付款」加速核实。"
+            title="订单已转人工确认；若您已完成付款，可再次点击「我已付款」加速核实。"
           />
         ) : null}
         {state === 7 ? (
@@ -261,7 +261,7 @@ export default function OrderDetailPage() {
             className="mt-4"
             type="info"
             showIcon
-            message="退款申请已提交，审核通过后将原路退回。"
+            title="退款申请已提交，审核通过后将原路退回。"
           />
         ) : null}
         {state === 5 && order.refundAmount ? (
@@ -269,7 +269,7 @@ export default function OrderDetailPage() {
             className="mt-4"
             type="success"
             showIcon
-            message={`已退款 ${formatMoney(order.refundAmount)}${order.refundTime ? `（${formatDateTime(order.refundTime)}）` : ''}`}
+            title={`已退款 ${formatMoney(order.refundAmount)}${order.refundTime ? `（${formatDateTime(order.refundTime)}）` : ''}`}
           />
         ) : null}
       </Card>

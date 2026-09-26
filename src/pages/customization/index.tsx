@@ -333,7 +333,7 @@ export default function CustomizationPage() {
           <Alert
             type="info"
             showIcon
-            message={`上次申请 ${current.requestNo} 已${stateMeta.label}`}
+            title={`上次申请 ${current.requestNo} 已${stateMeta.label}`}
             description="重新提交会创建一条新的定制申请。"
           />
         ) : null}
@@ -480,7 +480,7 @@ export default function CustomizationPage() {
           type="info"
           showIcon
           icon={<ClockCircleFilled />}
-          message="已提交，等待平台受理"
+          title="已提交，等待平台受理"
           description="平台会先与您确认需求，受理后进入定制。"
         />
       ) : null}
@@ -489,7 +489,7 @@ export default function CustomizationPage() {
           type="info"
           showIcon
           icon={<ClockCircleFilled />}
-          message="工程师正在定制"
+          title="工程师正在定制"
           description="定制完成后会在此交付，届时您可以先预览再验收。"
         />
       ) : null}
@@ -498,7 +498,7 @@ export default function CustomizationPage() {
           type="warning"
           showIcon
           icon={<ExclamationCircleFilled />}
-          message="工程师已交付，请验收"
+          title="工程师已交付，请验收"
           description={
             canPreview
               ? '建议先预览效果再验收。验收通过后该版首页才会对外生效。'
@@ -510,7 +510,7 @@ export default function CustomizationPage() {
         <Alert
           type="error"
           showIcon
-          message="上次验收未通过"
+          title="上次验收未通过"
           description={lastRejected?.rejectReason || '等待工程师调整后重新交付。'}
         />
       ) : null}
@@ -519,7 +519,7 @@ export default function CustomizationPage() {
           type="success"
           showIcon
           icon={<CheckCircleFilled />}
-          message="已验收，首页已生效"
+          title="已验收，首页已生效"
           description={detail?.activeHomePageKey ? '该定制版本已在线上生效' : undefined}
         />
       ) : null}
@@ -527,7 +527,7 @@ export default function CustomizationPage() {
         <Alert
           type="info"
           showIcon
-          message="申请已取消"
+          title="申请已取消"
           description={
             detail?.cancelReason
               ? `${getCancelOperatorMeta(detail.cancelOperator).label}：${detail.cancelReason}`

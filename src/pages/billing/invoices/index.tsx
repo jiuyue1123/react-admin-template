@@ -366,7 +366,7 @@ function ApplyInvoiceDrawer({
   return (
     <Drawer
       title="申请发票"
-      width={640}
+      size={640}
       open={open}
       onClose={onClose}
       destroyOnHidden
@@ -576,7 +576,7 @@ function InvoiceDetailDrawer({
 
   const open = Boolean(applyNo)
   return (
-    <Drawer title={applyNo ? `发票详情 · ${applyNo}` : '发票详情'} width={720} open={open} onClose={onClose}>
+    <Drawer title={applyNo ? `发票详情 · ${applyNo}` : '发票详情'} size={720} open={open} onClose={onClose}>
       {!open ? null : loading && !detail ? (
         <Skeleton active paragraph={{ rows: 8 }} />
       ) : !detail ? (

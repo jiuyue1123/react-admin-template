@@ -8,7 +8,6 @@ import type { Data } from '@puckeditor/core'
 import { puckConfig } from '@jff/builder-blocks'
 import { fetchGetPage } from '@/service/api/sitePage'
 import { PAGE_PREVIEW_LIVE_KEY, parseContent } from '@/utils/sitePage'
-import '@puckeditor/core/dist/index.css'
 
 /**
  * 全屏页面预览（blank 布局，无管理端外壳）

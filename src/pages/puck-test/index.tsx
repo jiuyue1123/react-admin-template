@@ -4,7 +4,6 @@ import { ReloadOutlined } from '@ant-design/icons'
 import { Puck } from '@puckeditor/core'
 import { puckConfig, setMediaField } from '@jff/builder-blocks'
 import PuckMediaField from '@/components/PuckMediaField'
-import '@puckeditor/core/dist/index.css'
 
 // 注册媒体选择器实现：编辑器中所有图片类字段共用（一次注册，全局生效）
 setMediaField(PuckMediaField)
@@ -47,11 +46,13 @@ export default function PuckTestPage() {
         height="100%"
         headerTitle="区块编辑器测试"
         onChange={handleChange}
-        renderHeaderActions={() => (
-          <Button icon={<ReloadOutlined />} onClick={handleReset}>
-            重置
-          </Button>
-        )}
+        overrides={{
+          headerActions: () => (
+            <Button icon={<ReloadOutlined />} onClick={handleReset}>
+              重置
+            </Button>
+          ),
+        }}
       />
     </div>
   )

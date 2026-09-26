@@ -188,7 +188,7 @@ export default function VerificationPage() {
             type="info"
             showIcon
             icon={<ClockCircleFilled />}
-            message="审核中，通常 1-2 个工作日完成"
+            title="审核中，通常 1-2 个工作日完成"
           />
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <Tag color={stateMeta.color}>{stateMeta.label}</Tag>
@@ -226,7 +226,7 @@ export default function VerificationPage() {
           <Alert
             type="error"
             showIcon
-            message="认证未通过"
+            title="认证未通过"
             description={v.rejectReason || '请核对资料后重新提交'}
           />
           <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -249,10 +249,10 @@ export default function VerificationPage() {
     <div className="mx-auto max-w-3xl space-y-4">
       {heading}
       {v && v.verifyState === 1 && !passed ? (
-        <Alert type="warning" showIcon message="实名认证已过期，请重新认证" />
+        <Alert type="warning" showIcon title="实名认证已过期，请重新认证" />
       ) : null}
       {v && v.verifyState === 2 ? (
-        <Alert type="error" showIcon message={v.rejectReason || '上次认证未通过，请核对资料后重新提交'} />
+        <Alert type="error" showIcon title={v.rejectReason || '上次认证未通过，请核对资料后重新提交'} />
       ) : null}
 
       <Card title="提交认证资料">

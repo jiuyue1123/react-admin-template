@@ -152,3 +152,21 @@ Puck 编辑器 edit：包 `<MediaFieldContext.Provider value={PuckMediaField}>`�
 - 租户3 `hello.jianfanfang.com` = 你好工作室（2 页 + 1 外链导航）。示例定制首页已作为 registry key `hello-home-v1` 发布（`homepages/hello-home-v1/`，暗色海报风）——**要走一遍交付链路（提交需求 → 平台受理 → 交付 key → 租户验收）该站点才会用上它**，否则 `homePageKey` 为空、仍显示共享兜底占位页。这正好是验证「交付后生效」的样本。
 - 租户4 `chenxi.jianfanfang.com` = 晨曦花艺（3 页 + 3 导航含 `tel:`），**未注册专属首页**，走共享兜底 —— 与租户1/2 同为兜底样本，但行业不同，用于持续检验「兜底首页行业中立的」这条约束。
 - 验证路径：注册租户 → 提交实名 → 平台端 approve → 建单 → 平台端 `manual-paid` → 发布页面 → 站点上线（跳过支付宝）。验证码从 Redis 取：`sms:code:tenant_register:{phone}`（发送短信**之前**就已写入）。
+
+## 11. 文案修复（2026-09-26，分支 `copy-polish`，7 个 commit）
+「只改前端硬编码」的文案优化：去 AI 味（夸大副词 / 空泛承诺 / 模板化营销语 / 排比堆砌）、删「向用户解释系统内部机制」的说明书腔、统一人称与同义表述。**收紧口径：只减不增**——不新增事实、数字、资质、承诺。
+
+- **人称统一「您」**（此前定制首页整个模块通篇用「你」）；**品牌统一「简帆坊租户管理平台」**（原 `index.html` 是脚手架名 `react-admin-template` + `lang="en"`，`VITE_APP_TITLE` 是「后台管理系统」，三处并存）。
+- **中文串可能被当逻辑用，改文案前必须 grep**。已确认不可动：`plans/index.tsx` 的 `planName.includes('推荐')` 与 `replace(/・推荐$/)`（「推荐」是**后端拼在 planName 里的标记**）、`utils/billing.ts` 的 `split(/\n|；|;|，|,|、/)`（**中文标点是分隔符契约**）、访客端 `REASON_TEXT` 的 **key**、各 `*_META` 的 `color`、`FormData.append('file',…)` 的字段名。
+- **两套同形反义的 `operatorType`**：操作日志 `1=管理员`（走 `OP_LOG_OPERATOR_TYPE_META`）vs 订阅变更日志 `1=租户`（走 `subscription/index.tsx` 的内联三目，已加反向注释）。**不可「统一」**——两处都渲染「租户/管理员」，合并会让整列标签静默反转且 TS 拦不住。
+- **180 天续费规则**原有 4 处措辞已漂移的副本，已以 `utils/billing.ts` 的到期横幅为**权威版**就地统一表述。**未抽共享常量**（跨 package 只覆盖 1/3，且属结构重构、越过「克制润色」边界）。
+- 已同步的跨包耦合：访客端 `SiteFormSubmit.tsx` 的默认成功文案 与 后台引用它的 placeholder（`forms/index.tsx`）必须同改。
+- **刻意未做**：改写本就简洁准确的串（「上传失败」「验证码为 6 位数字」「删除后不可恢复」等，改了只是 churn）；`mock` 页的文案润色（根因是这些页不该上线，见 §8 隐患①）；区块默认内容里的样板数字（「客户数突破 1000 家」「A 轮融资」——按用户决定保留）。**遗留风险**：样板数字若租户未改写即发布，会成为对外声明。
+- 完整来源清单（改文案前必查）见 `docs/copy-inventory.md`。
+
+### ⚠️ 发现的两个阻断问题（既有，非本次文案引入）
+**两个应用当前都无法构建**：
+- admin：`pnpm build` 的 `tsc -b` 失败于 6 个错误 —— `billing/invoices/index.tsx:47`（未用的 `modal`）、`content/pages/index.tsx:187`（未用的 `record`）、`:258/:261/:262/:263`（`FilterValue` 类型）→ `&&` 短路，vite build 不执行。
+- `apps/site`：`next build` 失败于 `PuckContent.tsx:56`（Form 覆盖组件不满足 Puck 的 `Config` 类型）。
+
+三处 `typecheck` 均不通过，因此本次文案改动只能用「**不新增错误**」作为验证闸门（基线：admin 6 条 / site 1 条）。

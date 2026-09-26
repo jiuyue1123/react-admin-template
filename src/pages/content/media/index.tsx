@@ -354,13 +354,13 @@ function MediaCard({ media, onPreview, onDelete }: MediaCardProps) {
         ) : isVideo ? (
           <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-text-tertiary">
             <PlayCircleOutlined className="text-4xl" />
-            <span className="text-xs uppercase">{ext || 'video'}</span>
+            <span className="text-xs uppercase">{ext || '视频'}</span>
           </div>
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center gap-2">
             <FileTextOutlined className="text-4xl text-primary" />
             <span className="rounded bg-fill-secondary px-1.5 py-0.5 text-xs uppercase text-text-secondary">
-              {ext || 'file'}
+              {ext || '文件'}
             </span>
           </div>
         )}

@@ -205,14 +205,14 @@ export default function MenuPage() {
       title: '链接类型',
       dataIndex: 'linkType',
       width: 110,
-      render: (_, record) => (record.linkType === 1 ? <Tag color="blue">站点页面</Tag> : <Tag>自定义URL</Tag>),
+      render: (_, record) => (record.linkType === 1 ? <Tag color="blue">站点页面</Tag> : <Tag>自定义链接</Tag>),
     },
     {
       title: '链接目标',
       dataIndex: 'linkTarget',
       render: (_, record) =>
         record.linkType === 1 ? (
-          pageMap.get(Number(record.linkTarget)) ?? <span className="text-text-tertiary">页面 #{record.linkTarget}</span>
+          pageMap.get(Number(record.linkTarget)) ?? <span className="text-text-tertiary">页面已删除</span>
         ) : (
           <span className="text-text-secondary">{record.linkTarget || '—'}</span>
         ),
@@ -369,7 +369,7 @@ function MenuModal({ modal, pages, parentOptions, loading, onClose, onFinish }: 
           <Radio.Group
             options={[
               { label: '站点页面', value: 1 },
-              { label: '自定义URL', value: 2 },
+              { label: '自定义链接', value: 2 },
             ]}
             onChange={() => form.setFieldValue('linkTarget', '')}
           />

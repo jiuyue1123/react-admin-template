@@ -349,7 +349,7 @@ function PageModal({ modal, loading, onClose, onFinish }: PageModalProps) {
             { pattern: /^[a-z0-9][a-z0-9-]*$/, message: '仅支持小写字母、数字和短横线' },
             { max: 50, message: '路径不超过 50 个字符' },
           ]}
-          extra="作为访问地址，同租户内需唯一，例如 about-us"
+          extra="作为访问地址，站内需唯一，例如 about-us"
         >
           <Input prefix="/" placeholder="about-us" maxLength={50} />
         </Form.Item>

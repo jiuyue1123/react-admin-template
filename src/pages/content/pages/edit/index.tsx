@@ -155,7 +155,7 @@ export default function PageEditorPage() {
     }
     modal.confirm({
       title: '放弃未保存的修改？',
-      content: '你有未保存的草稿修改，离开后将会丢失。',
+      content: '您有未保存的草稿修改，离开后将会丢失。',
       okText: '放弃并离开',
       cancelText: '取消',
       onOk: () => navigate('/content/pages'),

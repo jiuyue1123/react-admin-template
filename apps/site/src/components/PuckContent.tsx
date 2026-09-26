@@ -71,7 +71,7 @@ function EmptyPage({ pageTitle }: { pageTitle?: string }) {
       </span>
       <h1 className="mt-6 text-xl font-semibold text-ink">{pageTitle || '页面建设中'}</h1>
       <p className="mt-2 max-w-md text-[15px] leading-relaxed text-muted">
-        该页面还没有内容，请稍后再来看看。
+        该页面还没有内容，请稍后再来。
       </p>
     </div>
   )

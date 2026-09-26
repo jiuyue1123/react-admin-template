@@ -46,7 +46,7 @@ export async function POST(
       originHost = ''
     }
     if (originHost && originHost !== requestHost) {
-      return Response.json({ code: '10003', msg: '请求来源不合法', data: null }, { status: 403 })
+      return Response.json({ code: '10003', msg: '请求校验失败，请刷新页面后重试', data: null }, { status: 403 })
     }
   }
 

@@ -18,7 +18,7 @@ export default function SiteError({ error, reset }: { error: Error & { digest?: 
       <p className="text-5xl font-semibold tracking-tight text-neutral-300">500</p>
       <h1 className="mt-4 text-xl font-semibold">页面暂时无法访问</h1>
       <p className="mt-2 max-w-md text-neutral-500">
-        服务出现了一点问题，请稍后重试。如果持续出现，请联系站点管理员。
+        服务出现了一点问题，请稍后重试。持续出现请联系站点管理员。
       </p>
       <button
         type="button"

@@ -176,7 +176,7 @@ export default function SiteFormSubmit({
       {formError ? <p className="text-[14px] text-error">{formError}</p> : null}
       {stale ? (
         <p className="rounded-lg bg-warning/10 px-3 py-2 text-[13px] leading-relaxed text-warning">
-          表单可能已更新，请<b>强制刷新</b>页面（Windows 按 Ctrl+F5，Mac 按 Cmd+Shift+R）后再试。
+          表单可能已更新，请<b>强制刷新</b>页面后再试（Windows：Ctrl+F5，Mac：Cmd+Shift+R）。
         </p>
       ) : null}
 

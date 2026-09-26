@@ -49,7 +49,7 @@ export default async function SiteFormBlock({
           ) : (
             // 停用：明确告诉访客，而不是留一片空白
             <div className="rounded-xl border border-line bg-canvas px-6 py-10 text-center text-[15px] text-muted">
-              该表单已停止收集
+              该表单已停用
             </div>
           )}
         </div>

@@ -80,7 +80,7 @@ export default function DefaultHomepage({ site }: HomepageProps) {
             className="jf-soon-in mx-auto mt-3 max-w-[34ch] text-[14.5px] leading-[1.85] text-(--jf-faint)"
             style={{ animationDelay: '220ms' }}
           >
-            首页还在制作中{hasNav ? '，其他页面已经可以浏览' : '，请稍后再来看看'}。
+            首页还在制作中{hasNav ? '，其他页面已经可以浏览' : '，请稍后再来'}。
           </p>
 
           {actions.length > 0 ? (

@@ -1,4 +1,5 @@
 import type { ComponentConfig } from "@puckeditor/core";
+import { BlockStyles } from "./block-styles";
 import { SectionHeading } from "./SectionHeading";
 import { SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
 
@@ -24,7 +25,8 @@ export const FaqConfig: ComponentConfig<FaqProps> = {
 
   render({ title, subtitle, items, puck }) {
     return (
-      <section ref={puck.dragRef} style={{ maxWidth: 720, margin: "0 auto" }}>
+      <section ref={puck.dragRef} className="jff-section jff-faq">
+        <BlockStyles />
         <SectionHeading title={title} subtitle={subtitle} />
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {items.map((item, i) => (

@@ -1,40 +1,17 @@
 // ---------------------------------------------------------------------------
 // Shared section heading — title + subtitle block used by section components.
 // Returns null when both are empty.
+//
+// 字号/间距/颜色都在样式表里（`.jff-heading` / `.jff-title` / `.jff-subtitle`），
+// 因为它们要随断点降级，而内联 style 覆盖不了媒体查询。
 // ---------------------------------------------------------------------------
 
 export function SectionHeading({ title, subtitle }: { title: string; subtitle: string }) {
   if (!title && !subtitle) return null;
   return (
-    <div style={{ marginBottom: 32 }}>
-      {title && (
-        <h2
-          style={{
-            margin: "0 0 12px",
-            fontSize: 28,
-            fontWeight: 600,
-            lineHeight: 1.3,
-            textAlign: "center",
-            color: "#111",
-          }}
-        >
-          {title}
-        </h2>
-      )}
-      {subtitle && (
-        <p
-          style={{
-            margin: "0 auto",
-            maxWidth: 600,
-            fontSize: 15,
-            lineHeight: 1.7,
-            color: "rgba(0,0,0,0.6)",
-            textAlign: "center",
-          }}
-        >
-          {subtitle}
-        </p>
-      )}
+    <div className="jff-heading">
+      {title && <h2 className="jff-title">{title}</h2>}
+      {subtitle && <p className="jff-subtitle">{subtitle}</p>}
     </div>
   );
 }

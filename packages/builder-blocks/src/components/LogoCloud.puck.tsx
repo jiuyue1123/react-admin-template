@@ -1,4 +1,5 @@
 import type { ComponentConfig } from "@puckeditor/core";
+import { BlockStyles } from "./block-styles";
 import { MediaField } from "./media-field";
 import { SectionHeading } from "./SectionHeading";
 import { SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
@@ -26,17 +27,10 @@ export const LogoCloudConfig: ComponentConfig<LogoCloudProps> = {
 
   render({ title, subtitle, items, puck }) {
     return (
-      <section ref={puck.dragRef} style={{ maxWidth: 960, margin: "0 auto" }}>
+      <section ref={puck.dragRef} className="jff-section jff-logocloud">
+        <BlockStyles />
         <SectionHeading title={title} subtitle={subtitle} />
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: 48,
-          }}
-        >
+        <div className="jff-logo-row">
           {items.map((item, i) => (
             <div key={i} style={{ minWidth: 120, display: "flex", alignItems: "center", justifyContent: "center" }}>
               {item.logo ? (

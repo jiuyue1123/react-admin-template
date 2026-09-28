@@ -1,4 +1,5 @@
 import type { ComponentConfig } from "@puckeditor/core";
+import { BlockStyles } from "./block-styles";
 import { SectionHeading } from "./SectionHeading";
 import { SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
 
@@ -24,9 +25,10 @@ export const ProcessStepsConfig: ComponentConfig<ProcessStepsProps> = {
 
   render({ title, subtitle, items, puck }) {
     return (
-      <section ref={puck.dragRef} style={{ maxWidth: 1080, margin: "0 auto" }}>
+      <section ref={puck.dragRef} className="jff-section jff-steps">
+        <BlockStyles />
         <SectionHeading title={title} subtitle={subtitle} />
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 24 }}>
+        <div className="jff-grid">
           {items.map((item, i) => (
             <div key={i} style={{ textAlign: "center", padding: "0 8px" }}>
               <div

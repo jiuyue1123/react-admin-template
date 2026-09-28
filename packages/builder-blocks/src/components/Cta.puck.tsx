@@ -1,4 +1,5 @@
 import type { ComponentConfig } from "@puckeditor/core";
+import { BlockStyles } from "./block-styles";
 import { SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
 
 // ---------------------------------------------------------------------------
@@ -40,27 +41,27 @@ export const CtaConfig: ComponentConfig<CtaProps> = {
     return (
       <section
         ref={puck.dragRef}
+        className="jff-band jff-cta"
         style={{
           textAlign: "center",
-          padding: "56px 24px",
           borderRadius: 16,
           background: backgroundColor || "#f5f7fa",
         }}
       >
+        <BlockStyles />
         {title && (
           <h2 style={{ fontSize: 30, fontWeight: 700, margin: "0 0 12px", color: textColor }}>{title}</h2>
         )}
         {subtitle && (
-          <p style={{ fontSize: 16, color: subColor, margin: "0 auto 28px", maxWidth: 560, lineHeight: 1.6 }}>
+          <p className="jff-cta__sub" style={{ color: subColor }}>
             {subtitle}
           </p>
         )}
         {buttonText && (
           <a
             href={buttonLink || undefined}
+            className="jff-cta__btn"
             style={{
-              display: "inline-block",
-              padding: "12px 30px",
               background: buttonBg,
               color: buttonColor,
               borderRadius: 8,

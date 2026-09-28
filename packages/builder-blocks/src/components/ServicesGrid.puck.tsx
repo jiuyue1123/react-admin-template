@@ -1,4 +1,5 @@
 import type { ComponentConfig } from "@puckeditor/core";
+import { BlockStyles } from "./block-styles";
 import { SectionHeading } from "./SectionHeading";
 import { getIconNode, ICON_OPTIONS, SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
 
@@ -24,11 +25,16 @@ export const ServicesGridConfig: ComponentConfig<ServicesGridProps> = {
 
   render({ title, subtitle, items, puck }) {
     return (
-      <section ref={puck.dragRef} style={{ maxWidth: 1080, margin: "0 auto" }}>
+      <section ref={puck.dragRef} className="jff-section jff-services">
+        <BlockStyles />
         <SectionHeading title={title} subtitle={subtitle} />
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 24 }}>
+        <div className="jff-grid">
           {items.map((item, i) => (
-            <div key={i} style={{ padding: 28, border: "1px solid #ececec", borderRadius: 14, background: "#fff" }}>
+            <div
+              key={i}
+              className="jff-services__card"
+              style={{ border: "1px solid #ececec", borderRadius: 14, background: "#fff" }}
+            >
               {getIconNode(item.icon) && (
                 <div style={{ fontSize: 28, color: "#1677ff", marginBottom: 14 }}>{getIconNode(item.icon)}</div>
               )}

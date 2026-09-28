@@ -41,7 +41,7 @@ export const FormConfig: ComponentConfig<FormBlockProps> = {
 
   render({ formKey, title, description, puck }) {
     return (
-      <section ref={puck.dragRef} style={{ padding: "56px 24px" }}>
+      <section ref={puck.dragRef} className="jff-band jff-form">
         <BlockStyles />
         <div style={{ maxWidth: 640, margin: "0 auto" }}>
           {title && (

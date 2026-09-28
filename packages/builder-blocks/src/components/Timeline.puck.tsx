@@ -1,4 +1,5 @@
 import type { ComponentConfig } from "@puckeditor/core";
+import { BlockStyles } from "./block-styles";
 import { SectionHeading } from "./SectionHeading";
 import { SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
 
@@ -24,7 +25,8 @@ export const TimelineConfig: ComponentConfig<TimelineProps> = {
 
   render({ title, subtitle, items, puck }) {
     return (
-      <section ref={puck.dragRef} style={{ maxWidth: 800, margin: "0 auto" }}>
+      <section ref={puck.dragRef} className="jff-section jff-timeline">
+        <BlockStyles />
         <SectionHeading title={title} subtitle={subtitle} />
         <div style={{ position: "relative", paddingLeft: 28 }}>
           <div style={{ position: "absolute", left: 5, top: 6, bottom: 6, width: 2, background: "#e5e7eb" }} />

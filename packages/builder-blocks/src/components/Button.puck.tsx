@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import type { ComponentConfig } from "@puckeditor/core";
 import { BlockStyles } from "./block-styles";
 import { getIconNode, ICON_OPTIONS } from "./shared";
+import { resolveColor, themeVar } from "../theme";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -46,18 +47,20 @@ const YES_NO_OPTIONS = [
 ] as const;
 
 // ---------------------------------------------------------------------------
-// Design tokens — 对齐 antd 默认调色板，与本包其余区块一致
+// Design tokens —— 全部走 --jff-* 站点主题契约（见 ../theme.ts）。
+// 下面这几个**不含**主题令牌，是纯透明度的交互填充，保持字面量：
+// FILL_HOVER / FILL_ACTIVE / DISABLED_BG / DISABLED_FG。
 // ---------------------------------------------------------------------------
 
-const PRIMARY = "#1677ff";
-const PRIMARY_HOVER = "#4096ff";
-const PRIMARY_ACTIVE = "#0958d9";
-const DANGER = "#ff4d4f";
-const DANGER_HOVER = "#ff7875";
-const DANGER_ACTIVE = "#d9363e";
+const PRIMARY = themeVar("colorBrand");
+const PRIMARY_HOVER = themeVar("colorBrandHover");
+const PRIMARY_ACTIVE = themeVar("colorBrandActive");
+const DANGER = themeVar("colorDanger");
+const DANGER_HOVER = themeVar("colorDangerHover");
+const DANGER_ACTIVE = themeVar("colorDangerActive");
 
-const DEFAULT_BORDER = "#d9d9d9";
-const TEXT = "rgba(0, 0, 0, 0.88)";
+const DEFAULT_BORDER = themeVar("colorBorderStrong");
+const TEXT = themeVar("colorText");
 const FILL_HOVER = "rgba(0, 0, 0, 0.06)";
 const FILL_ACTIVE = "rgba(0, 0, 0, 0.15)";
 const DISABLED_BG = "rgba(0, 0, 0, 0.04)";
@@ -107,13 +110,13 @@ function resolvePalette(variant: ButtonVariant, isDanger: boolean) {
     // secondary / outline / dashed 视觉基底一致，仅边框线型不同
     default:
       return {
-        bg: "#ffffff",
+        bg: themeVar("colorSurface"),
         border: isDanger ? DANGER : DEFAULT_BORDER,
         fg: isDanger ? DANGER : TEXT,
-        hoverBg: "#ffffff",
+        hoverBg: themeVar("colorSurface"),
         hoverBorder: accentHover,
         hoverFg: accentHover,
-        activeBg: "#ffffff",
+        activeBg: themeVar("colorSurface"),
         activeBorder: accentActive,
         activeFg: accentActive,
       };
@@ -192,10 +195,13 @@ export const ButtonConfig: ComponentConfig<ButtonProps> = {
       style.cursor = "not-allowed";
     }
 
-    // 自定义外观字段优先级最高（与改造前的行为一致）
-    if (color) style.color = color;
-    if (backgroundColor) style.backgroundColor = backgroundColor;
-    if (hasBorder && borderColor) style.borderColor = borderColor;
+    // 自定义外观字段优先级最高（与改造前的行为一致）。
+    // 走 resolveColor：存量页面里存的是字面量（如 "#1677ff"），解析后即可跟随主题，
+    // 且不需要改动 select 的 option value（改了会让编辑器里已选项变空白）。
+    // 这里**没有**对颜色做字符串比较，所以解析是安全的。
+    if (color) style.color = resolveColor(color);
+    if (backgroundColor) style.backgroundColor = resolveColor(backgroundColor);
+    if (hasBorder && borderColor) style.borderColor = resolveColor(borderColor);
     const br = Number(borderRadius);
     if (br > 0) style.borderRadius = br;
     const fs = Number(fontSize);

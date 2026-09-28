@@ -2,6 +2,7 @@ import type { ComponentConfig } from "@puckeditor/core";
 import { BlockStyles } from "./block-styles";
 import { SectionHeading } from "./SectionHeading";
 import { SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
+import { themeVar } from "../theme";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -37,7 +38,7 @@ export const ProcessStepsConfig: ComponentConfig<ProcessStepsProps> = {
                   height: 44,
                   margin: "0 auto 14px",
                   borderRadius: "50%",
-                  background: "#1677ff",
+                  background: themeVar("colorBrand"),
                   color: "#fff",
                   display: "flex",
                   alignItems: "center",
@@ -48,8 +49,12 @@ export const ProcessStepsConfig: ComponentConfig<ProcessStepsProps> = {
               >
                 {i + 1}
               </div>
-              <h3 style={{ fontSize: 16, fontWeight: 600, margin: "0 0 6px", color: "#1f1f1f" }}>{item.title}</h3>
-              <p style={{ fontSize: 13, lineHeight: 1.6, color: "rgba(0,0,0,0.6)", margin: 0 }}>{item.description}</p>
+              <h3 style={{ fontSize: 16, fontWeight: 600, margin: "0 0 6px", color: themeVar("colorText") }}>
+                {item.title}
+              </h3>
+              <p style={{ fontSize: 13, lineHeight: 1.6, color: themeVar("colorTextSecondary"), margin: 0 }}>
+                {item.description}
+              </p>
             </div>
           ))}
         </div>

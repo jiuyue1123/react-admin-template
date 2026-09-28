@@ -2,6 +2,7 @@ import type { ComponentConfig } from "@puckeditor/core";
 import { BlockStyles } from "./block-styles";
 import { SectionHeading } from "./SectionHeading";
 import { getIconNode, ICON_OPTIONS, SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
+import { themeVar } from "../theme";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -30,16 +31,18 @@ export const ServicesGridConfig: ComponentConfig<ServicesGridProps> = {
         <SectionHeading title={title} subtitle={subtitle} />
         <div className="jff-grid">
           {items.map((item, i) => (
-            <div
-              key={i}
-              className="jff-services__card"
-              style={{ border: "1px solid #ececec", borderRadius: 14, background: "#fff" }}
-            >
+            <div key={i} className="jff-services__card">
               {getIconNode(item.icon) && (
-                <div style={{ fontSize: 28, color: "#1677ff", marginBottom: 14 }}>{getIconNode(item.icon)}</div>
+                <div style={{ fontSize: 28, color: themeVar("colorBrand"), marginBottom: 14 }}>
+                  {getIconNode(item.icon)}
+                </div>
               )}
-              <h3 style={{ fontSize: 17, fontWeight: 600, margin: "0 0 8px", color: "#1f1f1f" }}>{item.title}</h3>
-              <p style={{ fontSize: 14, lineHeight: 1.7, color: "rgba(0,0,0,0.6)", margin: 0 }}>{item.description}</p>
+              <h3 style={{ fontSize: 17, fontWeight: 600, margin: "0 0 8px", color: themeVar("colorText") }}>
+                {item.title}
+              </h3>
+              <p style={{ fontSize: 14, lineHeight: 1.7, color: themeVar("colorTextSecondary"), margin: 0 }}>
+                {item.description}
+              </p>
             </div>
           ))}
         </div>

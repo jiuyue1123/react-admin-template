@@ -2,6 +2,7 @@ import type { ComponentConfig } from "@puckeditor/core";
 import { BlockStyles } from "./block-styles";
 import { SectionHeading } from "./SectionHeading";
 import { SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
+import { themeVar } from "../theme";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -29,7 +30,16 @@ export const TimelineConfig: ComponentConfig<TimelineProps> = {
         <BlockStyles />
         <SectionHeading title={title} subtitle={subtitle} />
         <div style={{ position: "relative", paddingLeft: 28 }}>
-          <div style={{ position: "absolute", left: 5, top: 6, bottom: 6, width: 2, background: "#e5e7eb" }} />
+          <div
+            style={{
+              position: "absolute",
+              left: 5,
+              top: 6,
+              bottom: 6,
+              width: 2,
+              background: themeVar("colorBorder"),
+            }}
+          />
           {items.map((item, i) => (
             <div key={i} style={{ position: "relative", padding: "0 0 28px 20px" }}>
               <span
@@ -40,14 +50,20 @@ export const TimelineConfig: ComponentConfig<TimelineProps> = {
                   width: 14,
                   height: 14,
                   borderRadius: "50%",
-                  background: "#fff",
-                  border: "3px solid #1677ff",
+                  background: themeVar("colorSurface"),
+                  border: `3px solid ${themeVar("colorBrand")}`,
                   boxSizing: "border-box",
                 }}
               />
-              <div style={{ fontSize: 13, fontWeight: 600, color: "#1677ff", marginBottom: 4 }}>{item.year}</div>
-              <h3 style={{ fontSize: 16, fontWeight: 600, margin: "0 0 6px", color: "#1f1f1f" }}>{item.title}</h3>
-              <p style={{ fontSize: 14, color: "rgba(0,0,0,0.6)", lineHeight: 1.7, margin: 0 }}>{item.description}</p>
+              <div style={{ fontSize: 13, fontWeight: 600, color: themeVar("colorBrand"), marginBottom: 4 }}>
+                {item.year}
+              </div>
+              <h3 style={{ fontSize: 16, fontWeight: 600, margin: "0 0 6px", color: themeVar("colorText") }}>
+                {item.title}
+              </h3>
+              <p style={{ fontSize: 14, color: themeVar("colorTextSecondary"), lineHeight: 1.7, margin: 0 }}>
+                {item.description}
+              </p>
             </div>
           ))}
         </div>

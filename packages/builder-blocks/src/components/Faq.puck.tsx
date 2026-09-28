@@ -2,6 +2,7 @@ import type { ComponentConfig } from "@puckeditor/core";
 import { BlockStyles } from "./block-styles";
 import { SectionHeading } from "./SectionHeading";
 import { SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
+import { themeVar } from "../theme";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -32,7 +33,12 @@ export const FaqConfig: ComponentConfig<FaqProps> = {
           {items.map((item, i) => (
             <details
               key={i}
-              style={{ border: "1px solid #ececec", borderRadius: 10, padding: "0 18px", background: "#fff" }}
+              style={{
+                border: `1px solid ${themeVar("colorBorder")}`,
+                borderRadius: 12,
+                padding: "0 18px",
+                background: themeVar("colorSurface"),
+              }}
             >
               <summary
                 style={{
@@ -40,13 +46,20 @@ export const FaqConfig: ComponentConfig<FaqProps> = {
                   fontWeight: 600,
                   cursor: "pointer",
                   listStyle: "none",
-                  color: "#1f1f1f",
+                  color: themeVar("colorText"),
                 }}
               >
                 {item.question}
-                <span style={{ float: "right", color: "#999", fontWeight: 400 }}>+</span>
+                <span style={{ float: "right", color: themeVar("colorTextTertiary"), fontWeight: 400 }}>+</span>
               </summary>
-              <div style={{ paddingBottom: 16, color: "rgba(0,0,0,0.65)", lineHeight: 1.7, fontSize: 14 }}>
+              <div
+                style={{
+                  paddingBottom: 16,
+                  color: themeVar("colorTextSecondary"),
+                  lineHeight: 1.7,
+                  fontSize: 14,
+                }}
+              >
                 {item.answer}
               </div>
             </details>

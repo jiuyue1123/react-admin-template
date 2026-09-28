@@ -144,5 +144,5 @@ export type { ValuesCardsProps } from "./components/ValuesCards.puck.tsx";
 // `var(--jff-*, 回退值)`。导出 `SITE_THEME` 本身供两端做静态取值。
 // ---------------------------------------------------------------------------
 
-export { SITE_THEME, SITE_FONT_STACK, toCssVarName, toSiteThemeVars } from "./theme.ts";
+export { SITE_THEME, SITE_FONT_STACK, toCssVarName, toSiteThemeVars, themeVar, resolveColor } from "./theme.ts";
 export type { SiteThemeKey, SiteThemeVar } from "./theme.ts";

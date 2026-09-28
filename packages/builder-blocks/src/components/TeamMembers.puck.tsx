@@ -3,6 +3,7 @@ import { BlockStyles } from "./block-styles";
 import { MediaField } from "./media-field";
 import { SectionHeading } from "./SectionHeading";
 import { SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
+import { themeVar } from "../theme";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -36,9 +37,6 @@ export const TeamMembersConfig: ComponentConfig<TeamMembersProps> = {
               className="jff-team__card"
               style={{
                 textAlign: "center",
-                border: "1px solid #ececec",
-                borderRadius: 14,
-                background: "#fff",
               }}
             >
               {item.avatar ? (
@@ -61,20 +59,24 @@ export const TeamMembersConfig: ComponentConfig<TeamMembersProps> = {
                     height: 88,
                     borderRadius: "50%",
                     margin: "0 auto 14px",
-                    background: "#eef3ff",
+                    background: themeVar("colorBrandSubtle"),
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     fontSize: 28,
-                    color: "#1677ff",
+                    color: themeVar("colorBrand"),
                   }}
                 >
                   {(item.name || "人").slice(0, 1)}
                 </div>
               )}
-              <h3 style={{ fontSize: 17, fontWeight: 600, margin: "0 0 4px", color: "#1f1f1f" }}>{item.name}</h3>
-              <div style={{ fontSize: 13, color: "#1677ff", marginBottom: 10 }}>{item.role}</div>
-              <p style={{ fontSize: 13, lineHeight: 1.7, color: "rgba(0,0,0,0.6)", margin: 0 }}>{item.bio}</p>
+              <h3 style={{ fontSize: 17, fontWeight: 600, margin: "0 0 4px", color: themeVar("colorText") }}>
+                {item.name}
+              </h3>
+              <div style={{ fontSize: 13, color: themeVar("colorBrand"), marginBottom: 10 }}>{item.role}</div>
+              <p style={{ fontSize: 13, lineHeight: 1.7, color: themeVar("colorTextSecondary"), margin: 0 }}>
+                {item.bio}
+              </p>
             </div>
           ))}
         </div>

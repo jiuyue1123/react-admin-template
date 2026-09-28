@@ -1,5 +1,6 @@
 import type { ComponentConfig } from "@puckeditor/core";
 import type { CSSProperties } from "react";
+import { resolveColor } from "../theme";
 import {
   ALIGN_OPTIONS,
   FONT_WEIGHT_OPTIONS,
@@ -79,7 +80,10 @@ export const HeadingConfig: ComponentConfig<HeadingProps> = {
       fontSize: DEFAULT_FONT_SIZES[tagLevel],
       margin,
     };
-    if (color) style.color = color;
+    // 走 resolveColor：存量数据里的颜色是 select 的 value 字面量（如 "主题蓝" 存的
+    // "#1677ff"），解析后即可跟随站点主题，且不必改 option 的 value。
+    // 本组件不对颜色做字符串比较，所以解析是安全的。
+    if (color) style.color = resolveColor(color);
     if (fontWeight) style.fontWeight = Number(fontWeight);
     if (letterSpacing) style.letterSpacing = letterSpacing;
     if (lineHeight) style.lineHeight = Number(lineHeight);

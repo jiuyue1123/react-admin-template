@@ -3,6 +3,7 @@ import { BlockStyles } from "./block-styles";
 import { MediaField } from "./media-field";
 import { SectionHeading } from "./SectionHeading";
 import { SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
+import { themeVar } from "../theme";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -46,7 +47,7 @@ export const LogoCloudConfig: ComponentConfig<LogoCloudProps> = {
                   }}
                 />
               ) : (
-                <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: 1, color: "#bfbfbf" }}>
+                <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: 1, color: themeVar("colorTextTertiary") }}>
                   {item.name || "LOGO"}
                 </span>
               )}

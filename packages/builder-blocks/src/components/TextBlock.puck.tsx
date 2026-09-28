@@ -1,5 +1,6 @@
 import type { ComponentConfig } from "@puckeditor/core";
 import type { CSSProperties } from "react";
+import { resolveColor } from "../theme";
 import {
   ALIGN_OPTIONS,
   FONT_SIZE_OPTIONS,
@@ -52,7 +53,8 @@ export const TextBlockConfig: ComponentConfig<TextBlockProps> = {
     };
     const fs = Number(fontSize);
     if (fs > 0) style.fontSize = fs;
-    if (color) style.color = color;
+    // 走 resolveColor 让存量颜色字面量跟随站点主题（同上，本组件不比色）
+    if (color) style.color = resolveColor(color);
     if (fontWeight) style.fontWeight = Number(fontWeight);
     if (lineHeight) style.lineHeight = Number(lineHeight);
     if (letterSpacing) style.letterSpacing = letterSpacing;

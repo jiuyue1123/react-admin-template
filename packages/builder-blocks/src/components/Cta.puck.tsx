@@ -2,6 +2,7 @@ import type { ComponentConfig } from "@puckeditor/core";
 import { BlockStyles } from "./block-styles";
 import { SectionHeading } from "./SectionHeading";
 import { SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
+import { resolveColor, themeVar } from "../theme";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -30,14 +31,15 @@ export const CtaConfig: ComponentConfig<CtaProps> = {
   label: "行动号召",
 
   render({ title, subtitle, buttonText, buttonLink, backgroundColor, puck }) {
-    // 深色底判定**必须用原始字段值**（字面量比较）。改成解析后的 var(...) 会让
-    // 字符串比较静默失配，深色分支失效、CTA 变成浅底白字。
+    // 深色底判定**必须用原始字段值**（字面量比较）。若改成 resolveColor(...)，
+    // "#1677ff" 会变成 "var(--jff-color-brand)"，字符串比较静默失配，
+    // 深色分支失效、CTA 变成浅底白字。规则：判定用原值，写样式用解析值。
     const isDark =
       backgroundColor === "#1677ff" ||
       backgroundColor === "#1f2329" ||
       (backgroundColor ?? "").startsWith("linear-gradient");
-    const buttonBg = isDark ? "#fff" : "#1677ff";
-    const buttonColor = isDark ? "#1677ff" : "#fff";
+    const buttonBg = isDark ? themeVar("colorSurface") : themeVar("colorBrand");
+    const buttonColor = isDark ? themeVar("colorBrand") : "#fff";
 
     return (
       <section
@@ -46,7 +48,7 @@ export const CtaConfig: ComponentConfig<CtaProps> = {
         style={{
           textAlign: "center",
           borderRadius: 16,
-          background: backgroundColor || "#f5f7fa",
+          background: resolveColor(backgroundColor) || themeVar("colorCanvas"),
         }}
       >
         <BlockStyles />

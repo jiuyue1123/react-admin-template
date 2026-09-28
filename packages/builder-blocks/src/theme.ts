@@ -44,6 +44,8 @@ export const SITE_THEME = {
   colorBrandActive: "#0958d9",
   colorBrandSubtle: "#eef3ff",
   colorDanger: "#ff4d4f",
+  colorDangerHover: "#ff7875",
+  colorDangerActive: "#d9363e",
   colorWarning: "#faad14",
 
   // ── 文字色阶（3 档） ──
@@ -98,4 +100,60 @@ export function toSiteThemeVars(): Record<SiteThemeVar, string> {
   return Object.fromEntries(
     Object.entries(SITE_THEME).map(([key, value]) => [toCssVarName(key), value]),
   ) as Record<SiteThemeVar, string>;
+}
+
+/**
+ * 区块内联样式里引用主题值的统一写法：`var(--jff-x, <平台默认值>)`。
+ *
+ * 回退值直接从 `SITE_THEME` 取，所以默认值只有一处定义 —— 手写 `var()` 串
+ * 迟早会与 `SITE_THEME` 漂移，而漂移的表现就是「编辑器里一个色、线上一色」。
+ */
+export function themeVar(key: SiteThemeKey): string {
+  return `var(${toCssVarName(key)}, ${SITE_THEME[key]})`;
+}
+
+// ---------------------------------------------------------------------------
+// 存量字面量 → 主题变量
+// ---------------------------------------------------------------------------
+
+/**
+ * 颜色字段的历史字面量 → 主题变量。
+ *
+ * 为什么需要它：租户已保存的页面 JSON 里，颜色是 select 字段的 **value 本身**
+ * （`"#1677ff"`、`"rgba(0,0,0,0.88)"`）。若直接改 option 的 value，Puck 的 select
+ * 找不到匹配项，编辑器里已选中的项会变成空白 —— 那是破坏存量数据。
+ *
+ * 所以 option 的 value 一个字节都不动，改在**渲染时**解析：语义等价的主题色
+ * 转成 `var(...)` 跟随主题，其余原样返回。于是老页面里选过「主题蓝」的会自动
+ * 跟随 `--jff-color-brand`，而今天两者同值、视觉零变化。
+ *
+ * 注意带空格的历史写法（`rgba(0, 0, 0, 0.88)`）也要收录 —— 早期版本两种都写过。
+ *
+ * ⚠️ **只能用于「写样式」，不能用于判定。** 例如 `Cta` 的深色底判断是对
+ * `backgroundColor` 做字符串比较；若先解析成 `var(--jff-color-brand)`，
+ * 比较会静默失配、深色分支失效。规则：判定用原始值，写样式用解析值。
+ *
+ * `#ffffff` / `#000000` / `#1f2329` / `transparent` 不收录 —— 它们是绝对色，
+ * 不是主题色。
+ */
+const COLOR_ALIASES: Record<string, string> = {
+  "#1677ff": "var(--jff-color-brand)",
+  "#4096ff": "var(--jff-color-brand-hover)",
+  "#0958d9": "var(--jff-color-brand-active)",
+  "#eef3ff": "var(--jff-color-brand-subtle)",
+  "rgba(0,0,0,0.88)": "var(--jff-color-text)",
+  "rgba(0, 0, 0, 0.88)": "var(--jff-color-text)",
+  "rgba(0,0,0,0.65)": "var(--jff-color-text-secondary)",
+  "rgba(0, 0, 0, 0.65)": "var(--jff-color-text-secondary)",
+  "rgba(0,0,0,0.45)": "var(--jff-color-text-tertiary)",
+  "rgba(0, 0, 0, 0.45)": "var(--jff-color-text-tertiary)",
+  "#f5f7fa": "var(--jff-color-canvas)",
+  "#f7f8fa": "var(--jff-color-canvas)",
+  "#ececec": "var(--jff-color-border)",
+  "#e5e7eb": "var(--jff-color-border)",
+};
+
+/** 把存量颜色字面量解析成主题变量；无对应项则原样返回 */
+export function resolveColor(value: string): string {
+  return COLOR_ALIASES[value.trim()] ?? value;
 }

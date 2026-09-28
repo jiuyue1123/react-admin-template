@@ -2,6 +2,7 @@ import type { ComponentConfig } from "@puckeditor/core";
 import type { CSSProperties } from "react";
 import { MARGIN_OPTIONS } from "./shared";
 import { MediaField } from "./media-field";
+import { themeVar } from "../theme";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -93,9 +94,9 @@ export const ImageConfig: ComponentConfig<ImageProps> = {
             maxWidth: "100%",
             height: height === "auto" ? 120 : height,
             margin,
-            border: "1px dashed #d9d9d9",
+            border: `1px dashed ${themeVar("colorBorderStrong")}`,
             borderRadius: br || 0,
-            color: "#999",
+            color: themeVar("colorTextTertiary"),
             fontSize: 13,
           }}
         >

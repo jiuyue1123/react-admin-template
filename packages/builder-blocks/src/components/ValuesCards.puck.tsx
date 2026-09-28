@@ -2,6 +2,7 @@ import type { ComponentConfig } from "@puckeditor/core";
 import { BlockStyles } from "./block-styles";
 import { SectionHeading } from "./SectionHeading";
 import { getIconNode, ICON_OPTIONS, SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
+import { themeVar } from "../theme";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -30,14 +31,14 @@ export const ValuesCardsConfig: ComponentConfig<ValuesCardsProps> = {
         <SectionHeading title={title} subtitle={subtitle} />
         <div className="jff-grid">
           {items.map((item, i) => (
-            <div key={i} className="jff-values__card" style={{ borderRadius: 14, background: "#f7f8fa", textAlign: "center" }}>
+            <div key={i} className="jff-values__card" style={{ textAlign: "center" }}>
               <div
                 style={{
                   width: 56,
                   height: 56,
                   margin: "0 auto 16px",
                   borderRadius: "50%",
-                  background: "#1677ff",
+                  background: themeVar("colorBrand"),
                   color: "#fff",
                   fontSize: 24,
                   display: "flex",
@@ -47,8 +48,12 @@ export const ValuesCardsConfig: ComponentConfig<ValuesCardsProps> = {
               >
                 {getIconNode(item.icon)}
               </div>
-              <h3 style={{ fontSize: 17, fontWeight: 600, margin: "0 0 8px", color: "#1f1f1f" }}>{item.title}</h3>
-              <p style={{ fontSize: 14, lineHeight: 1.7, color: "rgba(0,0,0,0.6)", margin: 0 }}>{item.description}</p>
+              <h3 style={{ fontSize: 17, fontWeight: 600, margin: "0 0 8px", color: themeVar("colorText") }}>
+                {item.title}
+              </h3>
+              <p style={{ fontSize: 14, lineHeight: 1.7, color: themeVar("colorTextSecondary"), margin: 0 }}>
+                {item.description}
+              </p>
             </div>
           ))}
         </div>

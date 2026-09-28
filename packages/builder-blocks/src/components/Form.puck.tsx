@@ -3,6 +3,7 @@ import { BlockStyles } from "./block-styles";
 import { FormField } from "./form-field";
 import { SectionHeading } from "./SectionHeading";
 import { SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
+import { themeVar } from "../theme";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -50,17 +51,24 @@ export const FormConfig: ComponentConfig<FormBlockProps> = {
           {/* 编辑器占位：访客端会被替换成真实表单 */}
           <div
             style={{
-              border: "1px dashed #d9d9d9",
+              border: `1px dashed ${themeVar("colorBorderStrong")}`,
               borderRadius: 12,
-              background: "#fafafa",
+              background: themeVar("colorCanvas"),
               padding: "28px 20px",
               textAlign: "center",
             }}
           >
-            <div style={{ fontSize: 14, fontWeight: 600, color: "#1f1f29" }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: themeVar("colorText") }}>
               {formKey ? `表单：${formKey}` : "尚未选择表单"}
             </div>
-            <div style={{ fontSize: 12, color: "rgba(0, 0, 0, 0.45)", marginTop: 6, lineHeight: 1.6 }}>
+            <div
+              style={{
+                fontSize: 12,
+                color: themeVar("colorTextTertiary"),
+                marginTop: 6,
+                lineHeight: 1.6,
+              }}
+            >
               前台按该表单的字段渲染，访客提交后生成一条线索
             </div>
           </div>

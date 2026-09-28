@@ -131,7 +131,7 @@ const CSS = `
   font-weight: 600;
   line-height: 1.3;
   text-align: center;
-  color: #111;
+  color: var(--jff-color-text, ${SITE_THEME.colorText});
 }
 .jff-subtitle {
   margin: 0 auto;
@@ -139,7 +139,7 @@ const CSS = `
   font-size: 15px;
   line-height: 1.7;
   text-align: center;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--jff-color-text-secondary, ${SITE_THEME.colorTextSecondary});
 }
 /* 深色底（Cta 的深色/渐变背景）上的反白 */
 .jff-title--inverse { color: #fff; }
@@ -179,10 +179,28 @@ const CSS = `
   gap: 48px;
 }
 
-/* 卡片内边距（三种卡片的值本来就不同，各自成类，等后续收敛） */
-.jff-services__card { box-sizing: border-box; padding: 28px; }
-.jff-team__card { box-sizing: border-box; padding: 32px 20px; }
-.jff-values__card { box-sizing: border-box; padding: 32px; }
+/* 卡片。三种卡片的视觉此前各不相同（圆角 14/14/14、边框有无、底色 #fff/#f7f8fa），
+   现在共用同一个圆角档位与边框/底色令牌，只保留各自的内边距与对齐差异。 */
+.jff-services__card {
+  box-sizing: border-box;
+  padding: 28px;
+  border: 1px solid var(--jff-color-border, ${SITE_THEME.colorBorder});
+  border-radius: var(--jff-radius-md, ${SITE_THEME.radiusMd});
+  background: var(--jff-color-surface, ${SITE_THEME.colorSurface});
+}
+.jff-team__card {
+  box-sizing: border-box;
+  padding: 32px 20px;
+  border: 1px solid var(--jff-color-border, ${SITE_THEME.colorBorder});
+  border-radius: var(--jff-radius-md, ${SITE_THEME.radiusMd});
+  background: var(--jff-color-surface, ${SITE_THEME.colorSurface});
+}
+.jff-values__card {
+  box-sizing: border-box;
+  padding: 32px;
+  border-radius: var(--jff-radius-md, ${SITE_THEME.radiusMd});
+  background: var(--jff-color-canvas, ${SITE_THEME.colorCanvas});
+}
 
 /* ---------------- 移动端降级 ---------------- */
 @media (max-width: 640px) {

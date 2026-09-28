@@ -1,6 +1,7 @@
 import type { ComponentConfig } from "@puckeditor/core";
 import type { CSSProperties, ReactNode } from "react";
 import { MARGIN_OPTIONS, TEXT_COLOR_OPTIONS } from "./shared";
+import { resolveColor, themeVar } from "../theme";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -47,7 +48,9 @@ export const DividerConfig: ComponentConfig<DividerProps> = {
   }) {
     const isVertical = orientation === "vertical";
     const t = Number(thickness) || 1;
-    const lineColor = color || "rgba(5, 5, 5, 0.06)";
+    // 分隔线颜色：字段为空时用主题的边框色（原来是 antd 的 rgba(5,5,5,0.06)，
+    // 与区块里其它「线」的色值不一致）。字段值同样走 resolveColor。
+    const lineColor = resolveColor(color) || themeVar("colorBorder");
 
     let node: ReactNode;
     if (isVertical) {

@@ -212,6 +212,9 @@ export const ButtonConfig: ComponentConfig<ButtonProps> = {
         {text}
       </>
     );
+    // 圆形按钮的宽高必须相等，所以它要排除样式表里「手机上补触控热区」的
+    // min-height —— 否则会被拉成椭圆。见 block-styles.tsx 的 640px 断点。
+    const btnClass = shape === "circle" ? "jff-btn jff-btn--circle" : "jff-btn";
 
     // 有链接且未禁用时用 <a>，保证可被右键/新标签打开；否则退回 <button>
     if (href && !isDisabled) {
@@ -220,7 +223,7 @@ export const ButtonConfig: ComponentConfig<ButtonProps> = {
           <BlockStyles />
           <a
             ref={puck.dragRef}
-            className="jff-btn"
+            className={btnClass}
             style={css}
             href={href}
             target={target || undefined}
@@ -237,7 +240,7 @@ export const ButtonConfig: ComponentConfig<ButtonProps> = {
         <BlockStyles />
         <button
           ref={puck.dragRef}
-          className="jff-btn"
+          className={btnClass}
           style={css}
           type="button"
           disabled={isDisabled}

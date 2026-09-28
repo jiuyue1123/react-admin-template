@@ -191,6 +191,11 @@ const CSS = `
   .jff-services__card { padding: 20px; }
   .jff-team__card { padding: 24px 16px; }
   .jff-values__card { padding: 24px; }
+
+  /* 触控热区：Button 的三档高度是 24/32/40，手机上偏小。用 min-height 约束
+     内联的 height —— 两者是不同的属性，min-height 参与最终高度的计算，所以
+     这条能赢过 inline。圆形按钮必须排除：它的宽度等于高度，拉高会变椭圆。 */
+  .jff-btn:not(.jff-btn--circle) { min-height: 44px; }
 }
 `
 

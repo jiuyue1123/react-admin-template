@@ -46,6 +46,8 @@ export default function PuckTestPage() {
         data={initial}
         height="100%"
         headerTitle="区块编辑器测试"
+        // 与非 iframe 模式下失效的设备预设同理，见 edit/index.tsx
+        viewports={[]}
         onChange={handleChange}
         overrides={{
           // 与其他编辑入口一致：画布内容套站点主题作用域

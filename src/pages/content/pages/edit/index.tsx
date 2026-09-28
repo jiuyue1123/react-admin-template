@@ -193,6 +193,11 @@ export default function PageEditorPage() {
         data={contentData}
         height="100%"
         headerTitle={pageTitle}
+        // 隐藏工具栏的「手机/平板/桌面/全宽」预设：它们在非 iframe 模式下是失效的
+        // —— Puck 只在 iframe.enabled 时才用 viewports 的宽度，否则画布恒为 100%。
+        // 留着会让人点了没反应，还容易误判成「响应式没生效」（媒体查询看的是
+        // 浏览器视口，不是画布宽度）。自检移动端请用浏览器 DevTools。
+        viewports={[]}
         onChange={data => setContentData(data as Data)}
         // Puck 0.23：`renderHeaderActions` 已废弃 → `overrides.headerActions`。
         // 这是**覆盖**语义（未提供时默认什么都不渲染），所以只返回本页自己的按钮即可 ——

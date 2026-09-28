@@ -51,6 +51,19 @@ html {
   scroll-behavior: smooth;
 }
 
+/*
+ * 站点外壳尺寸
+ *
+ * 页头高度被多处用来算「视口高度减去页头」：首页要撑满首屏，移动端菜单面板要
+ * 限制最大高度。以前这些地方各写一个手算值（3.5rem / 4rem），改 SiteHeader 的
+ * 高度时不会有任何报错，只会静默错位。现在 SiteHeader 自己也读这两个变量，
+ * 所以这里是唯一真源。
+ */
+:root {
+  --jf-header-h: 3.5rem; /* 对应 h-14 */
+  --jf-header-h-sm: 4rem; /* 对应 sm:h-16 */
+}
+
 body {
   font-family: var(--font-sans);
   font-size: 16px;

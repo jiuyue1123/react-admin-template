@@ -11,7 +11,8 @@ import NavMenu from './NavMenu'
 export default function SiteHeader({ site }: { site: PublicSite }) {
   return (
     <header className="sticky top-0 z-50 border-b border-line/80 bg-surface/85 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:h-16 sm:px-6 lg:px-8">
+      {/* 高度读 --jf-header-h*（globals.css）：首页与移动端面板都用它算「视口减页头」 */}
+      <div className="mx-auto flex h-[var(--jf-header-h)] max-w-6xl items-center gap-3 px-4 sm:h-[var(--jf-header-h-sm)] sm:px-6 lg:px-8">
         <Link href="/" className="flex shrink-0 items-center gap-2.5 rounded-lg">
           {site.logo ? (
             // 站点名紧邻展示，Logo 视为装饰

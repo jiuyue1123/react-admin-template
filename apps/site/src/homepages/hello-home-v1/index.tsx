@@ -63,7 +63,7 @@ const HelloHomepage: HomepageComponent = ({ site, pages }) => {
         {HOMEPAGE_CSS}
       </style>
 
-      <section className="relative isolate flex min-h-[calc(100svh-3.5rem)] items-center overflow-hidden px-5 py-20 sm:px-8 sm:py-28 lg:min-h-[calc(100svh-4rem)]">
+      <section className="relative isolate flex min-h-[calc(100svh-var(--jf-header-h))] items-center overflow-hidden px-5 py-20 sm:min-h-[calc(100svh-var(--jf-header-h-sm))] sm:px-8 sm:py-28">
         {/* 背景：呼吸光晕 + 细网格 */}
         <div
           aria-hidden="true"

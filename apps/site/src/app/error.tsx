@@ -15,15 +15,15 @@ export default function SiteError({ error, reset }: { error: Error & { digest?: 
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
-      <p className="text-5xl font-semibold tracking-tight text-neutral-300">500</p>
-      <h1 className="mt-4 text-xl font-semibold">页面暂时无法访问</h1>
-      <p className="mt-2 max-w-md text-neutral-500">
+      <p className="text-5xl font-semibold tracking-tight text-subtle">500</p>
+      <h1 className="mt-4 text-xl font-semibold text-ink">页面暂时无法访问</h1>
+      <p className="mt-2 max-w-md text-muted">
         服务出现了一点问题，请稍后重试。持续出现请联系站点管理员。
       </p>
       <button
         type="button"
         onClick={reset}
-        className="mt-8 inline-flex min-h-11 items-center rounded-lg bg-neutral-900 px-6 text-white transition-colors hover:bg-neutral-700"
+        className="mt-8 inline-flex min-h-11 items-center rounded-lg bg-ink px-6 text-white transition-opacity hover:opacity-90"
       >
         重新加载
       </button>

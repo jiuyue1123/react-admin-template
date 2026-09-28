@@ -49,7 +49,7 @@ export default function DefaultHomepage({ site }: HomepageProps) {
         {HOMEPAGE_CSS}
       </style>
 
-      <section className="flex min-h-[calc(100svh-3.5rem)] items-center justify-center px-5 py-24 sm:px-8 lg:min-h-[calc(100svh-4rem)]">
+      <section className="flex min-h-[calc(100svh-var(--jf-header-h))] items-center justify-center px-5 py-24 sm:min-h-[calc(100svh-var(--jf-header-h-sm))] sm:px-8">
         <div className="w-full max-w-lg text-center">
           <span
             className="jf-soon-in inline-flex items-center gap-2 rounded-full bg-(--jf-chip) px-3.5 py-1.5 text-[12.5px] font-medium text-(--jf-dim)"

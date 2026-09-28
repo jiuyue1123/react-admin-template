@@ -109,6 +109,10 @@ const CSS = `
   max-width: calc(var(--jff-section-max, 1080px) + 2 * var(--jff-space-section-x, ${SITE_THEME.spaceSectionX}));
   margin-inline: auto;
   padding-inline: var(--jff-space-section-x, ${SITE_THEME.spaceSectionX});
+  /* 纵向节奏。此前内容区块完全没有纵向留白，页头与第一个区块、以及相邻区块
+     之间都是贴着的。放在这里而不是 <main> 上：通栏区块（.jff-band，带背景色）
+     不该在页头下方多出一道白边。 */
+  padding-block: 48px;
 }
 
 /* 版心档位（由区块自己的 class 设定，继承给 .jff-section 读） */
@@ -204,7 +208,7 @@ const CSS = `
 
 /* ---------------- 移动端降级 ---------------- */
 @media (max-width: 640px) {
-  .jff-section { padding-inline: 20px; }
+  .jff-section { padding-inline: 20px; padding-block: 32px; }
   .jff-band { padding: 40px 20px; }
   .jff-heading { margin-bottom: 24px; }
   .jff-title { font-size: 22px; }

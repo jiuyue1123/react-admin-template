@@ -150,7 +150,7 @@ export default function NavMenu({ items }: { items: PublicSiteMenu[] }) {
       {open && (
         <div
           id="site-mobile-nav"
-          className="absolute inset-x-0 top-full z-20 max-h-[calc(100vh-3.5rem)] overflow-y-auto border-b border-line bg-surface px-4 pb-4 shadow-lg shadow-black/5 md:hidden"
+          className="absolute inset-x-0 top-full z-20 max-h-[calc(100vh-var(--jf-header-h))] overflow-y-auto border-b border-line bg-surface px-4 pb-4 shadow-lg shadow-black/5 md:hidden"
         >
           <nav aria-label="站点导航" className="flex flex-col py-1">
             {items.map((menu, i) => {

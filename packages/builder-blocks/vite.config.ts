@@ -37,7 +37,8 @@ export default defineConfig({
             "react",
             "react-dom",
             "react/jsx-runtime",  // 别忘了这个
-            // 本包不含 UI 组件库 / 图标库依赖：区块全部为内联样式 + 内置 SVG 图标，
+            // 本包不含 UI 组件库 / 图标库依赖：版式走内联样式 + 一张自带的
+            // <style> 表（block-styles.tsx，含响应式断点），图标是内置 SVG，
             // 以便在访客端（Next.js RSC）服务端直接渲染。
             "@puckeditor/core",
           ],

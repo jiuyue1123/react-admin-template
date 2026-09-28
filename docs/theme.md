@@ -2,6 +2,12 @@
 
 一套语义化设计令牌（design tokens），支持**浅色 / 深色**两套主题，同一份定义同时被 **antd** 和 **Tailwind CSS** 消费，做到「一处定义、两处消费、零漂移」。
 
+> **本文只覆盖 admin 后台自己的 UI**（`src/theme/*` + `src/index.css`，变量前缀 `--tp-*`）。
+>
+> 还有**另一套彼此独立的**令牌：访客端与 Puck 区块共用的站点主题 `--jff-*`，
+> 真源在 `packages/builder-blocks/src/theme.ts`，见 `tasks/PROJECT_CONTEXT.md` §13。
+> 两套刻意不互通 —— 区块若消费 `--tp-*`，后台的深色主题就会漏进面向租户的页面。
+
 ## 设计目标
 
 - **语义化命名**：不写死 `#1677ff` 之类的裸色，统一用 `primary`、`bgContainer`、`textSecondary` 等有业务含义的名字。

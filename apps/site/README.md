@@ -196,7 +196,7 @@ pnpm --filter @jff/site start   # node .next/standalone/apps/site/server.js
 
 ---
 
-## 三条不能忘的约束
+## 四条不能忘的约束
 
 1. **不要加 `src/app/loading.tsx`**。它会建立 Suspense 边界，让响应先以 200 开始流式
    输出，此后任何 `notFound()` 都改不了状态码，退化成软 404（搜索引擎会收录
@@ -204,11 +204,18 @@ pnpm --filter @jff/site start   # node .next/standalone/apps/site/server.js
 
 2. **不要在渲染端引入 `@puckeditor/core/dist/index.css`**。它首行是
    `@import "https://rsms.me/inter/inter.css"`，会把访客首屏阻塞在外网字体上。
-   区块全部是内联样式，渲染端不需要任何 Puck 样式表。
+   区块的样式由区块库自带的一张 `<style href="jff-builder-blocks">` 提供（用到的区块
+   会自己挂载它，React 按 `href` 全文档去重），渲染端不需要任何 Puck 样式表。
 
 3. **`@jff/builder-blocks` 必须是 RSC 安全的**。该包同时被编辑器（客户端）和本应用
    （服务端）消费，`src` 下一旦出现 `createContext` / `useState` 等客户端专有 API，
    本应用会直接构建失败。该包自带守卫：`pnpm --filter @jff/builder-blocks check:rsc`。
+
+4. **站点主题变量的真源不在本应用**。`--jff-*` 的定义在
+   `@jff/builder-blocks` 的 `theme.ts`（`SITE_THEME`），`src/app/layout.tsx` 只把它
+   展开成 `<body>` 上的内联自定义属性；`globals.css` 用 `@theme inline` 做映射、
+   **不写字面量** —— 写了就是第二份真源，而漂移的表现是「后台编辑器里的预览不等于
+   线上」。细节见根目录 `tasks/PROJECT_CONTEXT.md` §13。
 
 ---
 

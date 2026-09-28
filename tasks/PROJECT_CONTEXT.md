@@ -4,6 +4,7 @@
 > 若本文件已存在：会话开始时加载本上下文，不再重复全量探索。
 > 最近更新：2026-09-03 完成计费订阅 M1 与 实名认证 / 站点生命周期与上线 / 站内信（M2+M3）；并新增支付结果页（blank、成功倒计时自动关闭）与租户端发票管理（申请 + 查看，见 §5/§6）。
 > 2026-09-16 新增**访客端 `apps/site`**（租户站点渲染端，Next.js 16 SSR，多租户共用部署）——见 §10。`@jff/builder-blocks` 已去除 antd 与图标库依赖、改为内置 SVG + 模块级媒体选择器注册，以满足 RSC 渲染。
+> 2026-09-28 建立**站点主题契约 `--jff-*`**、区块补齐响应式、色值收敛（分支 `style-polish`）——见 §13，**改动访客端或区块样式前必读**。
 
 ## 1. 产品与定位
 - **简帆坊（Jianfanfang）** —— SaaS 站点搭建的**租户端自助后台**（本仓库即租户后台 admin）。租户以手机号+短信验证码**注册即创建租户**（/register）或登录，自助运营一个营销官网微站：站点设置、页面（Puck 拖拽搭建）、导航菜单、媒体库、个人中心。
@@ -18,7 +19,7 @@ Monorepo：pnpm workspace（pnpm-workspace.yaml → `packages/*`），成员 `@j
 ```
 admin/                      # git remote: github.com/jiuyue1123/react-admin-template.git
 ├─ apps/site/               # @jff/site：访客端（租户站点渲染端，Next.js 16 SSR）见 §10
-├─ packages/builder-blocks/ # @jff/builder-blocks：Puck 组件库（puckConfig 注册表 + 13 个 *.puck.tsx + 内置 SVG 图标）
+├─ packages/builder-blocks/ # @jff/builder-blocks：Puck 组件库（puckConfig 注册表 + 14 个 *.puck.tsx + 内置 SVG 图标 + theme.ts 站点主题契约）
 ├─ docs/                    # theme.md（token 主题）；jff.md（租户端 pages/menus API tarslib 导出）
 ├─ src/
 │  ├─ components/           # AgreementModal AuthBrandPanel SmsCodeButton MediaPicker PuckMediaField
@@ -41,7 +42,7 @@ admin/                      # git remote: github.com/jiuyue1123/react-admin-temp
 - **状态（store/auth）**：zustand + persist，key `jff-tenant-auth`，仅持久化 `{token{accessToken,refreshToken}, isLogin}`。`logout()` 静默 revoke → 跳登录；`refreshToken()` 被请求层 401 流程调用。store 反向 import `@/router`（环形，属既有模式）。
 - **状态（store/billing，M1 新增，不 persist）**：跨页共享「当前订阅」`{subscription, loading, loadedAt, refresh(force?)}`；60s 去重，支付/退款成功后 `refresh(true)`。由 base 布局挂载时预热，供到期横幅与套餐/订阅页复用。全局横幅统一在 base 布局 `<BillingBanner/>`（临期≤15 天 warning / 已过期 error + 去续费），**不在页面内重复放横幅**。
 - **主题（theme/tokens.ts 语义单源）**：antd ConfigProvider + 同一份 token 镜像为 CSS 变量 `--tp-*`（Tailwind `@theme inline` 引用）；暗色切换持久化 localStorage `admin-theme`，`index.html` 内联脚本防闪烁；toAntdTokens 对 antd v6 colorFillAlter 派生偏差做了修正（有内联注释）。
-- **workspace 包 @jff/builder-blocks**：导出 `puckConfig`（13 个营销区块：Button Cta Divider Faq Heading Image LogoCloud ProcessSteps ServicesGrid TeamMembers TextBlock Timeline ValuesCards + 中文分类）+ 各 Config/Props。媒体字段**可插拔**：`media-field.tsx` 定义 `MediaFieldProps{value:string;onChange}`、默认 `DefaultUrlField`（antd URL Input）、`MediaFieldContext`；Image/LogoCloud/TeamMembers 通过 custom field 用 `MediaField`。**Puck 数据里媒体只存 URL 字符串**，保证 Data 可移植；宿主注入具体实现（src/components/PuckMediaField.tsx 包 MediaPicker，fileType=1）。
+- **workspace 包 @jff/builder-blocks**：导出 `puckConfig`（**14 个**营销区块：Button Cta Divider Faq **Form** Heading Image LogoCloud ProcessSteps ServicesGrid TeamMembers TextBlock Timeline ValuesCards + 中文分类）+ 各 Config/Props。媒体字段**可插拔**：`media-field.tsx` 定义 `MediaFieldProps{value:string;onChange}`、默认 `DefaultUrlField`（antd URL Input）、`MediaFieldContext`；Image/LogoCloud/TeamMembers 通过 custom field 用 `MediaField`。**Puck 数据里媒体只存 URL 字符串**，保证 Data 可移植；宿主注入具体实现（src/components/PuckMediaField.tsx 包 MediaPicker，fileType=1）。
 - **别名**：`@/*` → `src/*`（tsconfig.app + vite alias）。路由字符串的 `@/` 前缀是 transform 自己的约定。
 - **验证命令**：`pnpm dev`（强制 --mode test）、`pnpm build`（tsc -b && vite build）、`pnpm typecheck`、`pnpm lint`(oxlint)。**typecheck/lint 仅用户要求时才跑**（记忆）。注意根 tsc -b 不含 packages/builder-blocks（其 build 内自行 tsc -b）。
 
@@ -185,3 +186,38 @@ Puck 编辑器 edit：包 `<MediaFieldContext.Provider value={PuckMediaField}>`�
 3. **Puck 的 `overrides.headerActions` 是「覆盖」而非「追加」**。产物实现里未提供时默认是 `DefaultOverride`（什么都不渲染），所以迁移时只返回自己的按钮即可；**渲染 `{children}` 会把 Puck 的默认动作混进来，凭空改变界面**。旧的 `renderHeaderActions` 收到的 `{state, dispatch}` 在新 API 里要用 `usePuck()` 取。
 
 **刻意未改**：`service/request/index.ts` 的静态 `Modal.confirm` / `message.error`（`antd lint` 会报 2 条 usage 警告）。拦截器运行在 React 之外、拿不到 `App.useApp()`，且项目定过「勿改拦截器」——这两条警告是已知且接受的。
+
+## 13. 站点样式体系：`--jff-*` 主题契约（2026-09-28，分支 `style-polish`）
+
+此前访客端与区块库**都没有主题层**（语义令牌只存在于 admin 内部）。区块库因此是全仓唯一硬编码色值的地方（约 29 种色值 / 100 余处）、且**零响应式**（全包没有一处 `@media`）。本次建立契约、收敛色值、补齐断点。
+
+### 契约与单一真源
+- **`--jff-*` 命名空间**：区块只读 `var(--jff-x, <平台默认值>)`，宿主注入实际值。**刻意不用 `--color-*`** —— admin 把它映射到了 `--tp-*`（后台自己的主题），区块一旦消费就会被后台深色污染。
+- **唯一真源 = `packages/builder-blocks/src/theme.ts` 的 `SITE_THEME`**。两端唯一的共享物就是这个包；各写一份必然漂移，而漂移的表现就是「编辑器里一个色、线上一色」。
+  - admin：`src/components/SiteThemeScope.tsx` 把 `toSiteThemeVars()` 铺成包裹元素的**内联自定义属性**（经 `overrides.preview` 套在画布内容上，用 `display: contents` 不生成盒子）。
+  - 访客端：`apps/site/src/app/layout.tsx` 铺在 `<body>` 上；`globals.css` 只做 `@theme inline` 映射、**不写字面量**（写了就是第二份真源）。
+  - 两端都靠**继承**生效、不用 `<style>` 标签，所以不依赖样式表在 `<head>` 里的先后。
+- **默认值写成 `var()` 回退值，而不是一条 `:root` 声明** —— 这是不依赖级联顺序的关键：继承值永远优先于回退值。
+- **守卫**：`grep -c -- '--tp-\|--color-' packages/builder-blocks/dist/index.js` 必须为 0。**要查产物**，查 `src` 会被文档注释误伤。
+
+### 约定 R：哪些属性进内联、哪些进 class
+内联 `style` 的优先级高于任何选择器，**对自定义属性同样成立**（inline 设了 `--jff-x`，`@media` 里再改它是无效的）。因此：
+- **需要响应式降级的属性（padding / fontSize / maxWidth / gap / 栅格列）永远不能出现在 inline 里**，必须搬进 `block-styles.tsx` 的样式表由 class 命中。
+- **区块自身的默认视觉值（非字段）→ 搬进 class**：这是覆盖存量页面的唯一途径 —— **Puck 会把 `defaultProps` 写进已保存的节点**（`TextBlock.fontSize` 默认 `"14"` 而非空），所以「字段为空则不输出内联」对老数据根本不成立。
+- **字段值 → 走实例变量**（`--jff-btn-*` 先例）；字段为空时一律不输出内联，让 class 的回退值生效。
+- 要降级的变量不要在 `@media` 里改写它本身，要用 `min()`/`clamp()` 包住。
+
+### `resolveColor`：让存量颜色跟随主题
+租户已保存的 JSON 里，颜色是 **select 的 value 字面量**（`"#1677ff"`、`"rgba(0,0,0,0.88)"`）。改 option 的 value 会让 Puck 的 select 找不到匹配项、编辑器里已选项变空白 ⇒ **option 一个字节都不动**，改在**渲染时**把语义等价的字面量解析成 `var(--jff-color-*)`（`theme.ts` 的 `COLOR_ALIASES`，注意收录带空格的历史写法）。
+**⚠️ 判定用原值、写样式用解析值**：`Cta` 的深色底判断是对 `backgroundColor` 做字符串比较，若先 `resolveColor` 就会变成 `"var(--jff-color-brand)"` 而静默失配、深色分支失效（CTA 变浅底白字）。`Button` 的 palette 按 `variant` 判定、不比较颜色，所以它的颜色字段可以安全解析。
+
+### 断点按视口判定
+`@media` 比对的是**浏览器视口**而非画布宽度，所以**编辑器里永远走桌面分支** —— 这是不加 iframe 的必然结果，不是 bug，自检移动端要用浏览器 DevTools。
+配套已核实事实：**Puck 0.23 的设备预设按钮在非 iframe 模式下是失效的** —— `#puck-canvas-root` 的宽度只在 `iframe.enabled` 时取 `viewports.current.width`，否则恒为 `100%`。已用 `<Puck viewports={[]}>` 隐藏，避免「点了没反应」被误判成响应式没生效。
+
+### 其余关键事实
+- **`<BlockStyles />` 不是常驻的**：它由渲染它的区块自己挂载，React 按 `href` 全文档去重。本次把 9 个 section 区块与访客端 `SiteFormBlock` 都改为自己挂载 —— 因为**访客端覆写了 `Form` 区块的 render**，它不会渲染区块库的那张表。**新增用到 `jff-*` class 的区块时必须一并挂 `<BlockStyles />`**，否则会出现「有的页面有样式、有的没有」这类最难查的 bug。
+- **编辑器与线上的一致性**：区块是同文档渲染在 admin 页面里的，靠 `SiteThemeScope` 提供 `--jff-*` 与 `.jff-site` 排版基线（字体栈 / 16px / 1.6 行高）。此前区块继承的是 admin 文档的字体与行高，与线上不一致。
+- **已澄清的误判**：admin 切深色**不会**让编辑器画布变暗 —— Puck 调色板全是静态字面量、全仓 `prefers-color-scheme` 命中 0，画布底由 `--puck-canvas-preview-color-bg` 给白色。
+- **页头高度**是 `--jf-header-h` / `--jf-header-h-sm`（`apps/site/src/app/globals.css` 的 `:root`），`SiteHeader` 自己也读它。此前有 6 处各自手算「视口减页头」。
+- **仍存在的硬编码**（刻意）：`media-field.tsx` / `form-field.tsx` 渲染在编辑器侧栏，属后台自身 UI，不在本次范围；Button 的 `FILL_*`/`DISABLED_*` 与各处「反白」用的 `#fff` 是绝对色，不是主题色。

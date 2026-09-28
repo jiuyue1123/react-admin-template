@@ -17,7 +17,7 @@
 | **后端零实现** | `schema.sql` 无任何 `*_form*` / `*_submission*` 表；Java 类名含 `Form` 的 0 个；`ErrorCode` 无相关码；`/tenant/*` `/public/*` 下无表单端点 |
 | **`support_lead` 不是它** | 表注释即「**官网**联系我们线索表」，字段硬编码 `name/phone/demand`，**无 `tenant_id`** —— 平台自营售前，与租户站点无关 |
 | **站点端没有写能力** | `apps/site` 只有两个 GET Route Handler；`lib/transport.ts` **只有 `backendGet`** |
-| **区块库不能有交互** | `packages/builder-blocks` 的 `check:rsc` 守卫禁止 `useState`/`antd`；13 个区块无一是表单类 |
+| **区块库不能有交互** | `packages/builder-blocks` 的 `check:rsc` 守卫禁止 `useState`/`antd`；当时 13 个区块无一是表单类（`Form` 区块是本次为此新增的，其交互实现放在访客端 `SiteFormBlock`） |
 
 ---
 

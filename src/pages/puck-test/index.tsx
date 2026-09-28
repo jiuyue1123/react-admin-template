@@ -4,6 +4,7 @@ import { ReloadOutlined } from '@ant-design/icons'
 import { Puck } from '@puckeditor/core'
 import { puckConfig, setMediaField } from '@jff/builder-blocks'
 import PuckMediaField from '@/components/PuckMediaField'
+import SiteThemeScope from '@/components/SiteThemeScope'
 
 // 注册媒体选择器实现：编辑器中所有图片类字段共用（一次注册，全局生效）
 setMediaField(PuckMediaField)
@@ -47,6 +48,8 @@ export default function PuckTestPage() {
         headerTitle="区块编辑器测试"
         onChange={handleChange}
         overrides={{
+          // 与其他编辑入口一致：画布内容套站点主题作用域
+          preview: ({ children }) => <SiteThemeScope contents>{children}</SiteThemeScope>,
           headerActions: () => (
             <Button icon={<ReloadOutlined />} onClick={handleReset}>
               重置

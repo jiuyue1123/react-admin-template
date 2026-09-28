@@ -6,6 +6,7 @@ import { useRequest } from 'alova/client'
 import { Render } from '@puckeditor/core'
 import type { Data } from '@puckeditor/core'
 import { puckConfig } from '@jff/builder-blocks'
+import SiteThemeScope from '@/components/SiteThemeScope'
 import { fetchGetPage } from '@/service/api/sitePage'
 import { PAGE_PREVIEW_LIVE_KEY, parseContent } from '@/utils/sitePage'
 
@@ -39,7 +40,7 @@ export default function PagePreviewPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <SiteThemeScope className="min-h-screen">
       <Render config={puckConfig} data={data} />
       {/* 预览由 window.open 打开，可脚本关闭；浮层按钮便于退出 */}
       <Button
@@ -49,6 +50,6 @@ export default function PagePreviewPage() {
         className="fixed bottom-6 right-6 shadow-lg"
         onClick={() => window.close()}
       />
-    </div>
+    </SiteThemeScope>
   )
 }

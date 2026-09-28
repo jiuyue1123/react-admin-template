@@ -8,6 +8,7 @@ import type { Data } from '@puckeditor/core'
 import { puckConfig, setFormField, setMediaField } from '@jff/builder-blocks'
 import PuckFormField from '@/components/PuckFormField'
 import PuckMediaField from '@/components/PuckMediaField'
+import SiteThemeScope from '@/components/SiteThemeScope'
 import {
   fetchGetPage,
   fetchGetPageVersions,
@@ -197,6 +198,10 @@ export default function PageEditorPage() {
         // 这是**覆盖**语义（未提供时默认什么都不渲染），所以只返回本页自己的按钮即可 ——
         // 不要渲染 `{children}`，否则会把 Puck 的默认动作混进来、改变现有界面。
         overrides={{
+          // 给画布内容套上站点主题作用域：区块只有在这里才与访客端线上同貌
+          // （字体栈 / 行高 / 文字色 + `--jff-*` 变量）。用 `contents` 包法，
+          // 不生成盒子，画布内部的 `height: 100%` 容器不受影响。
+          preview: ({ children }) => <SiteThemeScope contents>{children}</SiteThemeScope>,
           headerActions: () => (
             <div className="flex items-center gap-2">
               <Tag color={stateMeta.color}>{stateMeta.label}</Tag>

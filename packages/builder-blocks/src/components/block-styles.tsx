@@ -13,11 +13,29 @@
 //
 // Per-instance colours are passed as CSS custom properties from the component's
 // inline style, so this sheet stays static and variant-agnostic.
+//
+// Colours come from the `--jff-*` site theme contract (see ../theme.ts), written
+// as `var(--jff-x, <platform default>)`. The fallback IS the platform default,
+// and any host that injects the variable wins by inheritance — so the order in
+// which this sheet lands in <head> never matters.
 // ---------------------------------------------------------------------------
+
+import { SITE_THEME, SITE_FONT_STACK } from "../theme"
 
 const STYLE_HREF = "jff-builder-blocks"
 
 const CSS = `
+/* 站点渲染基线 —— 复刻访客端 <body> 的排版上下文。
+   编辑器画布是同文档渲染，若不建立这条基线，区块里「未显式声明」的属性
+   （字体、行高、文字色）会继承 admin 文档的值，与线上不一致。
+   只放基线，不放任何区块版式。 */
+.jff-site {
+  font-family: var(--jff-font-sans, ${SITE_FONT_STACK});
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--jff-color-text, ${SITE_THEME.colorText});
+  background: var(--jff-color-surface, ${SITE_THEME.colorSurface});
+}
 .jff-btn {
   display: inline-flex;
   align-items: center;
@@ -36,7 +54,7 @@ const CSS = `
     color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 .jff-btn:focus-visible {
-  outline: 2px solid #1677ff;
+  outline: 2px solid var(--jff-color-brand, ${SITE_THEME.colorBrand});
   outline-offset: 2px;
 }
 .jff-btn:hover:not(:disabled):not([aria-disabled='true']) {
@@ -62,12 +80,12 @@ const CSS = `
     box-shadow 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 .jff-input:hover {
-  border-color: #4096ff;
+  border-color: var(--jff-color-brand-hover, ${SITE_THEME.colorBrandHover});
 }
 .jff-input:focus {
   outline: none;
-  border-color: #1677ff;
-  box-shadow: 0 0 0 2px rgba(5, 145, 255, 0.1);
+  border-color: var(--jff-color-brand, ${SITE_THEME.colorBrand});
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--jff-color-brand, ${SITE_THEME.colorBrand}) 10%, transparent);
 }
 `
 

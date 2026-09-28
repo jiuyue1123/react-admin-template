@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import type { CSSProperties } from 'react'
+import { toSiteThemeVars } from '@jff/builder-blocks'
 import { getCurrentSite, getRequestHost } from '@/lib/site'
 import { toSiteOrigin } from '@/lib/host'
 import './globals.css'
@@ -45,10 +47,24 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
+/**
+ * 站点主题变量（`--jff-*`）铺在 `<body>` 上
+ *
+ * 这一份值的**唯一真源是 `@jff/builder-blocks` 的 `theme.ts`** —— 编辑器预览与
+ * 线上必须用同一份值，否则画布里看到的就是假的。这里把它展开成内联自定义属性，
+ * 靠继承覆盖 `globals.css` 里 `@theme inline` 的映射与区块的 `var()` 回退值。
+ *
+ * 铺在 `<body>` 而不是 `<html>`：`body` 上的变量对自身声明同样可见，
+ * 而全局样式里没有需要它的 `html` 级规则。
+ */
+const SITE_THEME_VARS = toSiteThemeVars() as CSSProperties
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh-CN">
-      <body className="min-h-screen antialiased">{children}</body>
+      <body className="min-h-screen antialiased" style={SITE_THEME_VARS}>
+        {children}
+      </body>
     </html>
   )
 }

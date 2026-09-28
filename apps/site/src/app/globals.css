@@ -1,29 +1,49 @@
 @import 'tailwindcss';
 
 /*
- * 访客端基础样式与设计令牌
+ * 访客端基础样式
  *
  * 设计原则：
  * - SSR 直出、无外网字体（不阻塞首屏）
  * - 移动优先，点击热区 ≥ 44px，正文 ≥ 16px
  * - 中性底色 + 单一品牌强调色，避免与租户自有 Logo/配图打架
+ *
+ * ⚠️ 这里**只做映射，不写字面量**。
+ *
+ * 令牌值的唯一真源是 `@jff/builder-blocks` 的 `theme.ts`：`layout.tsx` 把它展开成
+ * `<body>` 上的内联 `--jff-*`，区块库消费的是同一批变量（见 block-styles.tsx）。
+ * 若在这里再写一份字面量，就成了第二份真源 —— 一旦漂移，后台编辑器里的预览
+ * 就不再等于线上，而这正是本次改动要消灭的问题。
+ *
+ * 用 `@theme inline` 是因为值本身是 `var(...)` 引用：inline 会把引用直接内联进
+ * 工具类（`.text-brand { color: var(--jff-color-brand) }`），而普通 `@theme` 会
+ * 把它当成「变量的值」再包一层，运行时解析不出来。
+ *
+ * 代价：`--color-*` 不再落到 `:root`，所以**本文件里自己的规则不能再用
+ * `var(--color-*)`**，一律直接读 `--jff-*`。
  */
-@theme {
-  --font-sans:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
-    'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@theme inline {
+  --font-sans: var(--jff-font-sans);
 
-  /* 品牌强调色（与 Puck 区块内联样式保持同源） */
-  --color-brand: #1677ff;
-  --color-brand-hover: #4096ff;
+  /* 品牌强调色 */
+  --color-brand: var(--jff-color-brand);
 
   /* 中性色阶 */
-  --color-ink: #1f2329;
-  --color-muted: #646a73;
-  --color-subtle: #8f959e;
-  --color-line: #e5e6eb;
-  --color-surface: #ffffff;
-  --color-canvas: #f7f8fa;
+  --color-ink: var(--jff-color-text);
+  --color-muted: var(--jff-color-text-secondary);
+  --color-subtle: var(--jff-color-text-tertiary);
+  --color-line: var(--jff-color-border);
+  --color-surface: var(--jff-color-surface);
+  --color-canvas: var(--jff-color-canvas);
+
+  /*
+   * 功能色 —— 这两个此前是缺失的：`SiteFormSubmit.tsx` 用了 `text-error` /
+   * `bg-warning/10` / `text-warning` 四处，而 Tailwind v4 对 `@theme` 里不存在
+   * 的键**既不报错也不生成工具类**，于是必填星号、字段校验红字、版本过期警告条
+   * 一直是无色的（继承父级颜色）。
+   */
+  --color-error: var(--jff-color-danger);
+  --color-warning: var(--jff-color-warning);
 }
 
 html {
@@ -35,15 +55,15 @@ body {
   font-family: var(--font-sans);
   font-size: 16px;
   line-height: 1.6;
-  color: var(--color-ink);
-  background: var(--color-surface);
+  color: var(--jff-color-text);
+  background: var(--jff-color-surface);
   /* 防止移动端横向溢出 */
   overflow-x: hidden;
 }
 
 /* 统一的键盘焦点样式 */
 :where(a, button, [tabindex]):focus-visible {
-  outline: 2px solid var(--color-brand);
+  outline: 2px solid var(--jff-color-brand);
   outline-offset: 2px;
   border-radius: 6px;
 }

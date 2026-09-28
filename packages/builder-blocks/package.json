@@ -12,6 +12,7 @@
     }
   },
   "type": "module",
+  "sideEffects": false,
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build && pnpm check:rsc",

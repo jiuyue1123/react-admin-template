@@ -134,3 +134,12 @@ export { TimelineConfig } from "./components/Timeline.puck.tsx";
 export type { TimelineProps } from "./components/Timeline.puck.tsx";
 export { ValuesCardsConfig } from "./components/ValuesCards.puck.tsx";
 export type { ValuesCardsProps } from "./components/ValuesCards.puck.tsx";
+
+// ---------------------------------------------------------------------------
+// Site theme contract — 两端唯一真源（见 theme.ts 顶部注释）。
+// 宿主用 `toSiteThemeVars()` 把默认值铺到作用域元素上；区块内部只读
+// `var(--jff-*, 回退值)`。导出 `SITE_THEME` 本身供两端做静态取值。
+// ---------------------------------------------------------------------------
+
+export { SITE_THEME, SITE_FONT_STACK, toCssVarName, toSiteThemeVars } from "./theme.ts";
+export type { SiteThemeKey, SiteThemeVar } from "./theme.ts";

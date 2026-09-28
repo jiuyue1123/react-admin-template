@@ -1,6 +1,7 @@
 import type { ComponentConfig } from "@puckeditor/core";
 import { BlockStyles } from "./block-styles";
 import { FormField } from "./form-field";
+import { SectionHeading } from "./SectionHeading";
 import { SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
 
 // ---------------------------------------------------------------------------
@@ -43,26 +44,8 @@ export const FormConfig: ComponentConfig<FormBlockProps> = {
     return (
       <section ref={puck.dragRef} className="jff-band jff-form">
         <BlockStyles />
-        <div style={{ maxWidth: 640, margin: "0 auto" }}>
-          {title && (
-            <h2 style={{ fontSize: 30, fontWeight: 700, margin: "0 0 12px", color: "#1f1f29", textAlign: "center" }}>
-              {title}
-            </h2>
-          )}
-          {description && (
-            <p
-              style={{
-                fontSize: 16,
-                color: "rgba(0, 0, 0, 0.6)",
-                margin: "0 auto 24px",
-                maxWidth: 560,
-                lineHeight: 1.6,
-                textAlign: "center",
-              }}
-            >
-              {description}
-            </p>
-          )}
+        <div className="jff-form__inner">
+          <SectionHeading title={title} subtitle={description} />
 
           {/* 编辑器占位：访客端会被替换成真实表单 */}
           <div

@@ -1,3 +1,4 @@
+import { BlockStyles, SectionHeading } from '@jff/builder-blocks'
 import { getRequestHost } from '@/lib/site'
 import { getForm } from '@/lib/site-api'
 import SiteFormSubmit from './SiteFormSubmit'
@@ -32,18 +33,16 @@ export default async function SiteFormBlock({
   if (!form) return null
 
   return (
-    <section style={{ padding: '56px 24px' }}>
-      <div className="mx-auto max-w-xl">
-        {title ? (
-          <h2 className="text-center text-[clamp(1.4rem,4vw,1.75rem)] font-bold tracking-tight text-ink">
-            {title}
-          </h2>
-        ) : null}
-        {description ? (
-          <p className="mt-2 text-center text-[15px] leading-relaxed text-muted">{description}</p>
-        ) : null}
+    <section className="jff-band jff-form">
+      {/* 样式表必须自己挂载：这张表原先只有 Button/Form 区块才会输出，
+          而本组件正是 Form 区块在站点端的替代实现 —— 不挂就没有 .jff-band。 */}
+      <BlockStyles />
+      <div className="jff-form__inner">
+        {/* 与编辑器外壳（Form.puck.tsx）共用同一个标题实现，
+            否则「编辑器预览 = 线上」做不到 */}
+        <SectionHeading title={title} subtitle={description} />
 
-        <div className={title || description ? 'mt-8' : undefined}>
+        <div>
           {form.state === 1 ? (
             <SiteFormSubmit formKey={formKey} form={form} sourcePage={sourcePage} />
           ) : (

@@ -141,6 +141,9 @@ const CSS = `
   text-align: center;
   color: rgba(0, 0, 0, 0.6);
 }
+/* 深色底（Cta 的深色/渐变背景）上的反白 */
+.jff-title--inverse { color: #fff; }
+.jff-subtitle--inverse { color: rgba(255, 255, 255, 0.75); }
 
 /* auto-fit 栅格。下界写成 min(下界, 100%) 而不是裸下界 ——
    容器比下界还窄时（手机上很常见）裸下界会横向溢出。 */
@@ -156,8 +159,12 @@ const CSS = `
 .jff-team { --jff-grid-min: 240px; }
 .jff-values { --jff-grid-min: 240px; }
 
-/* Cta 文案与按钮。按钮的 padding 要搬到 class 里才能给手机上留够触控热区。 */
-.jff-cta__sub { margin: 0 auto 28px; max-width: 560px; font-size: 16px; line-height: 1.6; }
+/* Cta / Form 的标题与正文之间要留出各自的间距（SectionHeading 默认不留） */
+.jff-cta .jff-subtitle { margin-bottom: 28px; }
+.jff-form__inner { max-width: 640px; margin: 0 auto; }
+.jff-form .jff-subtitle { margin-bottom: 24px; }
+
+/* Cta 按钮。padding 要搬到 class 里才能给手机上留够触控热区。 */
 .jff-cta__btn {
   display: inline-block;
   padding: 12px 30px;
@@ -185,7 +192,7 @@ const CSS = `
   .jff-title { font-size: 22px; }
   .jff-subtitle { font-size: 14px; }
   .jff-grid { grid-template-columns: 1fr; gap: 16px; }
-  .jff-cta__sub { font-size: 15px; margin-bottom: 24px; }
+  .jff-cta .jff-subtitle { margin-bottom: 24px; }
   .jff-cta__btn { padding: 14px 32px; }
   .jff-logo-row { gap: 24px; }
   .jff-services__card { padding: 20px; }

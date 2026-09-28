@@ -118,6 +118,9 @@ export type { FormFieldProps, FormFieldComponent } from "./components/form-field
 export { FormConfig } from "./components/Form.puck.tsx";
 export type { FormBlockProps } from "./components/Form.puck.tsx";
 export { BlockStyles } from "./components/block-styles.tsx";
+// 区块标题的唯一实现 —— 访客端的表单区块也用它，否则「编辑器预览 = 线上」做不到
+export { SectionHeading } from "./components/SectionHeading.tsx";
+export type { SectionHeadingTone } from "./components/SectionHeading.tsx";
 export { CtaConfig } from "./components/Cta.puck.tsx";
 export type { CtaProps } from "./components/Cta.puck.tsx";
 export { FaqConfig } from "./components/Faq.puck.tsx";

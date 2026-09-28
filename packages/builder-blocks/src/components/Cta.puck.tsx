@@ -1,5 +1,6 @@
 import type { ComponentConfig } from "@puckeditor/core";
 import { BlockStyles } from "./block-styles";
+import { SectionHeading } from "./SectionHeading";
 import { SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
 
 // ---------------------------------------------------------------------------
@@ -29,12 +30,12 @@ export const CtaConfig: ComponentConfig<CtaProps> = {
   label: "行动号召",
 
   render({ title, subtitle, buttonText, buttonLink, backgroundColor, puck }) {
+    // 深色底判定**必须用原始字段值**（字面量比较）。改成解析后的 var(...) 会让
+    // 字符串比较静默失配，深色分支失效、CTA 变成浅底白字。
     const isDark =
       backgroundColor === "#1677ff" ||
       backgroundColor === "#1f2329" ||
       (backgroundColor ?? "").startsWith("linear-gradient");
-    const textColor = isDark ? "#fff" : "#1f1f1f";
-    const subColor = isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.6)";
     const buttonBg = isDark ? "#fff" : "#1677ff";
     const buttonColor = isDark ? "#1677ff" : "#fff";
 
@@ -49,14 +50,7 @@ export const CtaConfig: ComponentConfig<CtaProps> = {
         }}
       >
         <BlockStyles />
-        {title && (
-          <h2 style={{ fontSize: 30, fontWeight: 700, margin: "0 0 12px", color: textColor }}>{title}</h2>
-        )}
-        {subtitle && (
-          <p className="jff-cta__sub" style={{ color: subColor }}>
-            {subtitle}
-          </p>
-        )}
+        <SectionHeading title={title} subtitle={subtitle} tone={isDark ? "inverse" : "default"} />
         {buttonText && (
           <a
             href={buttonLink || undefined}

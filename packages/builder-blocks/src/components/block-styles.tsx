@@ -335,6 +335,133 @@ const CSS = `
    顺手修掉「正文连分段都不支持」（此前 textarea 里敲回车会被折叠成一个空格）。 */
 .jff-richtext__legacy { margin: 0; white-space: pre-wrap; }
 
+/* ---------------- 客户评价 ---------------- */
+.jff-testimonials { --jff-grid-min: 280px; }
+.jff-testimonials__card {
+  box-sizing: border-box;
+  /* 署名贴底靠 flex + margin-top:auto —— 内联样式表达不了「贴底」，必须在这里 */
+  display: flex;
+  flex-direction: column;
+  margin: 0; /* figure 自带 UA margin，不假设宿主加载了 reset */
+  padding: 28px;
+  border: 1px solid var(--jff-color-border, ${SITE_THEME.colorBorder});
+  border-radius: var(--jff-radius-md, ${SITE_THEME.radiusMd});
+  background: var(--jff-color-surface, ${SITE_THEME.colorSurface});
+}
+.jff-testimonials__mark {
+  font-size: 32px;
+  line-height: 1;
+  margin-bottom: 8px;
+  color: var(--jff-color-brand, ${SITE_THEME.colorBrand});
+}
+.jff-testimonials__quote {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--jff-color-text, ${SITE_THEME.colorText});
+  overflow-wrap: anywhere; /* 长串不撑破卡片 */
+}
+.jff-testimonials__stars {
+  display: flex;
+  gap: 4px;
+  margin-top: 14px;
+  font-size: 16px;
+  color: var(--jff-color-brand, ${SITE_THEME.colorBrand});
+}
+.jff-testimonials__footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto; /* 贴底 */
+  padding-top: 20px;
+}
+.jff-testimonials__avatar {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.jff-testimonials__avatar--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--jff-color-brand-subtle, ${SITE_THEME.colorBrandSubtle});
+  color: var(--jff-color-brand, ${SITE_THEME.colorBrand});
+  font-weight: 600;
+}
+.jff-testimonials__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--jff-color-text, ${SITE_THEME.colorText});
+}
+.jff-testimonials__role {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--jff-color-text-tertiary, ${SITE_THEME.colorTextTertiary});
+}
+
+/* ---------------- 图片画廊 ---------------- */
+.jff-gallery__grid {
+  display: grid;
+  gap: var(--jff-space-gap, ${SITE_THEME.spaceGap});
+  /* 列数走变量由 .jff-gallery--cN 设 —— 不能内联，否则断点改不动 */
+  grid-template-columns: repeat(var(--jff-gallery-cols, 3), minmax(0, 1fr));
+}
+.jff-gallery--c2 { --jff-gallery-cols: 2; }
+.jff-gallery--c3 { --jff-gallery-cols: 3; }
+.jff-gallery--c4 { --jff-gallery-cols: 4; }
+.jff-gallery__item {
+  margin: 0; /* figure 自带 UA margin */
+  overflow: hidden;
+  background: var(--jff-color-canvas, ${SITE_THEME.colorCanvas});
+}
+.jff-gallery__item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* 不裁切模式：让图片按原比例撑开，而不是被拉伸到某个占位高度 */
+.jff-gallery__item--natural img { height: auto; }
+.jff-gallery__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 120px;
+  border: 1px dashed var(--jff-color-border-strong, ${SITE_THEME.colorBorderStrong});
+  color: var(--jff-color-text-tertiary, ${SITE_THEME.colorTextTertiary});
+  font-size: 13px;
+}
+
+/* ---------------- 数据指标 ---------------- */
+.jff-stats { --jff-grid-min: 200px; }
+.jff-stats__item { text-align: center; }
+.jff-stats__value {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--jff-color-text, ${SITE_THEME.colorText});
+  font-variant-numeric: tabular-nums; /* 多列数字基线对齐 */
+}
+.jff-stats__affix { font-size: 18px; font-weight: 600; }
+.jff-stats__label {
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--jff-color-text-secondary, ${SITE_THEME.colorTextSecondary});
+}
+.jff-stats__desc {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--jff-color-text-tertiary, ${SITE_THEME.colorTextTertiary});
+}
+
 /* ---------------- 移动端降级 ---------------- */
 @media (max-width: 640px) {
   .jff-section { padding-inline: 20px; }
@@ -355,6 +482,10 @@ const CSS = `
   .jff-services__card { padding: 20px; }
   .jff-team__card { padding: 24px 16px; }
   .jff-values__card { padding: 24px; }
+  .jff-testimonials__card { padding: 20px; }
+  /* 画廊在手机上固定两列（不再降到单列）：单列图片流太长，两列更像相册 */
+  .jff-gallery__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .jff-stats__value { font-size: 28px; }
 
   /* 触控热区：Button 的三档高度是 24/32/40，手机上偏小。用 min-height 约束
      内联的 height —— 两者是不同的属性，min-height 参与最终高度的计算，所以

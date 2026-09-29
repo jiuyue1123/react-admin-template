@@ -5,12 +5,15 @@ import { CtaConfig } from "./components/Cta.puck.tsx";
 import { DividerConfig } from "./components/Divider.puck.tsx";
 import { FaqConfig } from "./components/Faq.puck.tsx";
 import { FormConfig } from "./components/Form.puck.tsx";
+import { GalleryConfig } from "./components/Gallery.puck.tsx";
 import { HeadingConfig } from "./components/Heading.puck.tsx";
 import { ImageConfig } from "./components/Image.puck.tsx";
 import { LogoCloudConfig } from "./components/LogoCloud.puck.tsx";
 import { ProcessStepsConfig } from "./components/ProcessSteps.puck.tsx";
 import { ServicesGridConfig } from "./components/ServicesGrid.puck.tsx";
+import { StatsConfig } from "./components/Stats.puck.tsx";
 import { TeamMembersConfig } from "./components/TeamMembers.puck.tsx";
+import { TestimonialsConfig } from "./components/Testimonials.puck.tsx";
 import { TextBlockConfig } from "./components/TextBlock.puck.tsx";
 import { TimelineConfig } from "./components/Timeline.puck.tsx";
 import { ValuesCardsConfig } from "./components/ValuesCards.puck.tsx";
@@ -31,12 +34,15 @@ const components = {
     Divider: DividerConfig,
     Faq: FaqConfig,
     Form: FormConfig,
+    Gallery: GalleryConfig,
     Heading: HeadingConfig,
     Image: ImageConfig,
     LogoCloud: LogoCloudConfig,
     ProcessSteps: ProcessStepsConfig,
     ServicesGrid: ServicesGridConfig,
+    Stats: StatsConfig,
     TeamMembers: TeamMembersConfig,
+    Testimonials: TestimonialsConfig,
     TextBlock: TextBlockConfig,
     Timeline: TimelineConfig,
     ValuesCards: ValuesCardsConfig,
@@ -75,10 +81,13 @@ const categories = {
             "Cta",
             "Faq",
             "Form",
+            "Gallery",
             "LogoCloud",
             "ProcessSteps",
             "ServicesGrid",
+            "Stats",
             "TeamMembers",
+            "Testimonials",
             "Timeline",
             "ValuesCards",
         ],
@@ -132,6 +141,12 @@ export { CtaConfig } from "./components/Cta.puck.tsx";
 export type { CtaProps } from "./components/Cta.puck.tsx";
 export { FaqConfig } from "./components/Faq.puck.tsx";
 export type { FaqProps } from "./components/Faq.puck.tsx";
+export { GalleryConfig } from "./components/Gallery.puck.tsx";
+export type { GalleryProps, GalleryImage } from "./components/Gallery.puck.tsx";
+export { StatsConfig } from "./components/Stats.puck.tsx";
+export type { StatsProps, StatItem } from "./components/Stats.puck.tsx";
+export { TestimonialsConfig } from "./components/Testimonials.puck.tsx";
+export type { TestimonialsProps, TestimonialItem } from "./components/Testimonials.puck.tsx";
 export { LogoCloudConfig } from "./components/LogoCloud.puck.tsx";
 export type { LogoCloudProps } from "./components/LogoCloud.puck.tsx";
 export { ProcessStepsConfig } from "./components/ProcessSteps.puck.tsx";

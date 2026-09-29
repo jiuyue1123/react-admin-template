@@ -251,6 +251,58 @@ const CSS = `
   background: var(--jff-color-canvas, ${SITE_THEME.colorCanvas});
 }
 
+/* ---------------- 富文本正文 ----------------
+   内容来自 Puck 内置的 richtext 字段，DOM 形如
+   <div class="jff-richtext"><div class="rich-text">…</div></div>。
+
+   ⚠️ 下面这一组是**刻意与 Puck 编辑器注入的规则逐值对齐**的：站点端有 Tailwind
+   preflight（把 h/p/ul 的 margin 与列表符号全部重置掉），不复刻就会出现
+   「编辑器里排好的版一到线上就走形」，而且是最难查的那类不一致。
+   值取自 Puck 的编辑器样式（index.css 的 ._RichTextEditor--editor_ 块）：
+     .rich-text *          → white-space: pre-wrap
+     .rich-text p          → margin-block: 12px
+     .rich-text ul / ol    → list-style: disc / decimal；padding-left: 20px
+     .rich-text li         → line-height: 1.5
+     .rich-text > *:first-child / :last-child → 首尾 margin 归零
+   两边选择器特异性相同、值也相同，所以谁先加载都不影响结果。 */
+.jff-richtext .rich-text * { white-space: pre-wrap; }
+.jff-richtext .rich-text > *:first-child { margin-top: 0; }
+.jff-richtext .rich-text > *:last-child { margin-bottom: 0; }
+.jff-richtext .rich-text p { margin-block: 12px; }
+.jff-richtext .rich-text ul { list-style: disc; }
+.jff-richtext .rich-text ol { list-style: decimal; }
+.jff-richtext .rich-text ul,
+.jff-richtext .rich-text ol { padding-left: 20px; margin-block: 12px; }
+.jff-richtext .rich-text li { line-height: 1.5; }
+/* 标题：Puck 不样式化它们，而站点端的 preflight 会把 h2/h3 重置成正文大小 ——
+   必须自己给，否则正文里的小标题会退化成一行普通文字。
+   color: inherit 是为了让区块自己的「文字颜色」字段继续生效。 */
+.jff-richtext .rich-text h2 {
+  margin: 24px 0 12px;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: inherit;
+}
+.jff-richtext .rich-text h3 {
+  margin: 20px 0 10px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: inherit;
+}
+.jff-richtext .rich-text a {
+  color: var(--jff-color-brand, ${SITE_THEME.colorBrand});
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.jff-richtext .rich-text a:hover { color: var(--jff-color-brand-hover, ${SITE_THEME.colorBrandHover}); }
+.jff-richtext .rich-text strong { font-weight: 600; }
+
+/* 存量纯文本的回落分支。pre-wrap 让 textarea 里的换行变成真换行 ——
+   顺手修掉「正文连分段都不支持」（此前 textarea 里敲回车会被折叠成一个空格）。 */
+.jff-richtext__legacy { margin: 0; white-space: pre-wrap; }
+
 /* ---------------- 移动端降级 ---------------- */
 @media (max-width: 640px) {
   .jff-section { padding-inline: 20px; }
@@ -260,6 +312,8 @@ const CSS = `
   .jff-heading { margin-bottom: 24px; }
   .jff-title { font-size: 22px; }
   .jff-subtitle { font-size: 14px; }
+  .jff-richtext .rich-text h2 { font-size: 19px; }
+  .jff-richtext .rich-text h3 { font-size: 16px; }
   .jff-grid { grid-template-columns: 1fr; gap: 16px; }
   .jff-cta .jff-subtitle { margin-bottom: 24px; }
   .jff-cta__btn { padding: 14px 32px; }

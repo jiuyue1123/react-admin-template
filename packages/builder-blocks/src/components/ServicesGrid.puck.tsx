@@ -26,25 +26,27 @@ export const ServicesGridConfig: ComponentConfig<ServicesGridProps> = {
 
   render({ title, subtitle, items, puck }) {
     return (
-      <section ref={puck.dragRef} className="jff-section jff-services">
+      <section ref={puck.dragRef} className="jff-band jff-services">
         <BlockStyles />
-        <SectionHeading title={title} subtitle={subtitle} />
-        <div className="jff-grid">
-          {items.map((item, i) => (
-            <div key={i} className="jff-services__card">
-              {getIconNode(item.icon) && (
-                <div style={{ fontSize: 28, color: themeVar("colorBrand"), marginBottom: 14 }}>
-                  {getIconNode(item.icon)}
-                </div>
-              )}
-              <h3 style={{ fontSize: 17, fontWeight: 600, margin: "0 0 8px", color: themeVar("colorText") }}>
-                {item.title}
-              </h3>
-              <p style={{ fontSize: 14, lineHeight: 1.7, color: themeVar("colorTextSecondary"), margin: 0 }}>
-                {item.description}
-              </p>
-            </div>
-          ))}
+        <div className="jff-section">
+          <SectionHeading title={title} subtitle={subtitle} />
+          <div className="jff-grid">
+            {items.map((item, i) => (
+              <div key={i} className="jff-services__card">
+                {getIconNode(item.icon) && (
+                  <div style={{ fontSize: 28, color: themeVar("colorBrand"), marginBottom: 14 }}>
+                    {getIconNode(item.icon)}
+                  </div>
+                )}
+                <h3 style={{ fontSize: 17, fontWeight: 600, margin: "0 0 8px", color: themeVar("colorText") }}>
+                  {item.title}
+                </h3>
+                <p style={{ fontSize: 14, lineHeight: 1.7, color: themeVar("colorTextSecondary"), margin: 0 }}>
+                  {item.description}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     );

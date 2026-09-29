@@ -26,46 +26,48 @@ export const TimelineConfig: ComponentConfig<TimelineProps> = {
 
   render({ title, subtitle, items, puck }) {
     return (
-      <section ref={puck.dragRef} className="jff-section jff-timeline">
+      <section ref={puck.dragRef} className="jff-band jff-timeline">
         <BlockStyles />
-        <SectionHeading title={title} subtitle={subtitle} />
-        <div style={{ position: "relative", paddingLeft: 28 }}>
-          <div
-            style={{
-              position: "absolute",
-              left: 5,
-              top: 6,
-              bottom: 6,
-              width: 2,
-              background: themeVar("colorBorder"),
-            }}
-          />
-          {items.map((item, i) => (
-            <div key={i} style={{ position: "relative", padding: "0 0 28px 20px" }}>
-              <span
-                style={{
-                  position: "absolute",
-                  left: -27,
-                  top: 4,
-                  width: 14,
-                  height: 14,
-                  borderRadius: "50%",
-                  background: themeVar("colorSurface"),
-                  border: `3px solid ${themeVar("colorBrand")}`,
-                  boxSizing: "border-box",
-                }}
-              />
-              <div style={{ fontSize: 13, fontWeight: 600, color: themeVar("colorBrand"), marginBottom: 4 }}>
-                {item.year}
+        <div className="jff-section">
+          <SectionHeading title={title} subtitle={subtitle} />
+          <div style={{ position: "relative", paddingLeft: 28 }}>
+            <div
+              style={{
+                position: "absolute",
+                left: 5,
+                top: 6,
+                bottom: 6,
+                width: 2,
+                background: themeVar("colorBorder"),
+              }}
+            />
+            {items.map((item, i) => (
+              <div key={i} style={{ position: "relative", padding: "0 0 28px 20px" }}>
+                <span
+                  style={{
+                    position: "absolute",
+                    left: -27,
+                    top: 4,
+                    width: 14,
+                    height: 14,
+                    borderRadius: "50%",
+                    background: themeVar("colorSurface"),
+                    border: `3px solid ${themeVar("colorBrand")}`,
+                    boxSizing: "border-box",
+                  }}
+                />
+                <div style={{ fontSize: 13, fontWeight: 600, color: themeVar("colorBrand"), marginBottom: 4 }}>
+                  {item.year}
+                </div>
+                <h3 style={{ fontSize: 16, fontWeight: 600, margin: "0 0 6px", color: themeVar("colorText") }}>
+                  {item.title}
+                </h3>
+                <p style={{ fontSize: 14, color: themeVar("colorTextSecondary"), lineHeight: 1.7, margin: 0 }}>
+                  {item.description}
+                </p>
               </div>
-              <h3 style={{ fontSize: 16, fontWeight: 600, margin: "0 0 6px", color: themeVar("colorText") }}>
-                {item.title}
-              </h3>
-              <p style={{ fontSize: 14, color: themeVar("colorTextSecondary"), lineHeight: 1.7, margin: 0 }}>
-                {item.description}
-              </p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
     );

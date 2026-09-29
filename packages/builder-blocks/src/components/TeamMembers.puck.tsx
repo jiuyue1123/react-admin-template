@@ -27,58 +27,60 @@ export const TeamMembersConfig: ComponentConfig<TeamMembersProps> = {
 
   render({ title, subtitle, items, puck }) {
     return (
-      <section ref={puck.dragRef} className="jff-section jff-team">
+      <section ref={puck.dragRef} className="jff-band jff-team">
         <BlockStyles />
-        <SectionHeading title={title} subtitle={subtitle} />
-        <div className="jff-grid">
-          {items.map((item, i) => (
-            <div
-              key={i}
-              className="jff-team__card"
-              style={{
-                textAlign: "center",
-              }}
-            >
-              {item.avatar ? (
-                <img
-                  src={item.avatar}
-                  alt={item.name}
-                  style={{
-                    display: "block",
-                    width: 88,
-                    height: 88,
-                    borderRadius: "50%",
-                    objectFit: "cover",
-                    margin: "0 auto 14px",
-                  }}
-                />
-              ) : (
-                <div
-                  style={{
-                    width: 88,
-                    height: 88,
-                    borderRadius: "50%",
-                    margin: "0 auto 14px",
-                    background: themeVar("colorBrandSubtle"),
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 28,
-                    color: themeVar("colorBrand"),
-                  }}
-                >
-                  {(item.name || "人").slice(0, 1)}
-                </div>
-              )}
-              <h3 style={{ fontSize: 17, fontWeight: 600, margin: "0 0 4px", color: themeVar("colorText") }}>
-                {item.name}
-              </h3>
-              <div style={{ fontSize: 13, color: themeVar("colorBrand"), marginBottom: 10 }}>{item.role}</div>
-              <p style={{ fontSize: 13, lineHeight: 1.7, color: themeVar("colorTextSecondary"), margin: 0 }}>
-                {item.bio}
-              </p>
-            </div>
-          ))}
+        <div className="jff-section">
+          <SectionHeading title={title} subtitle={subtitle} />
+          <div className="jff-grid">
+            {items.map((item, i) => (
+              <div
+                key={i}
+                className="jff-team__card"
+                style={{
+                  textAlign: "center",
+                }}
+              >
+                {item.avatar ? (
+                  <img
+                    src={item.avatar}
+                    alt={item.name}
+                    style={{
+                      display: "block",
+                      width: 88,
+                      height: 88,
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                      margin: "0 auto 14px",
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: 88,
+                      height: 88,
+                      borderRadius: "50%",
+                      margin: "0 auto 14px",
+                      background: themeVar("colorBrandSubtle"),
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 28,
+                      color: themeVar("colorBrand"),
+                    }}
+                  >
+                    {(item.name || "人").slice(0, 1)}
+                  </div>
+                )}
+                <h3 style={{ fontSize: 17, fontWeight: 600, margin: "0 0 4px", color: themeVar("colorText") }}>
+                  {item.name}
+                </h3>
+                <div style={{ fontSize: 13, color: themeVar("colorBrand"), marginBottom: 10 }}>{item.role}</div>
+                <p style={{ fontSize: 13, lineHeight: 1.7, color: themeVar("colorTextSecondary"), margin: 0 }}>
+                  {item.bio}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     );

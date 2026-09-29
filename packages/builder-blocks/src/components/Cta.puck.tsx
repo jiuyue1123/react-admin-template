@@ -47,28 +47,30 @@ export const CtaConfig: ComponentConfig<CtaProps> = {
         className="jff-band jff-cta"
         style={{
           textAlign: "center",
-          borderRadius: 16,
+          borderRadius: themeVar("radiusLg"),
           background: resolveColor(backgroundColor) || themeVar("colorCanvas"),
         }}
       >
         <BlockStyles />
-        <SectionHeading title={title} subtitle={subtitle} tone={isDark ? "inverse" : "default"} />
-        {buttonText && (
-          <a
-            href={buttonLink || undefined}
-            className="jff-cta__btn"
-            style={{
-              background: buttonBg,
-              color: buttonColor,
-              borderRadius: 8,
-              fontWeight: 600,
-              fontSize: 15,
-              textDecoration: "none",
-            }}
-          >
-            {buttonText}
-          </a>
-        )}
+        <div className="jff-section">
+          <SectionHeading title={title} subtitle={subtitle} tone={isDark ? "inverse" : "default"} />
+          {buttonText && (
+            <a
+              href={buttonLink || undefined}
+              className="jff-cta__btn"
+              style={{
+                background: buttonBg,
+                color: buttonColor,
+                borderRadius: 8,
+                fontWeight: 600,
+                fontSize: 15,
+                textDecoration: "none",
+              }}
+            >
+              {buttonText}
+            </a>
+          )}
+        </div>
       </section>
     );
   },

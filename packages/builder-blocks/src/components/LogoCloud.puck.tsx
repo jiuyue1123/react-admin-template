@@ -28,31 +28,33 @@ export const LogoCloudConfig: ComponentConfig<LogoCloudProps> = {
 
   render({ title, subtitle, items, puck }) {
     return (
-      <section ref={puck.dragRef} className="jff-section jff-logocloud">
+      <section ref={puck.dragRef} className="jff-band jff-logocloud">
         <BlockStyles />
-        <SectionHeading title={title} subtitle={subtitle} />
-        <div className="jff-logo-row">
-          {items.map((item, i) => (
-            <div key={i} style={{ minWidth: 120, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              {item.logo ? (
-                <img
-                  src={item.logo}
-                  alt={item.name}
-                  style={{
-                    height: 36,
-                    maxWidth: 160,
-                    objectFit: "contain",
-                    filter: "grayscale(1)",
-                    opacity: 0.75,
-                  }}
-                />
-              ) : (
-                <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: 1, color: themeVar("colorTextTertiary") }}>
-                  {item.name || "LOGO"}
-                </span>
-              )}
-            </div>
-          ))}
+        <div className="jff-section">
+          <SectionHeading title={title} subtitle={subtitle} />
+          <div className="jff-logo-row">
+            {items.map((item, i) => (
+              <div key={i} style={{ minWidth: 120, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {item.logo ? (
+                  <img
+                    src={item.logo}
+                    alt={item.name}
+                    style={{
+                      height: 36,
+                      maxWidth: 160,
+                      objectFit: "contain",
+                      filter: "grayscale(1)",
+                      opacity: 0.75,
+                    }}
+                  />
+                ) : (
+                  <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: 1, color: themeVar("colorTextTertiary") }}>
+                    {item.name || "LOGO"}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     );

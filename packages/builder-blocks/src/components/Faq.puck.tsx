@@ -26,44 +26,46 @@ export const FaqConfig: ComponentConfig<FaqProps> = {
 
   render({ title, subtitle, items, puck }) {
     return (
-      <section ref={puck.dragRef} className="jff-section jff-faq">
+      <section ref={puck.dragRef} className="jff-band jff-faq">
         <BlockStyles />
-        <SectionHeading title={title} subtitle={subtitle} />
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {items.map((item, i) => (
-            <details
-              key={i}
-              style={{
-                border: `1px solid ${themeVar("colorBorder")}`,
-                borderRadius: 12,
-                padding: "0 18px",
-                background: themeVar("colorSurface"),
-              }}
-            >
-              <summary
+        <div className="jff-section">
+          <SectionHeading title={title} subtitle={subtitle} />
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {items.map((item, i) => (
+              <details
+                key={i}
                 style={{
-                  padding: "16px 0",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  listStyle: "none",
-                  color: themeVar("colorText"),
+                  border: `1px solid ${themeVar("colorBorder")}`,
+                  borderRadius: 12,
+                  padding: "0 18px",
+                  background: themeVar("colorSurface"),
                 }}
               >
-                {item.question}
-                <span style={{ float: "right", color: themeVar("colorTextTertiary"), fontWeight: 400 }}>+</span>
-              </summary>
-              <div
-                style={{
-                  paddingBottom: 16,
-                  color: themeVar("colorTextSecondary"),
-                  lineHeight: 1.7,
-                  fontSize: 14,
-                }}
-              >
-                {item.answer}
-              </div>
-            </details>
-          ))}
+                <summary
+                  style={{
+                    padding: "16px 0",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    listStyle: "none",
+                    color: themeVar("colorText"),
+                  }}
+                >
+                  {item.question}
+                  <span style={{ float: "right", color: themeVar("colorTextTertiary"), fontWeight: 400 }}>+</span>
+                </summary>
+                <div
+                  style={{
+                    paddingBottom: 16,
+                    color: themeVar("colorTextSecondary"),
+                    lineHeight: 1.7,
+                    fontSize: 14,
+                  }}
+                >
+                  {item.answer}
+                </div>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
     );

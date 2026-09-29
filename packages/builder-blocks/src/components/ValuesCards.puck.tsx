@@ -26,36 +26,38 @@ export const ValuesCardsConfig: ComponentConfig<ValuesCardsProps> = {
 
   render({ title, subtitle, items, puck }) {
     return (
-      <section ref={puck.dragRef} className="jff-section jff-values">
+      <section ref={puck.dragRef} className="jff-band jff-values">
         <BlockStyles />
-        <SectionHeading title={title} subtitle={subtitle} />
-        <div className="jff-grid">
-          {items.map((item, i) => (
-            <div key={i} className="jff-values__card" style={{ textAlign: "center" }}>
-              <div
-                style={{
-                  width: 56,
-                  height: 56,
-                  margin: "0 auto 16px",
-                  borderRadius: "50%",
-                  background: themeVar("colorBrand"),
-                  color: "#fff",
-                  fontSize: 24,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                {getIconNode(item.icon)}
+        <div className="jff-section">
+          <SectionHeading title={title} subtitle={subtitle} />
+          <div className="jff-grid">
+            {items.map((item, i) => (
+              <div key={i} className="jff-values__card" style={{ textAlign: "center" }}>
+                <div
+                  style={{
+                    width: 56,
+                    height: 56,
+                    margin: "0 auto 16px",
+                    borderRadius: "50%",
+                    background: themeVar("colorBrand"),
+                    color: "#fff",
+                    fontSize: 24,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {getIconNode(item.icon)}
+                </div>
+                <h3 style={{ fontSize: 17, fontWeight: 600, margin: "0 0 8px", color: themeVar("colorText") }}>
+                  {item.title}
+                </h3>
+                <p style={{ fontSize: 14, lineHeight: 1.7, color: themeVar("colorTextSecondary"), margin: 0 }}>
+                  {item.description}
+                </p>
               </div>
-              <h3 style={{ fontSize: 17, fontWeight: 600, margin: "0 0 8px", color: themeVar("colorText") }}>
-                {item.title}
-              </h3>
-              <p style={{ fontSize: 14, lineHeight: 1.7, color: themeVar("colorTextSecondary"), margin: 0 }}>
-                {item.description}
-              </p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
     );

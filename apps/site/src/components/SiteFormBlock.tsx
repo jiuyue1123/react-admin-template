@@ -37,20 +37,22 @@ export default async function SiteFormBlock({
       {/* 样式表必须自己挂载：这张表原先只有 Button/Form 区块才会输出，
           而本组件正是 Form 区块在站点端的替代实现 —— 不挂就没有 .jff-band。 */}
       <BlockStyles />
-      <div className="jff-form__inner">
-        {/* 与编辑器外壳（Form.puck.tsx）共用同一个标题实现，
-            否则「编辑器预览 = 线上」做不到 */}
-        <SectionHeading title={title} subtitle={description} />
+      <div className="jff-section">
+        <div className="jff-form__inner">
+          {/* 与编辑器外壳（Form.puck.tsx）共用同一个标题实现，
+              否则「编辑器预览 = 线上」做不到 */}
+          <SectionHeading title={title} subtitle={description} />
 
-        <div>
-          {form.state === 1 ? (
-            <SiteFormSubmit formKey={formKey} form={form} sourcePage={sourcePage} />
-          ) : (
-            // 停用：明确告诉访客，而不是留一片空白
-            <div className="rounded-xl border border-line bg-canvas px-6 py-10 text-center text-[15px] text-muted">
-              该表单已停用
-            </div>
-          )}
+          <div>
+            {form.state === 1 ? (
+              <SiteFormSubmit formKey={formKey} form={form} sourcePage={sourcePage} />
+            ) : (
+              // 停用：明确告诉访客，而不是留一片空白
+              <div className="rounded-xl border border-line bg-canvas px-6 py-10 text-center text-[15px] text-muted">
+                该表单已停用
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </section>

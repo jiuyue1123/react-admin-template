@@ -99,9 +99,9 @@ const CSS = `
    这是本批唯一的验收基准。
    --------------------------------------------------------------------------- */
 
-/* 版心 + 横向留白。宽度 = 内容列 + 两侧留白，与站点外壳的
-   "mx-auto max-w-6xl px-4" 是同一套 border-box 口径：若只写 max-width 而
-   不带 calc，内容列会凭空少掉 2×padding。
+/* 版心层：把内容收进内容列并居中。只负责 max-width 与横向留白。
+   宽度 = 内容列 + 两侧留白，与站点外壳的 "mx-auto max-w-6xl px-4" 是同一套
+   border-box 口径：若只写 max-width 而不带 calc，内容列会凭空少掉 2×padding。
    区块库不能假设宿主加载了 reset，所以 box-sizing 自己声明。 */
 .jff-section {
   box-sizing: border-box;
@@ -109,23 +109,30 @@ const CSS = `
   max-width: calc(var(--jff-section-max, 1080px) + 2 * var(--jff-space-section-x, ${SITE_THEME.spaceSectionX}));
   margin-inline: auto;
   padding-inline: var(--jff-space-section-x, ${SITE_THEME.spaceSectionX});
-  /* 纵向节奏。此前内容区块完全没有纵向留白，页头与第一个区块、以及相邻区块
-     之间都是贴着的。放在这里而不是 <main> 上：通栏区块（.jff-band，带背景色）
-     不该在页头下方多出一道白边。 */
-  padding-block: 48px;
 }
 
-/* 版心档位（由区块自己的 class 设定，继承给 .jff-section 读） */
-.jff-faq { --jff-section-max: 720px; }
-.jff-timeline { --jff-section-max: 800px; }
-.jff-logocloud { --jff-section-max: 960px; }
+/* 通栏层：占满整行 + 纵向节奏（背景由实例内联给）。
+   纵向留白放这一层而不是版心层，是为了让「通栏背景」自然带上呼吸感 ——
+   否则深色区块会变成一条紧裹着内容的色带。
 
-/* 通栏区块：没有版心，只有纵向留白。背景色/圆角由实例内联给出。 */
+   区块结构统一为 .jff-band > .jff-section 两层：外层通栏（背景 + 纵距），
+   内层版心（max-width + 横距）。默认无背景时两层与原先的单层 .jff-section
+   几何等价。 */
 .jff-band {
   box-sizing: border-box;
   width: 100%;
-  padding: var(--jff-space-section-y, ${SITE_THEME.spaceSectionY}) var(--jff-space-section-x, ${SITE_THEME.spaceSectionX});
+  padding-block: var(--jff-band-py, 48px);
 }
+
+/* Cta / Form 是通栏色带，纵向留白一直是 56px（比内容区块的 48px 多一点，
+   色带有背景、需要更足的呼吸感）。保持原值。 */
+.jff-band.jff-cta,
+.jff-band.jff-form { padding-block: var(--jff-space-section-y, ${SITE_THEME.spaceSectionY}); }
+
+/* 版心档位（由区块自己的 class 设定在外层 .jff-band 上，靠继承给内层 .jff-section） */
+.jff-faq { --jff-section-max: 720px; }
+.jff-timeline { --jff-section-max: 800px; }
+.jff-logocloud { --jff-section-max: 960px; }
 
 /* 区块标题（SectionHeading） */
 .jff-heading { margin-bottom: 32px; }
@@ -208,8 +215,10 @@ const CSS = `
 
 /* ---------------- 移动端降级 ---------------- */
 @media (max-width: 640px) {
-  .jff-section { padding-inline: 20px; padding-block: 32px; }
-  .jff-band { padding: 40px 20px; }
+  .jff-section { padding-inline: 20px; }
+  .jff-band { padding-block: 32px; }
+  .jff-band.jff-cta,
+  .jff-band.jff-form { padding-block: 40px; }
   .jff-heading { margin-bottom: 24px; }
   .jff-title { font-size: 22px; }
   .jff-subtitle { font-size: 14px; }

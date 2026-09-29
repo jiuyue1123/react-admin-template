@@ -67,6 +67,25 @@ const RICH_TEXT_OPTIONS: NonNullable<RichtextField["options"]> = {
   underline: false,
 };
 
+/**
+ * 新建区块时播种的默认富文本。
+ *
+ * ⚠️ **不能放进 `defaultProps.content`**：编辑器会把 `defaultProps` 合并进
+ * **每一个存量节点**（`{...defaultProps, ...item.props}`），而存量节点没有
+ * `content` 这个键 —— 于是一放非空默认值，所有老正文节点都会改走富文本分支，
+ * 租户写的 `text` 一个字都不显示。这是「一次搞坏所有页面」级的坑。
+ *
+ * 所以改走 `resolveData` + `trigger === "insert"`：只在**新建**时播种。
+ * 已核实：编辑器的 `insertComponent` 确实以 `"insert"` 调用 resolver
+ * （`chunk-55V3NZVF.mjs` 的 `resolveAndReplaceData(itemData, getState, "insert")`），
+ * 而全编辑器**没有任何 `"load"` 触发** —— 存量节点根本不经过这条路径。
+ *
+ * 文案口径（沿用 docs/copy-inventory.md 的去 AI 味原则：不夸大、不承诺、
+ * 不排比）：这是一段**占位文字**，租户不改就发布的话别人会看到它，
+ * 所以它要一眼看出是占位、而不是装作正文。
+ */
+const DEFAULT_CONTENT = "<p>这里是正文内容，直接改成你想说的就行。</p>";
+
 // ---------------------------------------------------------------------------
 // Component config
 // ---------------------------------------------------------------------------
@@ -128,6 +147,15 @@ export const TextBlockConfig: ComponentConfig<TextBlockProps> = {
     letterSpacing: "",
     indent: "",
     margin: "0 0 16px",
+  },
+
+  resolveData(data, params) {
+    // 只在新建时播种默认富文本 —— 见 DEFAULT_CONTENT 上方的说明。
+    // 存量节点走不到这里（编辑器没有 "load" 触发），所以老页面的 text 不会被动。
+    if (params.trigger === "insert" && !data.props.content) {
+      return { ...data, props: { ...data.props, content: DEFAULT_CONTENT } };
+    }
+    return data;
   },
 
   resolveFields(data, params) {

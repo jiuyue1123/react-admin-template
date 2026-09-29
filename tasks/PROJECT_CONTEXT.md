@@ -263,7 +263,7 @@ Puck 编辑器 edit：包 `<MediaFieldContext.Provider value={PuckMediaField}>`�
 用 Puck 原生 `slot`（`SlotField`，RSC 经 `SlotRenderPure` 真渲染，无深度限制；slot 数据是 `props.<名字>` 下的裸数组，不污染 `data.zones`，所以 `parseContent`/`isEmptyPuckData` 一行都不用改）。
 
 - **4 个槽必须无条件调用** (`col1({ className: "jff-col" })`) —— slot 是函数，不调就什么都不渲染。
-- **不设「列数」字段**：列数由 auto-fit 算、空栏用 `:empty` 折叠。按列数条件调用会让隐藏栏的内容**静默消失但仍在数据里**。
+- **列数可以指定，但槽永远全部渲染**：默认「自适应」由 auto-fit 算（缺点是列数随容器宽度变），另有 2/3/4 档把它定下来。**指定列数只改轨道数、不条件渲染 `colN()`** —— 条件渲染会让「4 栏改成 2 栏」时第 3/4 栏的内容**静默消失但仍在数据里**，改回又冒出来；现在多出来的栏会**换行显示**，不丢。
 - 栅格下界**必须 240px**（4×240+3×24=1032 ≤ 1080 ⇒ 恰好 4 条轨道；用 260 会退化成 3 条 + 换行）。
 - **只中和 `.jff-section`**（结构性：版心/居中，栏内无意义），**不中和 `.jff-band`**（视觉性：背景+内边距，栏内依然成立）。
 - **空栏折叠必须把编辑器的拖放区排除掉**（`.jff-col:empty:not([data-puck-dropzone])`）。**这一条踩过坑**：编辑器的 `DropZoneEdit` 空闲时 children 是 `contentIdsWithPreview.map(...)`，空槽就是空数组、**DOM 里真的没有子节点**，所以 `:empty` 一样会命中 —— 写成裸的 `.jff-col:empty { display: none }` 会让空栏在编辑器里整个消失、**什么都拖不进去**（用户实测报障）。`[data-puck-dropzone]` 是 Puck 加在活的拖放区根元素上的标记，线上渲染没有。

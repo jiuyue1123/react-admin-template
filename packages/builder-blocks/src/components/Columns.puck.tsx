@@ -1,6 +1,6 @@
 import type { ComponentConfig, Slot } from "@puckeditor/core";
 import { BlockStyles } from "./block-styles";
-import { bgClass, padClass, BLOCK_BACKGROUND_FIELD, SECTION_SPACING_FIELD } from "./shared";
+import { bgClass, padClass, BLOCK_BACKGROUND_FIELD, GRID_COLUMNS_FIELD, SECTION_SPACING_FIELD } from "./shared";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -9,6 +9,8 @@ import { bgClass, padClass, BLOCK_BACKGROUND_FIELD, SECTION_SPACING_FIELD } from
 export type ColumnsProps = {
   /** 列间距（px 数值的字符串） */
   gap: string;
+  /** "" = 自适应（按内容与容器宽度算）/ "2" / "3" / "4" */
+  columns: string;
   background: string;
   borderRadius: string;
   spacing: string;
@@ -16,6 +18,13 @@ export type ColumnsProps = {
   col2: Slot;
   col3: Slot;
   col4: Slot;
+};
+
+/** 列数档位 → class。与 .jff-grid--cN 同形，但落在 .jff-cols 上（下界不同） */
+const COLS_CLASS: Record<string, string> = {
+  "2": "jff-cols--c2",
+  "3": "jff-cols--c3",
+  "4": "jff-cols--c4",
 };
 
 const GAP_OPTIONS = [
@@ -43,12 +52,15 @@ const RADIUS_OPTIONS = [
  *
  * 关键设计（都有非显然的理由）：
  *
- * 1. **不设「列数」字段**。列数由 CSS 的 auto-fit 按容器宽度算，空栏用
- *    `:empty` 折叠（**但必须排除编辑器的拖放区** —— 见 block-styles.tsx 的注释，
- *    编辑器的空槽 DOM 里同样没有子节点，裸写 `:empty` 会让空栏在编辑器里消失、
- *    什么都拖不进去）。若设了列数字段、按列数条件调用 `colN()`，从 4 栏改成 2 栏
- *    会让第 3/4 栏的内容**静默消失但仍在数据里**，日后改回又冒出来 ——
- *    这是比视觉不一致严重得多的数据陷阱。
+ * 1. **列数可以指定，但槽永远全部渲染**。默认「自适应」由 CSS 的 auto-fit 按容器
+ *    宽度算（缺点是列数会随宽度变：1080 下 4 个卡片是 4 列，画布窄一点就变 3 列 +
+ *    换行），所以另外给了 2/3/4 档让它确定下来。
+ *    **指定列数只改轨道数、不条件渲染 `colN()`** —— 若按列数条件渲染，把 4 栏改成
+ *    2 栏会让第 3/4 栏的内容**静默消失但仍在数据里**，日后改回又冒出来。
+ *    现在多出来的栏会**换行显示**，不会丢。
+ *    空栏仍由 `:empty` 折叠（**但必须排除编辑器的拖放区** —— 见 block-styles.tsx
+ *    的注释，编辑器的空槽 DOM 里同样没有子节点，裸写 `:empty` 会让空栏在编辑器里
+ *    消失、什么都拖不进去）。
  *
  * 2. **4 个槽必须无条件调用**。slot 是函数，不调用就什么都不渲染；空栏只能交给
  *    CSS 折叠，条件调用会让空栏永远无法被拖入。
@@ -62,10 +74,11 @@ const RADIUS_OPTIONS = [
 export const ColumnsConfig: ComponentConfig<ColumnsProps> = {
   label: "分栏",
 
-  render({ gap, background, borderRadius, spacing, col1, col2, col3, col4, puck }) {
+  render({ gap, columns, background, borderRadius, spacing, col1, col2, col3, col4, puck }) {
     const bandCls = ["jff-band", "jff-cols-band", bgClass(background), padClass(spacing)]
       .filter(Boolean)
       .join(" ");
+    const gridCls = ["jff-section", "jff-cols", COLS_CLASS[columns]].filter(Boolean).join(" ");
     const br = Number(borderRadius);
 
     return (
@@ -77,7 +90,7 @@ export const ColumnsConfig: ComponentConfig<ColumnsProps> = {
         style={{ borderRadius: br > 0 ? br : undefined }}
       >
         <BlockStyles />
-        <div className="jff-section jff-cols" style={{ gap: gap ? `${gap}px` : undefined }}>
+        <div className={gridCls} style={{ gap: gap ? `${gap}px` : undefined }}>
           {/* 必须全部调用 —— 见组件注释第 2 条 */}
           {col1({ className: "jff-col" })}
           {col2({ className: "jff-col" })}
@@ -90,6 +103,7 @@ export const ColumnsConfig: ComponentConfig<ColumnsProps> = {
 
   defaultProps: {
     gap: "24",
+    columns: "",
     background: "",
     borderRadius: "",
     spacing: "",
@@ -107,6 +121,7 @@ export const ColumnsConfig: ComponentConfig<ColumnsProps> = {
     col2: { type: "slot", label: "第 2 栏（留空则不显示）" },
     col3: { type: "slot", label: "第 3 栏（留空则不显示）" },
     col4: { type: "slot", label: "第 4 栏（留空则不显示）" },
+    columns: GRID_COLUMNS_FIELD,
     gap: { type: "select", label: "列间距", options: [...GAP_OPTIONS] },
     background: BLOCK_BACKGROUND_FIELD,
     borderRadius: { type: "select", label: "圆角", options: [...RADIUS_OPTIONS] },

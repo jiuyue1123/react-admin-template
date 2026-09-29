@@ -220,6 +220,14 @@ const CSS = `
   grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
 }
 
+/* 指定列数。**只改轨道数，不条件渲染槽** —— 4 个槽始终调用，
+   所以「栏数少于已填栏」时多出来的内容会**换行显示**，而不是静默消失
+   （那才是数据陷阱）。未填的栏仍由 :empty 折叠。
+   注意这只是「最多几栏」的近似：填不满时，空轨道不会让已填的栏变宽。 */
+.jff-cols--c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.jff-cols--c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.jff-cols--c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
 .jff-col { min-width: 0; }
 /* 空栏不占列。
    ⚠️ **必须把编辑器的拖放区排除掉**：编辑器的 DropZoneEdit 在空闲时 children 是
@@ -503,8 +511,11 @@ details[open] > summary .jff-faq__mark { transform: rotate(90deg); }
   .jff-richtext .rich-text h2 { font-size: 19px; }
   .jff-richtext .rich-text h3 { font-size: 16px; }
   .jff-grid { grid-template-columns: 1fr; gap: 16px; }
-  /* 手机上分栏永远单列（.jff-cols 的特异性与 .jff-grid 相同，写在后面即生效） */
-  .jff-cols { grid-template-columns: 1fr; }
+  /* 手机上分栏永远单列（把带列数修饰的几个类一起列出来，不靠源码顺序） */
+  .jff-cols,
+  .jff-cols--c2,
+  .jff-cols--c3,
+  .jff-cols--c4 { grid-template-columns: 1fr; }
   .jff-cta .jff-subtitle { margin-bottom: 24px; }
   .jff-cta__btn { padding: 14px 32px; }
   .jff-logo-row { gap: 24px; }

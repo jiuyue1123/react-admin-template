@@ -1,5 +1,6 @@
 import type { Config } from "@puckeditor/core";
 import { ButtonConfig } from "./components/Button.puck.tsx";
+import { ColumnsConfig } from "./components/Columns.puck.tsx";
 import { CtaConfig } from "./components/Cta.puck.tsx";
 import { DividerConfig } from "./components/Divider.puck.tsx";
 import { FaqConfig } from "./components/Faq.puck.tsx";
@@ -25,6 +26,7 @@ import { ValuesCardsConfig } from "./components/ValuesCards.puck.tsx";
 
 const components = {
     Button: ButtonConfig,
+    Columns: ColumnsConfig,
     Cta: CtaConfig,
     Divider: DividerConfig,
     Faq: FaqConfig,
@@ -64,7 +66,7 @@ const categories = {
     Layout: {
         title: "布局",
         defaultExpanded: true,
-        components: ["Divider"],
+        components: ["Columns", "Divider"],
     },
     Section: {
         title: "区块",
@@ -103,6 +105,8 @@ export type PuckConfig = typeof puckConfig;
 
 export { ButtonConfig } from "./components/Button.puck.tsx";
 export type { ButtonProps } from "./components/Button.puck.tsx";
+export { ColumnsConfig } from "./components/Columns.puck.tsx";
+export type { ColumnsProps } from "./components/Columns.puck.tsx";
 export { HeadingConfig } from "./components/Heading.puck.tsx";
 export type { HeadingProps } from "./components/Heading.puck.tsx";
 export { TextBlockConfig } from "./components/TextBlock.puck.tsx";

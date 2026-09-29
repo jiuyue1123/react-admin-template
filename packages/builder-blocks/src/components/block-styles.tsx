@@ -202,6 +202,38 @@ const CSS = `
 .jff-grid--c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .jff-grid--c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
+/* ---------------- 分栏容器 ----------------
+   列数完全由内容决定，没有「列数」字段。
+
+   auto-fit 的轨道数由**容器宽度**算，与子元素个数无关：
+     版心 1080 / gap 24 → 4×240 + 3×24 = 1032 ≤ 1080（4 条轨道），
+                          5×240 + 4×24 = 1296 > 1080（不会出现第 5 条）。
+   auto-fit 再折叠空轨道（连它的 gutter 一起塌），于是
+     4 栏 = 4×252，3 栏 = 3×344，2 栏 = 2×528，1 栏 = 满宽。
+   ⚠️ 下界**必须是 240px**：用 .jff-services 那档的 260px 会让 4 栏在 1080
+      版心下放不下，静默退化成「3 条轨道 + 第 4 栏换行」。
+   ⚠️ 下界要用 min(·,100%) 包住（同 .jff-grid）：宿主把版心调窄时防横向溢出。 */
+.jff-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+}
+
+.jff-col { min-width: 0; }
+/* 空栏不占列。**只在线上成立**：RSC 的空槽输出一个完全无子节点的
+   <div class="jff-col"> → :empty 命中；编辑器里 drop zone 会写入占位节点，
+   所以编辑器中永远不命中 —— 这正是要的，空栏必须能当拖放目标。 */
+.jff-col:empty { display: none; }
+
+/* 栏内嵌的 section 区块携带的是「整页版心」（max-width + 居中 + 横向留白），
+   在一条 252px 的栏里没有意义。只中和这些**结构性**属性；
+   .jff-band 的背景与内边距是**视觉性**的，在栏内依然成立，不动它
+   （清了会让 Cta 的文字贴到圆角上、深色色带塌成紧裹字块）。 */
+.jff-col .jff-section {
+  max-width: none;
+  margin-inline: 0;
+  padding-inline: 0;
+}
+
 /* 栅格列宽下界档位 */
 .jff-steps { --jff-grid-min: 180px; }
 .jff-services { --jff-grid-min: 260px; }
@@ -315,6 +347,8 @@ const CSS = `
   .jff-richtext .rich-text h2 { font-size: 19px; }
   .jff-richtext .rich-text h3 { font-size: 16px; }
   .jff-grid { grid-template-columns: 1fr; gap: 16px; }
+  /* 手机上分栏永远单列（.jff-cols 的特异性与 .jff-grid 相同，写在后面即生效） */
+  .jff-cols { grid-template-columns: 1fr; }
   .jff-cta .jff-subtitle { margin-bottom: 24px; }
   .jff-cta__btn { padding: 14px 32px; }
   .jff-logo-row { gap: 24px; }

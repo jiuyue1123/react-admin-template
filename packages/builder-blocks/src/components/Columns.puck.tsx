@@ -52,23 +52,23 @@ const RADIUS_OPTIONS = [
  *
  * 关键设计（都有非显然的理由）：
  *
- * 1. **列数可以指定，但槽永远全部渲染**。默认「自适应」由 CSS 的 auto-fit 按容器
- *    宽度算（缺点是列数会随宽度变：1080 下 4 个卡片是 4 列，画布窄一点就变 3 列 +
- *    换行），所以另外给了 2/3/4 档让它确定下来。
- *    **指定列数只改轨道数、不条件渲染 `colN()`** —— 若按列数条件渲染，把 4 栏改成
- *    2 栏会让第 3/4 栏的内容**静默消失但仍在数据里**，日后改回又冒出来。
- *    现在多出来的栏会**换行显示**，不会丢。
- *    空栏仍由 `:empty` 折叠（**但必须排除编辑器的拖放区** —— 见 block-styles.tsx
- *    的注释，编辑器的空槽 DOM 里同样没有子节点，裸写 `:empty` 会让空栏在编辑器里
- *    消失、什么都拖不进去）。
+ * 1. **列数可以指定，指定的就是「一行 N 栏」**。默认「自适应」由 CSS 的 auto-fit
+ *    按容器宽度算（缺点是列数会随宽度变：1080 下 4 个卡片是 4 列，画布窄一点就变成
+ *    3 列 + 换行），所以给了 2/3/4 档把它定下来。
  *
- * 2. **4 个槽必须无条件调用**。slot 是函数，不调用就什么都不渲染；空栏只能交给
- *    CSS 折叠，条件调用会让空栏永远无法被拖入。
+ * 2. **指定列数时只渲染前 N 栏**（自适应时 4 栏全渲染）。
+ *    为什么不是「4 个槽永远渲染、只改轨道数」：编辑器里的空栏**不会折叠**
+ *    （`:empty` 规则必须排除拖放区，否则空栏没法拖入），所以始终渲染 4 个槽时，
+ *    选「2 栏」会看到第 3/4 个空栏**换行到第二行** —— 看起来就像没生效。
+ *    未渲染的栏内容仍留在 `data` 里，把列数调大就会重新出现，不会丢。
  *
- * 3. **不设独立的上下留白字段** —— 复用 .jff-band 的 `--jff-band-py`，与其它
+ * 3. **自适应时多出来的空栏由 CSS `:empty` 折叠**（排除编辑器拖放区那条见
+ *    block-styles.tsx 的注释）。指定列数时空轨道保留 —— 这才叫「一行 N 栏」。
+ *
+ * 4. **不设独立的上下留白字段** —— 复用 .jff-band 的 `--jff-band-py`，与其它
  *    区块同一套机制、同一套档位。
  *
- * 4. 背景只提供浅色系与一个深色。深色会把文字令牌翻白，而栏内的区块（尤其
+ * 5. 背景只提供浅色系与一个深色。深色会把文字令牌翻白，而栏内的区块（尤其
  *    卡片）靠 .jff-surface 复位保持浅底深字 —— 这套机制与 9 个 section 共用。
  */
 export const ColumnsConfig: ComponentConfig<ColumnsProps> = {
@@ -80,6 +80,13 @@ export const ColumnsConfig: ComponentConfig<ColumnsProps> = {
       .join(" ");
     const gridCls = ["jff-section", "jff-cols", COLS_CLASS[columns]].filter(Boolean).join(" ");
     const br = Number(borderRadius);
+    // 指定列数时**只渲染前 N 栏**：编辑器里空栏不会折叠（那是必需的，否则没法
+    // 拖进去），若始终渲染 4 个槽，选「2 栏」时会看到第 3/4 个空栏换行到第二行 ——
+    // 看起来就像「还是换行」。
+    // 未渲染的栏，内容仍留在 data 里，把列数调大就会重新出现 —— 不会丢。
+    // 「自适应」时 4 栏全渲染，多出来的空栏由 CSS 的 :empty 折叠。
+    const parsed = Number(columns);
+    const colCount = parsed >= 1 && parsed <= 4 ? parsed : 4;
 
     return (
       <section
@@ -91,11 +98,11 @@ export const ColumnsConfig: ComponentConfig<ColumnsProps> = {
       >
         <BlockStyles />
         <div className={gridCls} style={{ gap: gap ? `${gap}px` : undefined }}>
-          {/* 必须全部调用 —— 见组件注释第 2 条 */}
-          {col1({ className: "jff-col" })}
-          {col2({ className: "jff-col" })}
-          {col3({ className: "jff-col" })}
-          {col4({ className: "jff-col" })}
+          {/* 槽数跟着列数走 —— 见上方注释 */}
+          {colCount >= 1 && col1({ className: "jff-col" })}
+          {colCount >= 2 && col2({ className: "jff-col" })}
+          {colCount >= 3 && col3({ className: "jff-col" })}
+          {colCount >= 4 && col4({ className: "jff-col" })}
         </div>
       </section>
     );

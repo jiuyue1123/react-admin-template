@@ -140,23 +140,33 @@ export function themeVar(key: SiteThemeKey): string {
  * 不是主题色。
  */
 const COLOR_ALIASES: Record<string, string> = {
-  "#1677ff": "var(--jff-color-brand)",
-  "#4096ff": "var(--jff-color-brand-hover)",
-  "#0958d9": "var(--jff-color-brand-active)",
-  "#eef3ff": "var(--jff-color-brand-subtle)",
-  "rgba(0,0,0,0.88)": "var(--jff-color-text)",
-  "rgba(0, 0, 0, 0.88)": "var(--jff-color-text)",
-  "rgba(0,0,0,0.65)": "var(--jff-color-text-secondary)",
-  "rgba(0, 0, 0, 0.65)": "var(--jff-color-text-secondary)",
-  "rgba(0,0,0,0.45)": "var(--jff-color-text-tertiary)",
-  "rgba(0, 0, 0, 0.45)": "var(--jff-color-text-tertiary)",
-  "#f5f7fa": "var(--jff-color-canvas)",
-  "#f7f8fa": "var(--jff-color-canvas)",
-  "#ececec": "var(--jff-color-border)",
-  "#e5e7eb": "var(--jff-color-border)",
+  "#1677ff": themeVar("colorBrand"),
+  "#4096ff": themeVar("colorBrandHover"),
+  "#0958d9": themeVar("colorBrandActive"),
+  "#eef3ff": themeVar("colorBrandSubtle"),
+  "rgba(0,0,0,0.88)": themeVar("colorText"),
+  "rgba(0, 0, 0, 0.88)": themeVar("colorText"),
+  "rgba(0,0,0,0.65)": themeVar("colorTextSecondary"),
+  "rgba(0, 0, 0, 0.65)": themeVar("colorTextSecondary"),
+  "rgba(0,0,0,0.45)": themeVar("colorTextTertiary"),
+  "rgba(0, 0, 0, 0.45)": themeVar("colorTextTertiary"),
+  "#f5f7fa": themeVar("colorCanvas"),
+  "#f7f8fa": themeVar("colorCanvas"),
+  "#ececec": themeVar("colorBorder"),
+  "#e5e7eb": themeVar("colorBorder"),
 };
 
-/** 把存量颜色字面量解析成主题变量；无对应项则原样返回 */
+/**
+ * 把存量颜色字面量解析成主题变量；无对应项则原样返回。
+ *
+ * 返回值一律是 **`var(--jff-x, 回退值)`**（经 `themeVar` 生成），**必须带回退** ——
+ * 这一条踩过坑：最初这里写的是裸 `var(--jff-color-canvas)`，于是在任何没有注入
+ * `--jff-*` 的上下文里，整条 `background` 声明会因 `var()` 解析失败而**失效**，
+ * 表现为「背景没了」。而 Cta 的深浅判定是按原始字面量做的（`tone="inverse"`），
+ * 两者一叠加就成了**白底白字**。
+ *
+ * 用 `themeVar()` 生成而不是手写字面量，还能保证回退值与 `SITE_THEME` 不漂移。
+ */
 export function resolveColor(value: string): string {
   return COLOR_ALIASES[value.trim()] ?? value;
 }

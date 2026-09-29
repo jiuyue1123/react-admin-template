@@ -221,10 +221,13 @@ const CSS = `
 }
 
 .jff-col { min-width: 0; }
-/* 空栏不占列。**只在线上成立**：RSC 的空槽输出一个完全无子节点的
-   <div class="jff-col"> → :empty 命中；编辑器里 drop zone 会写入占位节点，
-   所以编辑器中永远不命中 —— 这正是要的，空栏必须能当拖放目标。 */
-.jff-col:empty { display: none; }
+/* 空栏不占列。
+   ⚠️ **必须把编辑器的拖放区排除掉**：编辑器的 DropZoneEdit 在空闲时 children 是
+   contentIdsWithPreview.map(...) —— 空槽就是空数组，DOM 里**真的没有子节点**，
+   所以 :empty 一样会命中，空栏会整个消失、什么都拖不进去。
+   [data-puck-dropzone] 正是 Puck 加在「活的拖放区」根元素上的标记，线上渲染没有，
+   拿它做判别最贴切。 */
+.jff-col:empty:not([data-puck-dropzone]) { display: none; }
 
 /* 栏内嵌的 section 区块携带的是「整页版心」（max-width + 居中 + 横向留白），
    在一条 252px 的栏里没有意义。只中和这些**结构性**属性；

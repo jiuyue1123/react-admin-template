@@ -266,7 +266,7 @@ Puck 编辑器 edit：包 `<MediaFieldContext.Provider value={PuckMediaField}>`�
 - **不设「列数」字段**：列数由 auto-fit 算、空栏用 `:empty` 折叠。按列数条件调用会让隐藏栏的内容**静默消失但仍在数据里**。
 - 栅格下界**必须 240px**（4×240+3×24=1032 ≤ 1080 ⇒ 恰好 4 条轨道；用 260 会退化成 3 条 + 换行）。
 - **只中和 `.jff-section`**（结构性：版心/居中，栏内无意义），**不中和 `.jff-band`**（视觉性：背景+内边距，栏内依然成立）。
-- `:empty` 在**编辑器里不成立是必需的** —— 空栏必须能当拖放目标。
+- **空栏折叠必须把编辑器的拖放区排除掉**（`.jff-col:empty:not([data-puck-dropzone])`）。**这一条踩过坑**：编辑器的 `DropZoneEdit` 空闲时 children 是 `contentIdsWithPreview.map(...)`，空槽就是空数组、**DOM 里真的没有子节点**，所以 `:empty` 一样会命中 —— 写成裸的 `.jff-col:empty { display: none }` 会让空栏在编辑器里整个消失、**什么都拖不进去**（用户实测报障）。`[data-puck-dropzone]` 是 Puck 加在活的拖放区根元素上的标记，线上渲染没有。
 
 ### 已知脆弱点（未修，记录备查）
 

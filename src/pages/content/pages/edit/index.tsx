@@ -17,6 +17,7 @@ import {
   fetchUpdatePage,
 } from '@/service/api/sitePage'
 import { getPageStateMeta, PAGE_PREVIEW_LIVE_KEY, parseContent } from '@/utils/sitePage'
+import { PUCK_ZH } from '@/utils/puckLocale'
 
 // 注册媒体选择器实现：编辑器中所有图片类字段共用（一次注册，全局生效）
 setMediaField(PuckMediaField)
@@ -198,6 +199,9 @@ export default function PageEditorPage() {
         // 留着会让人点了没反应，还容易误判成「响应式没生效」（媒体查询看的是
         // 浏览器视口，不是画布宽度）。自检移动端请用浏览器 DevTools。
         viewports={[]}
+        // Puck 0.23 没有 i18n API，但支持注入整份字符串字典；
+        // 未覆盖的 key 会自动回落到内置英文。见 utils/puckLocale.ts
+        dictionary={PUCK_ZH}
         onChange={data => setContentData(data as Data)}
         // Puck 0.23：`renderHeaderActions` 已废弃 → `overrides.headerActions`。
         // 这是**覆盖**语义（未提供时默认什么都不渲染），所以只返回本页自己的按钮即可 ——

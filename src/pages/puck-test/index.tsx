@@ -5,6 +5,7 @@ import { Puck } from '@puckeditor/core'
 import { puckConfig, setMediaField } from '@jff/builder-blocks'
 import PuckMediaField from '@/components/PuckMediaField'
 import SiteThemeScope from '@/components/SiteThemeScope'
+import { PUCK_ZH } from '@/utils/puckLocale'
 
 // 注册媒体选择器实现：编辑器中所有图片类字段共用（一次注册，全局生效）
 setMediaField(PuckMediaField)
@@ -48,6 +49,7 @@ export default function PuckTestPage() {
         headerTitle="区块编辑器测试"
         // 与非 iframe 模式下失效的设备预设同理，见 edit/index.tsx
         viewports={[]}
+        dictionary={PUCK_ZH}
         onChange={handleChange}
         overrides={{
           // 与其他编辑入口一致：画布内容套站点主题作用域

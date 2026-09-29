@@ -196,3 +196,25 @@
   right: 0;
   margin-inline: auto;
 }
+
+/* ---------------------------------------------------------------------------
+ * 修补 Puck 0.23 的一个悬空变量（否则侧栏「大纲」里的组件名在深色主题下看不清）
+ *
+ * Puck 自己的样式链是：
+ *   ._LayerTreeRoot { --_puck-outline-color-text:
+ *                       var(--puck-outline-color-text, var(--puck-color-text-primary)) }
+ *   图层标题        { color: var(--_puck-outline-color-text) }
+ *
+ * 而 **--puck-color-text-primary 在 Puck 0.23.0 里从未被定义**（CSS 与 JS 里
+ * 都是 0 处）—— 全包只有这一个变量是「被裸引用（不带 fallback）且未定义」。
+ * 于是 var() 解析失败 → color 变成无效值 → 按规范退化为 inherit →
+ * **深色主题下大纲文字继承了 admin 文档的浅色文字，压在 Puck 的浅色面板上
+ * 完全看不清**。
+ *
+ * 这里用 Puck 留的公开覆盖钩子 --puck-outline-color-text 把颜色定死。
+ * 它全包只在这一个声明里被读，所以不会波及画布上那些 outline 标签。
+ * 升级 @puckeditor/core 后应复查这条是否还被需要。
+ * --------------------------------------------------------------------------- */
+:root {
+  --puck-outline-color-text: var(--puck-color-black);
+}

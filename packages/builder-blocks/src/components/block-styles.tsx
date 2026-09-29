@@ -25,6 +25,8 @@ import { SITE_THEME, SITE_FONT_STACK } from "../theme"
 const STYLE_HREF = "jff-builder-blocks"
 
 const CSS = `
+/* ⚠️ 本段是模板字符串：下面的注释里**不要用反引号**引用代码片段（会提前终止字面量，
+   报 TS1005）。用引号或「」。见 tasks/lessons.md 第 16 条。 */
 /* 站点渲染基线 —— 复刻访客端 <body> 的排版上下文。
    编辑器画布是同文档渲染，若不建立这条基线，区块里「未显式声明」的属性
    （字体、行高、文字色）会继承 admin 文档的值，与线上不一致。

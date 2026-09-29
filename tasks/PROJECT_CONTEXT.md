@@ -5,6 +5,7 @@
 > 最近更新：2026-09-03 完成计费订阅 M1 与 实名认证 / 站点生命周期与上线 / 站内信（M2+M3）；并新增支付结果页（blank、成功倒计时自动关闭）与租户端发票管理（申请 + 查看，见 §5/§6）。
 > 2026-09-16 新增**访客端 `apps/site`**（租户站点渲染端，Next.js 16 SSR，多租户共用部署）——见 §10。`@jff/builder-blocks` 已去除 antd 与图标库依赖、改为内置 SVG + 模块级媒体选择器注册，以满足 RSC 渲染。
 > 2026-09-28 建立**站点主题契约 `--jff-*`**、区块补齐响应式、色值收敛（分支 `style-polish`）——见 §13，**改动访客端或区块样式前必读**。
+> 2026-09-29 区块库 **14 → 18 个**：新增分栏容器 / 客户评价 / 图片画廊 / 数据指标；正文升级为**富文本**；9 个区块统一为 `band > section` 并加了统一的外观出口——见 §14，**动区块库前必读**。
 
 ## 1. 产品与定位
 - **简帆坊（Jianfanfang）** —— SaaS 站点搭建的**租户端自助后台**（本仓库即租户后台 admin）。租户以手机号+短信验证码**注册即创建租户**（/register）或登录，自助运营一个营销官网微站：站点设置、页面（Puck 拖拽搭建）、导航菜单、媒体库、个人中心。
@@ -19,7 +20,7 @@ Monorepo：pnpm workspace（pnpm-workspace.yaml → `packages/*`），成员 `@j
 ```
 admin/                      # git remote: github.com/jiuyue1123/react-admin-template.git
 ├─ apps/site/               # @jff/site：访客端（租户站点渲染端，Next.js 16 SSR）见 §10
-├─ packages/builder-blocks/ # @jff/builder-blocks：Puck 组件库（puckConfig 注册表 + 14 个 *.puck.tsx + 内置 SVG 图标 + theme.ts 站点主题契约）
+├─ packages/builder-blocks/ # @jff/builder-blocks：Puck 组件库（puckConfig 注册表 + 18 个 *.puck.tsx + 内置 SVG 图标 + theme.ts 站点主题契约）
 ├─ docs/                    # theme.md（token 主题）；jff.md（租户端 pages/menus API tarslib 导出）
 ├─ src/
 │  ├─ components/           # AgreementModal AuthBrandPanel SmsCodeButton MediaPicker PuckMediaField
@@ -42,7 +43,7 @@ admin/                      # git remote: github.com/jiuyue1123/react-admin-temp
 - **状态（store/auth）**：zustand + persist，key `jff-tenant-auth`，仅持久化 `{token{accessToken,refreshToken}, isLogin}`。`logout()` 静默 revoke → 跳登录；`refreshToken()` 被请求层 401 流程调用。store 反向 import `@/router`（环形，属既有模式）。
 - **状态（store/billing，M1 新增，不 persist）**：跨页共享「当前订阅」`{subscription, loading, loadedAt, refresh(force?)}`；60s 去重，支付/退款成功后 `refresh(true)`。由 base 布局挂载时预热，供到期横幅与套餐/订阅页复用。全局横幅统一在 base 布局 `<BillingBanner/>`（临期≤15 天 warning / 已过期 error + 去续费），**不在页面内重复放横幅**。
 - **主题（theme/tokens.ts 语义单源）**：antd ConfigProvider + 同一份 token 镜像为 CSS 变量 `--tp-*`（Tailwind `@theme inline` 引用）；暗色切换持久化 localStorage `admin-theme`，`index.html` 内联脚本防闪烁；toAntdTokens 对 antd v6 colorFillAlter 派生偏差做了修正（有内联注释）。
-- **workspace 包 @jff/builder-blocks**：导出 `puckConfig`（**14 个**营销区块：Button Cta Divider Faq **Form** Heading Image LogoCloud ProcessSteps ServicesGrid TeamMembers TextBlock Timeline ValuesCards + 中文分类）+ 各 Config/Props。媒体字段**可插拔**：`media-field.tsx` 定义 `MediaFieldProps{value:string;onChange}`、默认 `DefaultUrlField`（antd URL Input）、`MediaFieldContext`；Image/LogoCloud/TeamMembers 通过 custom field 用 `MediaField`。**Puck 数据里媒体只存 URL 字符串**，保证 Data 可移植；宿主注入具体实现（src/components/PuckMediaField.tsx 包 MediaPicker，fileType=1）。
+- **workspace 包 @jff/builder-blocks**：导出 `puckConfig`（**18 个**区块：Button **Columns** Cta Divider Faq Form **Gallery** Heading Image LogoCloud ProcessSteps ServicesGrid **Stats** TeamMembers **Testimonials** TextBlock Timeline ValuesCards + 中文分类）+ 各 Config/Props。媒体字段**可插拔**：`media-field.tsx` 定义 `MediaFieldProps{value:string;onChange}`、默认 `DefaultUrlField`（antd URL Input）、`MediaFieldContext`；Image/LogoCloud/TeamMembers/Gallery 通过 custom field 用 `MediaField`。**Puck 数据里媒体只存 URL 字符串**，保证 Data 可移植；宿主注入具体实现（src/components/PuckMediaField.tsx 包 MediaPicker，fileType=1）。
 - **别名**：`@/*` → `src/*`（tsconfig.app + vite alias）。路由字符串的 `@/` 前缀是 transform 自己的约定。
 - **验证命令**：`pnpm dev`（强制 --mode test）、`pnpm build`（tsc -b && vite build）、`pnpm typecheck`、`pnpm lint`(oxlint)。**typecheck/lint 仅用户要求时才跑**（记忆）。注意根 tsc -b 不含 packages/builder-blocks（其 build 内自行 tsc -b）。
 
@@ -221,3 +222,52 @@ Puck 编辑器 edit：包 `<MediaFieldContext.Provider value={PuckMediaField}>`�
 - **已澄清的误判**：admin 切深色**不会**让编辑器画布变暗 —— Puck 调色板全是静态字面量、全仓 `prefers-color-scheme` 命中 0，画布底由 `--puck-canvas-preview-color-bg` 给白色。
 - **页头高度**是 `--jf-header-h` / `--jf-header-h-sm`（`apps/site/src/app/globals.css` 的 `:root`），`SiteHeader` 自己也读它。此前有 6 处各自手算「视口减页头」。
 - **仍存在的硬编码**（刻意）：`media-field.tsx` / `form-field.tsx` 渲染在编辑器侧栏，属后台自身 UI，不在本次范围；Button 的 `FILL_*`/`DISABLED_*` 与各处「反白」用的 `#fff` 是绝对色，不是主题色。
+
+## 14. 布局能力、富文本与区块外观出口（2026-09-29，分支 `style-polish`）
+
+**区块库 14 → 18 个**：新增 `Columns`（分栏容器）、`Testimonials`（客户评价）、`Gallery`（图片画廊）、`Stats`（数据指标）。此前 14 个全是自闭合的固定版式、**容器类为 0**，租户只能竖着摞，做不出左图右文。
+
+### 三个必须知道的 Puck 机制（都踩过或差点踩）
+
+1. **`defaultProps` 两端合并不对称**：编辑器 `{...defaultProps, ...item.props}`，**访客端 RSC 只用 `{...item.props}`**。所以 `render` 里所有字段都必须容忍 `undefined`，**不能依赖默认值存在**。（本次实测：手工造一个缺 `items` 的 Stats 节点，RSC 直接抛 `undefined.map`。）
+   - 推论：**`defaultProps` 里放任何非空默认值都会被写进存量节点**。`TextBlock.content` 因此**必须是空串** —— 放样例文案会让所有老正文节点改走富文本分支、租户写的 `text` 一个字都不显示。
+2. **`<BlockStyles />` 不是常驻的**：它由渲染它的区块自己挂载。**新增任何依赖 `jff-*` class 的区块都必须一并挂**，否则「只放了这一个区块的页面」会完全没有排版。本次 TextBlock 升级为富文本后补挂了（它现在依赖 `.jff-richtext`）。
+3. **`resolveFields` 看得到普通字段（原始值），看不到 slot 内容**。所以容器不能用它判断空栏；TextBlock 用它判断「是否写过富文本」（`if (data.props.content) delete next.text`）。
+
+### 富文本：Puck 原生 `richtext` 字段（底层就是 Tiptap）
+
+**零新增依赖** —— `@puckeditor/core` 自己依赖 `@tiptap/*`（22 个包），编辑器、工具栏、逐扩展开关（`field.options`）、以及 **RSC 渲染路径**（`@tiptap/html` 的 `generateHTML`，无需 DOM）Puck 全接好了。`render` 拿到的 `content` 已被 `useRichtextProps` 换成渲染好的 ReactNode。
+
+- 存的是 **HTML 字符串**（编辑器 `editor.getHTML()`）。渲染侧是 `dangerouslySetInnerHTML`，**转换与注入由 Puck 承担**。
+- 归一化会用 `/<\/?[a-z][\s\S]*>/i` **嗅探 HTML** ⇒ **存量纯文本绝不能进这条路径**（含 `a<b` 会被当 HTML 解析）。`TextBlock` 的回落分支走 `<p>{text}</p>` 由 React 转义，是唯一安全的写法。
+- 外层必须是 `<div>` 而非 `<p>`（富文本自带 `<p>`，套 `<p>` 是非法 HTML）。
+- **`options.textAlign = false` 无效**（Puck 把默认值合并在后面），那 4 个对齐按钮去不掉。
+- **运行时成本**：`@tiptap/html` 的 node 版每次调用 `new Window()`（happy-dom），约 3–8ms/字段/请求。产物成本早已付出（happy-dom 与 tiptap 早就在 `apps/site/.next/standalone` 里，因为 `rsc.mjs` 无条件调 `useRichtextProps`）。
+- **⚠️ XSS 让步（明确记录，不是遗漏）**：`dangerouslySetInnerHTML` 没有消失，只是从我们写变成 Puck 写。编辑器产出的 HTML 很干净（Tiptap 的 `DOMSerializer` 转义文本、Link 扩展对 href 有协议白名单），但**接口绕过编辑器** —— 手工 PUT `content: "<img src=x onerror=...>"` 即可执行脚本。影响面限于「租户在自己域名下执行任意 JS」（admin token 走 Bearer 头、不在站点 cookie 里）。**待办：后端在保存 `content` 时做一次服务端白名单消毒。**
+
+### 区块结构：`.jff-band > .jff-section` 两层
+
+**9 个 section 统一为两层**（含 Cta/Form）：外层 `.jff-band` 通栏（背景 + 纵向留白），内层 `.jff-section` 版心（max-width + 横向留白）。默认无背景时两层与原来的单层几何等价。背景要铺满视口就必须这样分层。
+
+### 外观出口与深色反白
+
+9 个 section + Form 共用一组字段：`background`（无/浅灰/品牌浅底/深色）、`spacing`（默认/无/紧凑/宽松）、`columns`（仅栅格区块）。存的是**语义值**（`"canvas"` / `"tight"`），不是 CSS 类名 —— 映射表在 `shared.ts` 的 `bgClass`/`padClass`/`colsClass`，访客端的 `SiteFormBlock` 也用同一套。
+
+- **深色反白靠令牌继承**：`.jff-bg-dark` 在 band 元素上重定义 `--jff-color-text*` / `--jff-color-border*`，整棵子树自动反白 —— 不需要逐个组件传 `tone`。这是 §13 令牌契约的直接红利。
+- **背景色必须取独立令牌 `--jff-color-dark`**：若拿 `--jff-color-text` 当自己的背景，同一条规则里又把它覆盖成白色，会自噬成白底。
+- **`.jff-surface` 复位**：卡片是一个「面」，反白色块不改变它内部的文字与线。加在三种卡片、评价卡、Faq 折叠项、Form 占位壳上。**不加就会出现白底卡片里的白字。**
+- **留白走变量 `--jff-band-py`**（不是直接写 `padding-block`）：一处生效、无特异性之争，且租户的选择在桌面与手机两端都被尊重（不会在断点里被默认值盖掉）。
+
+### 分栏容器 `Columns`
+
+用 Puck 原生 `slot`（`SlotField`，RSC 经 `SlotRenderPure` 真渲染，无深度限制；slot 数据是 `props.<名字>` 下的裸数组，不污染 `data.zones`，所以 `parseContent`/`isEmptyPuckData` 一行都不用改）。
+
+- **4 个槽必须无条件调用** (`col1({ className: "jff-col" })`) —— slot 是函数，不调就什么都不渲染。
+- **不设「列数」字段**：列数由 auto-fit 算、空栏用 `:empty` 折叠。按列数条件调用会让隐藏栏的内容**静默消失但仍在数据里**。
+- 栅格下界**必须 240px**（4×240+3×24=1032 ≤ 1080 ⇒ 恰好 4 条轨道；用 260 会退化成 3 条 + 换行）。
+- **只中和 `.jff-section`**（结构性：版心/居中，栏内无意义），**不中和 `.jff-band`**（视觉性：背景+内边距，栏内依然成立）。
+- `:empty` 在**编辑器里不成立是必需的** —— 空栏必须能当拖放目标。
+
+### 已知脆弱点（未修，记录备查）
+
+**18 个区块都直接 `items.map(...)` / `images.map(...)`，不兜底**。编辑器保存的节点一定带 `defaultProps`，所以线上不可达；但**手工构造或迁移不完整的节点会让整个页面 500**（不是只崩那个区块）。Puck 自身对未知组件类型是静默跳过的，所以这个「一处崩全页」的行为与它的容错哲学不一致。要修的话是每个区块解构处加 `items = []`。

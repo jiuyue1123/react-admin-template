@@ -1,7 +1,14 @@
 import type { ComponentConfig } from "@puckeditor/core";
 import { BlockStyles } from "./block-styles";
 import { SectionHeading } from "./SectionHeading";
-import { SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
+import {
+  bgClass,
+  padClass,
+  BLOCK_BACKGROUND_FIELD,
+  SECTION_SPACING_FIELD,
+  SECTION_SUBTITLE_FIELD,
+  SECTION_TITLE_FIELD,
+} from "./shared";
 import { themeVar } from "../theme";
 
 // ---------------------------------------------------------------------------
@@ -9,7 +16,13 @@ import { themeVar } from "../theme";
 // ---------------------------------------------------------------------------
 
 export type TimelineItem = { year: string; title: string; description: string };
-export type TimelineProps = { title: string; subtitle: string; items: TimelineItem[] };
+export type TimelineProps = {
+  title: string;
+  subtitle: string;
+  items: TimelineItem[];
+  background: string;
+  spacing: string;
+};
 
 const SAMPLE_ITEMS: TimelineItem[] = [
   { year: "2022", title: "公司成立", description: "在北京成立，组建初始团队。" },
@@ -24,9 +37,10 @@ const SAMPLE_ITEMS: TimelineItem[] = [
 export const TimelineConfig: ComponentConfig<TimelineProps> = {
   label: "发展历程",
 
-  render({ title, subtitle, items, puck }) {
+  render({ title, subtitle, items, background, spacing, puck }) {
+    const bandCls = ["jff-band", "jff-timeline", bgClass(background), padClass(spacing)].filter(Boolean).join(" ");
     return (
-      <section ref={puck.dragRef} className="jff-band jff-timeline">
+      <section ref={puck.dragRef} className={bandCls}>
         <BlockStyles />
         <div className="jff-section">
           <SectionHeading title={title} subtitle={subtitle} />
@@ -77,6 +91,8 @@ export const TimelineConfig: ComponentConfig<TimelineProps> = {
     title: "发展历程",
     subtitle: "发展中的关键节点",
     items: SAMPLE_ITEMS,
+    background: "",
+    spacing: "",
   },
 
   fields: {
@@ -93,5 +109,7 @@ export const TimelineConfig: ComponentConfig<TimelineProps> = {
         description: { type: "textarea", label: "描述" },
       },
     },
+    background: BLOCK_BACKGROUND_FIELD,
+    spacing: SECTION_SPACING_FIELD,
   },
 };

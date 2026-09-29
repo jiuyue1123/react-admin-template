@@ -1,7 +1,18 @@
 import type { ComponentConfig } from "@puckeditor/core";
 import { BlockStyles } from "./block-styles";
 import { SectionHeading } from "./SectionHeading";
-import { getIconNode, ICON_OPTIONS, SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
+import {
+  bgClass,
+  colsClass,
+  getIconNode,
+  GRID_COLUMNS_FIELD,
+  ICON_OPTIONS,
+  padClass,
+  BLOCK_BACKGROUND_FIELD,
+  SECTION_SPACING_FIELD,
+  SECTION_SUBTITLE_FIELD,
+  SECTION_TITLE_FIELD,
+} from "./shared";
 import { themeVar } from "../theme";
 
 // ---------------------------------------------------------------------------
@@ -9,7 +20,14 @@ import { themeVar } from "../theme";
 // ---------------------------------------------------------------------------
 
 export type ValueItem = { icon: string; title: string; description: string };
-export type ValuesCardsProps = { title: string; subtitle: string; items: ValueItem[] };
+export type ValuesCardsProps = {
+  title: string;
+  subtitle: string;
+  items: ValueItem[];
+  background: string;
+  spacing: string;
+  columns: string;
+};
 
 const SAMPLE_ITEMS: ValueItem[] = [
   { icon: "heart", title: "客户第一", description: "把客户需求放在首位。" },
@@ -24,15 +42,17 @@ const SAMPLE_ITEMS: ValueItem[] = [
 export const ValuesCardsConfig: ComponentConfig<ValuesCardsProps> = {
   label: "价值观",
 
-  render({ title, subtitle, items, puck }) {
+  render({ title, subtitle, items, background, spacing, columns, puck }) {
+    const bandCls = ["jff-band", "jff-values", bgClass(background), padClass(spacing)].filter(Boolean).join(" ");
+    const gridCls = ["jff-grid", colsClass(columns)].filter(Boolean).join(" ");
     return (
-      <section ref={puck.dragRef} className="jff-band jff-values">
+      <section ref={puck.dragRef} className={bandCls}>
         <BlockStyles />
         <div className="jff-section">
           <SectionHeading title={title} subtitle={subtitle} />
-          <div className="jff-grid">
+          <div className={gridCls}>
             {items.map((item, i) => (
-              <div key={i} className="jff-values__card" style={{ textAlign: "center" }}>
+              <div key={i} className="jff-values__card jff-surface" style={{ textAlign: "center" }}>
                 <div
                   style={{
                     width: 56,
@@ -67,6 +87,9 @@ export const ValuesCardsConfig: ComponentConfig<ValuesCardsProps> = {
     title: "我们的价值观",
     subtitle: "我们做事的原则",
     items: SAMPLE_ITEMS,
+    background: "",
+    spacing: "",
+    columns: "",
   },
 
   fields: {
@@ -83,5 +106,8 @@ export const ValuesCardsConfig: ComponentConfig<ValuesCardsProps> = {
         description: { type: "textarea", label: "描述" },
       },
     },
+    columns: GRID_COLUMNS_FIELD,
+    background: BLOCK_BACKGROUND_FIELD,
+    spacing: SECTION_SPACING_FIELD,
   },
 };

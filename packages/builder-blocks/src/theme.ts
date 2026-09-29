@@ -56,6 +56,9 @@ export const SITE_THEME = {
   // ── 面与线 ──
   colorSurface: "#ffffff",
   colorCanvas: "#f7f8fa",
+  /** 深色底。**必须是独立令牌**：深色区块要把 --jff-color-text 翻成白色，
+     若拿 --jff-color-text 当自己的背景色，会在同一个元素上被自己覆盖成白底。 */
+  colorDark: "#1f2329",
   colorBorder: "#e5e6eb",
   colorBorderStrong: "#d9d9d9",
 

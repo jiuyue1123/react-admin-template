@@ -1,7 +1,7 @@
 import type { ComponentConfig } from "@puckeditor/core";
 import { BlockStyles } from "./block-styles";
 import { SectionHeading } from "./SectionHeading";
-import { SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
+import { padClass, SECTION_SPACING_FIELD, SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
 import { resolveColor, themeVar } from "../theme";
 
 // ---------------------------------------------------------------------------
@@ -14,6 +14,7 @@ export type CtaProps = {
   buttonText: string;
   buttonLink: string;
   backgroundColor: string;
+  spacing: string;
 };
 
 const BG_OPTIONS = [
@@ -30,7 +31,7 @@ const BG_OPTIONS = [
 export const CtaConfig: ComponentConfig<CtaProps> = {
   label: "行动号召",
 
-  render({ title, subtitle, buttonText, buttonLink, backgroundColor, puck }) {
+  render({ title, subtitle, buttonText, buttonLink, backgroundColor, spacing, puck }) {
     // 深色底判定**必须用原始字段值**（字面量比较）。若改成 resolveColor(...)，
     // "#1677ff" 会变成 "var(--jff-color-brand)"，字符串比较静默失配，
     // 深色分支失效、CTA 变成浅底白字。规则：判定用原值，写样式用解析值。
@@ -44,7 +45,7 @@ export const CtaConfig: ComponentConfig<CtaProps> = {
     return (
       <section
         ref={puck.dragRef}
-        className="jff-band jff-cta"
+        className={["jff-band", "jff-cta", padClass(spacing)].filter(Boolean).join(" ")}
         style={{
           textAlign: "center",
           borderRadius: themeVar("radiusLg"),
@@ -81,6 +82,7 @@ export const CtaConfig: ComponentConfig<CtaProps> = {
     buttonText: "联系我们",
     buttonLink: "",
     backgroundColor: "#f5f7fa",
+    spacing: "",
   },
 
   fields: {
@@ -88,6 +90,8 @@ export const CtaConfig: ComponentConfig<CtaProps> = {
     subtitle: SECTION_SUBTITLE_FIELD,
     buttonText: { type: "text", label: "按钮文字" },
     buttonLink: { type: "text", label: "按钮链接" },
+    // Cta 用自己的一套背景（含渐变与深色反白判定），不接共享的 background 字段
     backgroundColor: { type: "select", label: "背景", options: [...BG_OPTIONS] },
+    spacing: SECTION_SPACING_FIELD,
   },
 };

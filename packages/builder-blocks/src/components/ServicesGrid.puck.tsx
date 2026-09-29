@@ -1,7 +1,18 @@
 import type { ComponentConfig } from "@puckeditor/core";
 import { BlockStyles } from "./block-styles";
 import { SectionHeading } from "./SectionHeading";
-import { getIconNode, ICON_OPTIONS, SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
+import {
+  bgClass,
+  colsClass,
+  getIconNode,
+  GRID_COLUMNS_FIELD,
+  ICON_OPTIONS,
+  padClass,
+  BLOCK_BACKGROUND_FIELD,
+  SECTION_SPACING_FIELD,
+  SECTION_SUBTITLE_FIELD,
+  SECTION_TITLE_FIELD,
+} from "./shared";
 import { themeVar } from "../theme";
 
 // ---------------------------------------------------------------------------
@@ -9,7 +20,14 @@ import { themeVar } from "../theme";
 // ---------------------------------------------------------------------------
 
 export type ServiceItem = { icon: string; title: string; description: string };
-export type ServicesGridProps = { title: string; subtitle: string; items: ServiceItem[] };
+export type ServicesGridProps = {
+  title: string;
+  subtitle: string;
+  items: ServiceItem[];
+  background: string;
+  spacing: string;
+  columns: string;
+};
 
 const SAMPLE_ITEMS: ServiceItem[] = [
   { icon: "rocket", title: "快速部署", description: "开箱即用，无需从零搭建。" },
@@ -24,15 +42,17 @@ const SAMPLE_ITEMS: ServiceItem[] = [
 export const ServicesGridConfig: ComponentConfig<ServicesGridProps> = {
   label: "服务卡片",
 
-  render({ title, subtitle, items, puck }) {
+  render({ title, subtitle, items, background, spacing, columns, puck }) {
+    const bandCls = ["jff-band", "jff-services", bgClass(background), padClass(spacing)].filter(Boolean).join(" ");
+    const gridCls = ["jff-grid", colsClass(columns)].filter(Boolean).join(" ");
     return (
-      <section ref={puck.dragRef} className="jff-band jff-services">
+      <section ref={puck.dragRef} className={bandCls}>
         <BlockStyles />
         <div className="jff-section">
           <SectionHeading title={title} subtitle={subtitle} />
-          <div className="jff-grid">
+          <div className={gridCls}>
             {items.map((item, i) => (
-              <div key={i} className="jff-services__card">
+              <div key={i} className="jff-services__card jff-surface">
                 {getIconNode(item.icon) && (
                   <div style={{ fontSize: 28, color: themeVar("colorBrand"), marginBottom: 14 }}>
                     {getIconNode(item.icon)}
@@ -56,6 +76,9 @@ export const ServicesGridConfig: ComponentConfig<ServicesGridProps> = {
     title: "我们的服务",
     subtitle: "我们能为您做这些",
     items: SAMPLE_ITEMS,
+    background: "",
+    spacing: "",
+    columns: "",
   },
 
   fields: {
@@ -72,5 +95,8 @@ export const ServicesGridConfig: ComponentConfig<ServicesGridProps> = {
         description: { type: "textarea", label: "描述" },
       },
     },
+    columns: GRID_COLUMNS_FIELD,
+    background: BLOCK_BACKGROUND_FIELD,
+    spacing: SECTION_SPACING_FIELD,
   },
 };

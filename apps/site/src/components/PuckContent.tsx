@@ -41,11 +41,13 @@ export default function PuckContent({
   // 区块库里的 `FormConfig` 能通过类型检查，靠的正是同一个显式标注。
   const formOverride: ComponentConfig<FormBlockProps> = {
     ...FormConfig,
-    render: ({ formKey, title, description }) => (
+    render: ({ formKey, title, description, background, spacing }) => (
       <SiteFormBlock
         formKey={formKey}
         title={title}
         description={description}
+        background={background}
+        spacing={spacing}
         sourcePage={sourcePage}
       />
     ),

@@ -1,7 +1,16 @@
 import type { ComponentConfig } from "@puckeditor/core";
 import { BlockStyles } from "./block-styles";
 import { SectionHeading } from "./SectionHeading";
-import { SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
+import {
+  bgClass,
+  colsClass,
+  GRID_COLUMNS_FIELD,
+  padClass,
+  BLOCK_BACKGROUND_FIELD,
+  SECTION_SPACING_FIELD,
+  SECTION_SUBTITLE_FIELD,
+  SECTION_TITLE_FIELD,
+} from "./shared";
 import { themeVar } from "../theme";
 
 // ---------------------------------------------------------------------------
@@ -9,7 +18,14 @@ import { themeVar } from "../theme";
 // ---------------------------------------------------------------------------
 
 export type StepItem = { title: string; description: string };
-export type ProcessStepsProps = { title: string; subtitle: string; items: StepItem[] };
+export type ProcessStepsProps = {
+  title: string;
+  subtitle: string;
+  items: StepItem[];
+  background: string;
+  spacing: string;
+  columns: string;
+};
 
 const SAMPLE_ITEMS: StepItem[] = [
   { title: "需求沟通", description: "了解您的业务目标与需求" },
@@ -24,13 +40,15 @@ const SAMPLE_ITEMS: StepItem[] = [
 export const ProcessStepsConfig: ComponentConfig<ProcessStepsProps> = {
   label: "流程步骤",
 
-  render({ title, subtitle, items, puck }) {
+  render({ title, subtitle, items, background, spacing, columns, puck }) {
+    const bandCls = ["jff-band", "jff-steps", bgClass(background), padClass(spacing)].filter(Boolean).join(" ");
+    const gridCls = ["jff-grid", colsClass(columns)].filter(Boolean).join(" ");
     return (
-      <section ref={puck.dragRef} className="jff-band jff-steps">
+      <section ref={puck.dragRef} className={bandCls}>
         <BlockStyles />
         <div className="jff-section">
           <SectionHeading title={title} subtitle={subtitle} />
-          <div className="jff-grid">
+          <div className={gridCls}>
             {items.map((item, i) => (
               <div key={i} style={{ textAlign: "center", padding: "0 8px" }}>
                 <div
@@ -68,6 +86,9 @@ export const ProcessStepsConfig: ComponentConfig<ProcessStepsProps> = {
     title: "合作流程",
     subtitle: "从沟通到上线",
     items: SAMPLE_ITEMS,
+    background: "",
+    spacing: "",
+    columns: "",
   },
 
   fields: {
@@ -83,5 +104,8 @@ export const ProcessStepsConfig: ComponentConfig<ProcessStepsProps> = {
         description: { type: "textarea", label: "描述" },
       },
     },
+    columns: GRID_COLUMNS_FIELD,
+    background: BLOCK_BACKGROUND_FIELD,
+    spacing: SECTION_SPACING_FIELD,
   },
 };

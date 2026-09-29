@@ -125,9 +125,41 @@ const CSS = `
 }
 
 /* Cta / Form 是通栏色带，纵向留白一直是 56px（比内容区块的 48px 多一点，
-   色带有背景、需要更足的呼吸感）。保持原值。 */
+   色带有背景、需要更足的呼吸感）。只设变量、不改属性，这样租户在「上下留白」
+   字段里选的档位（特异性 0,2,0）仍然能盖过它。 */
 .jff-band.jff-cta,
-.jff-band.jff-form { padding-block: var(--jff-space-section-y, ${SITE_THEME.spaceSectionY}); }
+.jff-band.jff-form { --jff-band-py: var(--jff-space-section-y, ${SITE_THEME.spaceSectionY}); }
+
+/* 上下留白档位。走变量而不是直接写 padding-block —— 一处生效、无特异性之争，
+   且租户的选择在桌面与手机两端都被尊重（不会在断点里被默认值盖掉）。
+   值刻意是字面量而不是令牌：它们是「版式档位」，不是主题色。 */
+.jff-band.jff-pad-none { --jff-band-py: 0px; }
+.jff-band.jff-pad-tight { --jff-band-py: 32px; }
+.jff-band.jff-pad-loose { --jff-band-py: 80px; }
+
+/* 区块背景（精选色板）。深色同时做两件事：铺底 + 把文字/线条令牌翻成反白。
+   反白靠**令牌继承**实现 —— 所有区块都读 var(--jff-color-text*)，所以在
+   band 上重定义即可让整棵子树换肤，不需要逐个组件传 tone。 */
+.jff-bg-canvas { background: var(--jff-color-canvas, ${SITE_THEME.colorCanvas}); }
+.jff-bg-brand { background: var(--jff-color-brand-subtle, ${SITE_THEME.colorBrandSubtle}); }
+.jff-bg-dark {
+  background: var(--jff-color-dark, ${SITE_THEME.colorDark});
+  --jff-color-text: #ffffff;
+  --jff-color-text-secondary: rgba(255, 255, 255, 0.78);
+  --jff-color-text-tertiary: rgba(255, 255, 255, 0.56);
+  --jff-color-border: rgba(255, 255, 255, 0.18);
+  --jff-color-border-strong: rgba(255, 255, 255, 0.32);
+}
+/* 卡片是一个「面」：反白色块不改变它内部的文字与线。
+   不复位的话，白底卡片里会出现白字（反白令牌被继承进卡片）。
+   面/底色令牌**不翻转**，卡片保持浅底。 */
+.jff-bg-dark .jff-surface {
+  --jff-color-text: ${SITE_THEME.colorText};
+  --jff-color-text-secondary: ${SITE_THEME.colorTextSecondary};
+  --jff-color-text-tertiary: ${SITE_THEME.colorTextTertiary};
+  --jff-color-border: ${SITE_THEME.colorBorder};
+  --jff-color-border-strong: ${SITE_THEME.colorBorderStrong};
+}
 
 /* 版心档位（由区块自己的 class 设定在外层 .jff-band 上，靠继承给内层 .jff-section） */
 .jff-faq { --jff-section-max: 720px; }
@@ -163,6 +195,12 @@ const CSS = `
   gap: var(--jff-space-gap, ${SITE_THEME.spaceGap});
   grid-template-columns: repeat(auto-fit, minmax(min(var(--jff-grid-min, 260px), 100%), 1fr));
 }
+
+/* 列数档位。特异性与 .jff-grid 相同、写在它之后，所以能盖过自适应；
+   而 640px 断点里的单列规则又写在这些之后，手机上仍然强制单列。 */
+.jff-grid--c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.jff-grid--c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.jff-grid--c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
 /* 栅格列宽下界档位 */
 .jff-steps { --jff-grid-min: 180px; }
@@ -216,9 +254,9 @@ const CSS = `
 /* ---------------- 移动端降级 ---------------- */
 @media (max-width: 640px) {
   .jff-section { padding-inline: 20px; }
-  .jff-band { padding-block: 32px; }
+  .jff-band { padding-block: var(--jff-band-py, 32px); }
   .jff-band.jff-cta,
-  .jff-band.jff-form { padding-block: 40px; }
+  .jff-band.jff-form { --jff-band-py: 40px; }
   .jff-heading { margin-bottom: 24px; }
   .jff-title { font-size: 22px; }
   .jff-subtitle { font-size: 14px; }

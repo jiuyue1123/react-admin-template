@@ -1,4 +1,4 @@
-import { BlockStyles, SectionHeading } from '@jff/builder-blocks'
+import { BlockStyles, SectionHeading, bgClass, padClass } from '@jff/builder-blocks'
 import { getRequestHost } from '@/lib/site'
 import { getForm } from '@/lib/site-api'
 import SiteFormSubmit from './SiteFormSubmit'
@@ -15,11 +15,16 @@ export default async function SiteFormBlock({
   formKey,
   title,
   description,
+  background,
+  spacing,
   sourcePage,
 }: {
   formKey: string
   title: string
   description: string
+  /** 外观字段，与区块库共用同一套 class 映射（见 @jff/builder-blocks 的 shared.ts） */
+  background?: string
+  spacing?: string
   /** 提交时带上的来源页面 path（后端不读 Referer，必须显式传） */
   sourcePage: string
 }) {
@@ -32,8 +37,10 @@ export default async function SiteFormBlock({
   // 表单不存在（被删、或 key 改过）：**静默不渲染** —— 访客不该看到内部错误
   if (!form) return null
 
+  const bandCls = ['jff-band', 'jff-form', bgClass(background), padClass(spacing)].filter(Boolean).join(' ')
+
   return (
-    <section className="jff-band jff-form">
+    <section className={bandCls}>
       {/* 样式表必须自己挂载：这张表原先只有 Button/Form 区块才会输出，
           而本组件正是 Form 区块在站点端的替代实现 —— 不挂就没有 .jff-band。 */}
       <BlockStyles />

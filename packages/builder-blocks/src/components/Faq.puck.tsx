@@ -1,7 +1,14 @@
 import type { ComponentConfig } from "@puckeditor/core";
 import { BlockStyles } from "./block-styles";
 import { SectionHeading } from "./SectionHeading";
-import { SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
+import {
+  bgClass,
+  padClass,
+  BLOCK_BACKGROUND_FIELD,
+  SECTION_SPACING_FIELD,
+  SECTION_SUBTITLE_FIELD,
+  SECTION_TITLE_FIELD,
+} from "./shared";
 import { themeVar } from "../theme";
 
 // ---------------------------------------------------------------------------
@@ -9,7 +16,13 @@ import { themeVar } from "../theme";
 // ---------------------------------------------------------------------------
 
 export type FaqItem = { question: string; answer: string };
-export type FaqProps = { title: string; subtitle: string; items: FaqItem[] };
+export type FaqProps = {
+  title: string;
+  subtitle: string;
+  items: FaqItem[];
+  background: string;
+  spacing: string;
+};
 
 const SAMPLE_ITEMS: FaqItem[] = [
   { question: "服务怎么收费？", answer: "方案按业务规模分档，具体价格请联系我们。" },
@@ -24,9 +37,10 @@ const SAMPLE_ITEMS: FaqItem[] = [
 export const FaqConfig: ComponentConfig<FaqProps> = {
   label: "常见问题",
 
-  render({ title, subtitle, items, puck }) {
+  render({ title, subtitle, items, background, spacing, puck }) {
+    const bandCls = ["jff-band", "jff-faq", bgClass(background), padClass(spacing)].filter(Boolean).join(" ");
     return (
-      <section ref={puck.dragRef} className="jff-band jff-faq">
+      <section ref={puck.dragRef} className={bandCls}>
         <BlockStyles />
         <div className="jff-section">
           <SectionHeading title={title} subtitle={subtitle} />
@@ -34,6 +48,7 @@ export const FaqConfig: ComponentConfig<FaqProps> = {
             {items.map((item, i) => (
               <details
                 key={i}
+                className="jff-surface"
                 style={{
                   border: `1px solid ${themeVar("colorBorder")}`,
                   borderRadius: 12,
@@ -75,6 +90,8 @@ export const FaqConfig: ComponentConfig<FaqProps> = {
     title: "常见问题",
     subtitle: "关于我们，您可能想了解这些",
     items: SAMPLE_ITEMS,
+    background: "",
+    spacing: "",
   },
 
   fields: {
@@ -90,5 +107,7 @@ export const FaqConfig: ComponentConfig<FaqProps> = {
         answer: { type: "textarea", label: "回答" },
       },
     },
+    background: BLOCK_BACKGROUND_FIELD,
+    spacing: SECTION_SPACING_FIELD,
   },
 };

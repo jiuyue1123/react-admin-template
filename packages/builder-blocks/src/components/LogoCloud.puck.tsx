@@ -2,7 +2,14 @@ import type { ComponentConfig } from "@puckeditor/core";
 import { BlockStyles } from "./block-styles";
 import { MediaField } from "./media-field";
 import { SectionHeading } from "./SectionHeading";
-import { SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
+import {
+  bgClass,
+  padClass,
+  BLOCK_BACKGROUND_FIELD,
+  SECTION_SPACING_FIELD,
+  SECTION_SUBTITLE_FIELD,
+  SECTION_TITLE_FIELD,
+} from "./shared";
 import { themeVar } from "../theme";
 
 // ---------------------------------------------------------------------------
@@ -10,7 +17,13 @@ import { themeVar } from "../theme";
 // ---------------------------------------------------------------------------
 
 export type LogoItem = { name: string; logo: string };
-export type LogoCloudProps = { title: string; subtitle: string; items: LogoItem[] };
+export type LogoCloudProps = {
+  title: string;
+  subtitle: string;
+  items: LogoItem[];
+  background: string;
+  spacing: string;
+};
 
 const SAMPLE_ITEMS: LogoItem[] = [
   { name: "公司 A", logo: "" },
@@ -26,9 +39,10 @@ const SAMPLE_ITEMS: LogoItem[] = [
 export const LogoCloudConfig: ComponentConfig<LogoCloudProps> = {
   label: "合作伙伴",
 
-  render({ title, subtitle, items, puck }) {
+  render({ title, subtitle, items, background, spacing, puck }) {
+    const bandCls = ["jff-band", "jff-logocloud", bgClass(background), padClass(spacing)].filter(Boolean).join(" ");
     return (
-      <section ref={puck.dragRef} className="jff-band jff-logocloud">
+      <section ref={puck.dragRef} className={bandCls}>
         <BlockStyles />
         <div className="jff-section">
           <SectionHeading title={title} subtitle={subtitle} />
@@ -64,6 +78,8 @@ export const LogoCloudConfig: ComponentConfig<LogoCloudProps> = {
     title: "合作伙伴",
     subtitle: "以下是我们合作的部分企业",
     items: SAMPLE_ITEMS,
+    background: "",
+    spacing: "",
   },
 
   fields: {
@@ -83,5 +99,7 @@ export const LogoCloudConfig: ComponentConfig<LogoCloudProps> = {
         },
       },
     },
+    background: BLOCK_BACKGROUND_FIELD,
+    spacing: SECTION_SPACING_FIELD,
   },
 };

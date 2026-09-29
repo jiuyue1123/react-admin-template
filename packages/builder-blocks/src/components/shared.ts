@@ -147,3 +147,69 @@ export function getIconNode(icon: string): ReactNode | undefined {
 
 export const SECTION_TITLE_FIELD = { type: "text", label: "标题" } as const;
 export const SECTION_SUBTITLE_FIELD = { type: "textarea", label: "副标题" } as const;
+
+// ---------------------------------------------------------------------------
+// 区块外观字段 —— 9 个 section 区块共用同一组出口
+//
+// 存的是**语义值**（"canvas" / "tight" / "3"），不是 CSS 类名：类名是实现细节，
+// 写进租户数据里会让数据与样式表耦合。映射表在下面，改名只动一处。
+// ---------------------------------------------------------------------------
+
+export const BLOCK_BACKGROUND_FIELD = {
+  type: "select",
+  label: "背景",
+  options: [
+    { label: "无", value: "" },
+    { label: "浅灰", value: "canvas" },
+    { label: "品牌浅底", value: "brand" },
+    { label: "深色（文字反白）", value: "dark" },
+  ],
+} as const;
+
+export const SECTION_SPACING_FIELD = {
+  type: "select",
+  label: "上下留白",
+  options: [
+    { label: "默认", value: "" },
+    { label: "无", value: "none" },
+    { label: "紧凑", value: "tight" },
+    { label: "宽松", value: "loose" },
+  ],
+} as const;
+
+/** 仅供栅格类区块（服务卡片 / 价值观 / 团队 / 流程） */
+export const GRID_COLUMNS_FIELD = {
+  type: "select",
+  label: "列数",
+  options: [
+    { label: "自适应", value: "" },
+    { label: "2 列", value: "2" },
+    { label: "3 列", value: "3" },
+    { label: "4 列", value: "4" },
+  ],
+} as const;
+
+const BG_CLASS: Record<string, string> = {
+  canvas: "jff-bg-canvas",
+  brand: "jff-bg-brand",
+  dark: "jff-bg-dark",
+};
+const PAD_CLASS: Record<string, string> = {
+  none: "jff-pad-none",
+  tight: "jff-pad-tight",
+  loose: "jff-pad-loose",
+};
+const COLS_CLASS: Record<string, string> = { "2": "jff-grid--c2", "3": "jff-grid--c3", "4": "jff-grid--c4" };
+
+/**
+ * 三个独立的小映射：外观字段 → class 片段（未选则空串）。
+ *
+ * ⚠️ 这三个字段在 render 里必须容忍 `undefined` —— 编辑器会合并 `defaultProps`，
+ * 而访客端的 RSC 渲染**不合并**（`rsc.mjs` 直接用 `item.props`），所以线上拿到的
+ * 可能是缺字段的老节点。
+ *
+ * 分三个而不是合成一个：背景/留白落在 `.jff-band` 上，列数必须落在栅格元素上。
+ */
+export const bgClass = (value?: string): string => (value && BG_CLASS[value]) || "";
+export const padClass = (value?: string): string => (value && PAD_CLASS[value]) || "";
+export const colsClass = (value?: string): string => (value && COLS_CLASS[value]) || "";

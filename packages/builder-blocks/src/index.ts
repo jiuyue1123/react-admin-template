@@ -118,6 +118,9 @@ export type { FormFieldProps, FormFieldComponent } from "./components/form-field
 export { FormConfig } from "./components/Form.puck.tsx";
 export type { FormBlockProps } from "./components/Form.puck.tsx";
 export { BlockStyles } from "./components/block-styles.tsx";
+// 区块外观字段 → class 映射。访客端的表单实现（apps/site）也要用同一套，
+// 否则租户给区块选的背景/留白在线上不生效。
+export { bgClass, padClass, colsClass } from "./components/shared.ts";
 // 区块标题的唯一实现 —— 访客端的表单区块也用它，否则「编辑器预览 = 线上」做不到
 export { SectionHeading } from "./components/SectionHeading.tsx";
 export type { SectionHeadingTone } from "./components/SectionHeading.tsx";

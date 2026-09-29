@@ -2,7 +2,16 @@ import type { ComponentConfig } from "@puckeditor/core";
 import { BlockStyles } from "./block-styles";
 import { MediaField } from "./media-field";
 import { SectionHeading } from "./SectionHeading";
-import { SECTION_SUBTITLE_FIELD, SECTION_TITLE_FIELD } from "./shared";
+import {
+  bgClass,
+  colsClass,
+  GRID_COLUMNS_FIELD,
+  padClass,
+  BLOCK_BACKGROUND_FIELD,
+  SECTION_SPACING_FIELD,
+  SECTION_SUBTITLE_FIELD,
+  SECTION_TITLE_FIELD,
+} from "./shared";
 import { themeVar } from "../theme";
 
 // ---------------------------------------------------------------------------
@@ -10,7 +19,14 @@ import { themeVar } from "../theme";
 // ---------------------------------------------------------------------------
 
 export type MemberItem = { avatar: string; name: string; role: string; bio: string };
-export type TeamMembersProps = { title: string; subtitle: string; items: MemberItem[] };
+export type TeamMembersProps = {
+  title: string;
+  subtitle: string;
+  items: MemberItem[];
+  background: string;
+  spacing: string;
+  columns: string;
+};
 
 const SAMPLE_ITEMS: MemberItem[] = [
   { avatar: "", name: "张三", role: "创始人 / CEO", bio: "十年行业经验，带队从零搭建产品体系。" },
@@ -25,17 +41,19 @@ const SAMPLE_ITEMS: MemberItem[] = [
 export const TeamMembersConfig: ComponentConfig<TeamMembersProps> = {
   label: "团队成员",
 
-  render({ title, subtitle, items, puck }) {
+  render({ title, subtitle, items, background, spacing, columns, puck }) {
+    const bandCls = ["jff-band", "jff-team", bgClass(background), padClass(spacing)].filter(Boolean).join(" ");
+    const gridCls = ["jff-grid", colsClass(columns)].filter(Boolean).join(" ");
     return (
-      <section ref={puck.dragRef} className="jff-band jff-team">
+      <section ref={puck.dragRef} className={bandCls}>
         <BlockStyles />
         <div className="jff-section">
           <SectionHeading title={title} subtitle={subtitle} />
-          <div className="jff-grid">
+          <div className={gridCls}>
             {items.map((item, i) => (
               <div
                 key={i}
-                className="jff-team__card"
+                className="jff-team__card jff-surface"
                 style={{
                   textAlign: "center",
                 }}
@@ -90,6 +108,9 @@ export const TeamMembersConfig: ComponentConfig<TeamMembersProps> = {
     title: "我们的团队",
     subtitle: "以下是团队主要成员",
     items: SAMPLE_ITEMS,
+    background: "",
+    spacing: "",
+    columns: "",
   },
 
   fields: {
@@ -111,5 +132,8 @@ export const TeamMembersConfig: ComponentConfig<TeamMembersProps> = {
         bio: { type: "textarea", label: "简介" },
       },
     },
+    columns: GRID_COLUMNS_FIELD,
+    background: BLOCK_BACKGROUND_FIELD,
+    spacing: SECTION_SPACING_FIELD,
   },
 };

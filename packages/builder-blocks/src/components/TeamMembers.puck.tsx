@@ -92,8 +92,8 @@ export const TeamMembersConfig: ComponentConfig<TeamMembersProps> = {
                 <h3 style={{ fontSize: 17, fontWeight: 600, margin: "0 0 4px", color: themeVar("colorText") }}>
                   {item.name}
                 </h3>
-                <div style={{ fontSize: 13, color: themeVar("colorBrand"), marginBottom: 10 }}>{item.role}</div>
-                <p style={{ fontSize: 13, lineHeight: 1.7, color: themeVar("colorTextSecondary"), margin: 0 }}>
+                <div style={{ fontSize: 14, color: themeVar("colorBrand"), marginBottom: 10 }}>{item.role}</div>
+                <p style={{ fontSize: 14, lineHeight: 1.7, color: themeVar("colorTextSecondary"), margin: 0 }}>
                   {item.bio}
                 </p>
               </div>

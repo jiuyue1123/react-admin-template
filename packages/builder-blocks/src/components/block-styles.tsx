@@ -283,6 +283,30 @@ const CSS = `
   background: var(--jff-color-canvas, ${SITE_THEME.colorCanvas});
 }
 
+/* 卡片 hover：只换边框色，不做位移 —— 营销页上的卡片是静态内容，
+   浮起/缩放这类动效容易显得廉价，也更容易在触屏上误触。 */
+.jff-services__card,
+.jff-team__card,
+.jff-testimonials__card {
+  transition: border-color 0.2s ease;
+}
+.jff-services__card:hover,
+.jff-team__card:hover,
+.jff-testimonials__card:hover {
+  border-color: var(--jff-color-brand, ${SITE_THEME.colorBrand});
+}
+
+/* Faq 展开指示：details[open] 时旋转 90°，纯 CSS，零 JS */
+.jff-faq__mark {
+  float: right;
+  width: 14px;
+  height: 14px;
+  margin-top: 4px;
+  color: var(--jff-color-text-tertiary, ${SITE_THEME.colorTextTertiary});
+  transition: transform 0.2s ease;
+}
+details[open] > summary .jff-faq__mark { transform: rotate(90deg); }
+
 /* ---------------- 富文本正文 ----------------
    内容来自 Puck 内置的 richtext 字段，DOM 形如
    <div class="jff-richtext"><div class="rich-text">…</div></div>。

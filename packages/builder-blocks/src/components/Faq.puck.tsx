@@ -66,7 +66,20 @@ export const FaqConfig: ComponentConfig<FaqProps> = {
                   }}
                 >
                   {item.question}
-                  <span style={{ float: "right", color: themeVar("colorTextTertiary"), fontWeight: 400 }}>+</span>
+                  {/* 展开指示：纯 CSS 旋转（details[open] 时转 90°）。
+                      以前是一个不变的 "+" 文本，展开后毫无反馈。 */}
+                  <svg
+                    className="jff-faq__mark"
+                    aria-hidden="true"
+                    viewBox="0 0 12 12"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M4.5 2.5 8 6l-3.5 3.5" />
+                  </svg>
                 </summary>
                 <div
                   style={{

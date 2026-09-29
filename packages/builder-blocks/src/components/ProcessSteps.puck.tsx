@@ -71,7 +71,7 @@ export const ProcessStepsConfig: ComponentConfig<ProcessStepsProps> = {
                 <h3 style={{ fontSize: 16, fontWeight: 600, margin: "0 0 6px", color: themeVar("colorText") }}>
                   {item.title}
                 </h3>
-                <p style={{ fontSize: 13, lineHeight: 1.6, color: themeVar("colorTextSecondary"), margin: 0 }}>
+                <p style={{ fontSize: 14, lineHeight: 1.6, color: themeVar("colorTextSecondary"), margin: 0 }}>
                   {item.description}
                 </p>
               </div>

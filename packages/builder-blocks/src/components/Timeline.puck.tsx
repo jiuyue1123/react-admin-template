@@ -70,7 +70,7 @@ export const TimelineConfig: ComponentConfig<TimelineProps> = {
                     boxSizing: "border-box",
                   }}
                 />
-                <div style={{ fontSize: 13, fontWeight: 600, color: themeVar("colorBrand"), marginBottom: 4 }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: themeVar("colorBrand"), marginBottom: 4 }}>
                   {item.year}
                 </div>
                 <h3 style={{ fontSize: 16, fontWeight: 600, margin: "0 0 6px", color: themeVar("colorText") }}>
